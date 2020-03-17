@@ -90,9 +90,10 @@ run_hook() {
 
 decompress() {
     case $1 in
-        *.bz2)      bzip2 -d ;;
+        *.bz2)      bzip2 -d  ;;
         *.xz)       xz -dcT 0 ;;
-        *.tgz|*.gz) gzip -d ;;
+        *.tgz|*.gz) gzip -d   ;;
+        *.zst)      zstd -d   ;;
     esac < "$1"
 }
 
@@ -516,6 +517,7 @@ pkg_tar() {
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
             gz)  gzip -6  ;;
+            zst) zstd -3  ;;
         esac \
     > "$bin_dir/$1#$version-$release.tar.${KISS_COMPRESS:=gz}"
 
