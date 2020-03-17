@@ -1,0 +1,13 @@
+KISS PACKAGE MANAGER
+====================
+
+My personal fork of [KISS] which is a simplistic
+package manager by Dylan Araps. Changes are minor
+but are things that wouldn't be/aren't liked by Dylan.
+
+I will follow upstream releases while maintaining my
+own changes. This fork will NOT be on the Carbs Linux
+repositories. I have plans for this in the future, just
+not yet.
+
+[KISS]: https://github.com/kisslinux/kiss
