@@ -1072,10 +1072,7 @@ pkg_install() {
     log "$pkg_name" "Installed successfully"
 }
 
-pkg_updates() {
-    # Check all installed packages for updates. So long as the installed
-    # version and the version in the repositories differ, it's considered
-    # an update.
+pkg_fetch() {
     log "Updating repositories"
 
     # Create a list of all repositories.
@@ -1141,6 +1138,13 @@ pkg_updates() {
             fi
         }
     done
+}
+
+pkg_updates(){
+    # Check all installed packages for updates. So long as the installed
+    # version and the version in the repositories differ, it's considered
+    # an update.
+    pkg_fetch
 
     log "Checking for new package versions"
 
@@ -1306,6 +1310,8 @@ args() {
             done
         ;;
 
+        f|fetch) pkg_fetch ;;
+
         i|install)
             pkg_order "$@"
 
@@ -1326,10 +1332,11 @@ args() {
         v|version) log kiss 1.8.1 ;;
 
         h|help|-h|--help|'')
-            log 'kiss [a|b|c|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
+            log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
             log 'alternatives: List and swap to alternatives'
             log 'build:        Build a package'
             log 'checksum:     Generate checksums'
+            log 'fetch:        Fetch repositories'
             log 'install:      Install a package'
             log 'list:         List installed packages'
             log 'remove:       Remove a package'
