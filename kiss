@@ -518,6 +518,7 @@ pkg_tar() {
             xz)  xz -zT 0 ;;
             gz)  gzip -6  ;;
             zst) zstd -3  ;;
+            *) gzip -6    ;;  # Fallback to gzip
         esac \
     > "$bin_dir/$1#$version-$release.tar.${KISS_COMPRESS:=gz}"
 
