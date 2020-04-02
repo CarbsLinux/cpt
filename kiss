@@ -379,17 +379,16 @@ pkg_strip() {
     #       it allows us to remove 'file' from the
     #       core repositories altogether.
     find "$pkg_dir/$1" -type f | while read -r file; do
-        case $(readelf -h "$file" 2>/dev/null) in
+        case $(readelf -h "$file") in
             *" DYN "*)  strip_opt=unneeded ;;
             *" EXEC "*) strip_opt=all ;;
             *" REL "*)  strip_opt=debug ;;
             *) continue
         esac
 
-        # Suppress errors here as some binaries and libraries may
-        # fail to strip. This is OK.
-        strip "--strip-$strip_opt" "$file" 2>/dev/null ||:
-    done
+        strip "--strip-$strip_opt" "$file" &&
+        printf 'Stripped %10s %s\n' "($strip_opt)" "${file##$pkg_dir/$1}"
+    done 2>/dev/null ||:
 }
 
 pkg_fixdeps() {
