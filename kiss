@@ -135,7 +135,7 @@ pkg_find() {
     # See [1] at top of script.
     # shellcheck disable=2046,2086
     set -- $(find "$@" "$sys_db/." \( ! -name . -prune \) \
-        ! -name .git -a -name "$query" -type d)
+        ! -name .git -a -name "$query" \( -type d -o -type l \))
 
     # A package may also not be found due to a repository not being
     # readable by the current user. Either way, we need to die here.
