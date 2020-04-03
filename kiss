@@ -1096,6 +1096,10 @@ pkg_fetch() {
             if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
                 git fetch
                 git merge
+                ! [ -e .gitmodules ] || {
+                    git submodule init
+                    git submodule update
+                }
 
             else
                 [ "$uid" = 0 ] || log "$PWD" "Need root to update"
@@ -1113,9 +1117,13 @@ pkg_fetch() {
                         log "Dropping permissions to $user for pull"
 
                     case $su in
-                        su) "$su" -c "git fetch && git merge" "$user" ;;
+                        su) "$su" -c "git fetch && git merge && { ! [ -e .gitmodules ] || { git submodule init ; git submodule update ;} ;}" "$user" ;;
                          *) "$su" -u "$user" git fetch
                             "$su" -u "$user" git merge
+                            ! [ -e .gitmodules ] || {
+                                "$su" -u "$user" git submodule init
+                                "$su" -u "$user" git submodule update
+                            }
                     esac
                 )
             fi
@@ -1303,7 +1311,7 @@ args() {
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.10.1-carbs ;;
+        v|version) log kiss 1.11-carbs ;;
 
         h|help|-h|--help|'')
             log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
