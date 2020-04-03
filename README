@@ -1,13 +1,26 @@
 KISS PACKAGE MANAGER
-====================
+--------------------
 
-My personal fork of [KISS] which is a simplistic
-package manager by Dylan Araps. Changes are minor
-but are things that wouldn't be/aren't liked by Dylan.
-
-I will follow upstream releases while maintaining my
-own changes. This fork will NOT be on the Carbs Linux
-repositories. I have plans for this in the future, just
-not yet.
+Package manager for Carbs Linux. Forked from [KISS]. All
+usage information can be obtained from the manual page.
 
 [KISS]: https://github.com/kisslinux/kiss
+
+Changes since fork
+------------------
+
+2020-04-04: Make manual page easily readable                db7a7e0a,e5f9936,4635df1
+2020-04-03: Add submodule support for KISS repositories     36654d0c
+2020-04-02: Add symlink support for packages                bca41604
+2020-03-18: Modify kiss-chbuild to install carbs-rootfs     c1058a80
+2020-03-18: Add fallback method during compression          82a25242
+2020-03-17: Add zstd compression support                    266047ff
+2020-03-09: Seperated pkg_update with a pkg_fetch function  64abd92a
+
+Background
+----------
+
+This used to be my personal fork of KISS, but I do think
+that it has matured enough to be used by default on Carbs
+Linux. I will still try to make sure to get upstream changes
+to ensure compatibility.
