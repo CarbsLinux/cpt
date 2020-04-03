@@ -118,24 +118,19 @@ pkg_find() {
     # Figure out which repository a package belongs to by
     # searching for directories matching the package name
     # in $KISS_PATH/*.
-    query=$1 match=$2
+    query=$1 match=$2 IFS=:; set --
 
-    # This ugly mess appends '/.' to the end of each path in
-    # '$KISS_PATH' as POSIX 'find' has no '-mindepth'/'-maxdepth'.
-    # See: https://unix.stackexchange.com/a/330372
-    IFS=:; set --
-    for path in $KISS_PATH; do set -- "$@" "$path/."; done
+    # Word splitting is intentional here.
+    # shellcheck disable=2086
+    for path in $KISS_PATH "$sys_db" ; do
+        set +f
+
+        for path2 in "$path/"$query; do
+            [ -d "$path2" ] && set -f -- "$@" "$path2"
+        done
+    done
+
     IFS=$old_ifs
-
-    # Find the repository containing a package.
-    # Searches installed packages if the package is absent
-    # from the repositories. This ugly mess is thanks to POSIX
-    # find which has no '-mindepth'/'-maxdepth', etc.
-    # See: https://unix.stackexchange.com/a/330372
-    # See [1] at top of script.
-    # shellcheck disable=2046,2086
-    set -- $(find "$@" "$sys_db/." \( ! -name . -prune \) \
-        ! -name .git -a -name "$query" \( -type d -o -type l \))
 
     # A package may also not be found due to a repository not being
     # readable by the current user. Either way, we need to die here.
@@ -1311,7 +1306,7 @@ args() {
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.11.0-carbs ;;
+        v|version) log kiss 1.11.1-carbs ;;
 
         h|help|-h|--help|'')
             log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
