@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+# Concatanate package files in the installed package database.
+# File names are printed to stderr.
+
+[ "$1" ] || { printf 'usage: %s <pkg> [file] [file]\n' "${0##*/}" ; exit 1;}
+kiss l "${pkg:=$1}" >/dev/null ; shift
+
+for file in ${*:-build depends sources version} ; do
+    [ -f "/var/db/kiss/installed/$pkg/$file" ] && {
+        printf '\033[1m%s:\033[m\n' "$file" >&2
+        cat "/var/db/kiss/installed/$pkg/$file"
+    }
+done
