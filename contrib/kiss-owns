@@ -8,7 +8,9 @@ file=$(readlink -f "$KISS_ROOT/${1##$KISS_ROOT}")
 
 # Check if the file exists and exit if it is not.
 [ -f "$file" ] || {
-    printf '%s\n' "error: file '$1' doesn't exist." >&2
+    [ -d "$file" ] && printf '%s\n' \
+        "error: please specify a file instead of a directory" >&2 ||
+        printf '%s\n' "error: file '$1' doesn't exist." >&2
     exit 1
 }
 
