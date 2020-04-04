@@ -1,11 +1,15 @@
 #!/bin/sh
 
 [ "$1" ] || {
-    printf 'usage: kiss-carg-urlgen [crate-ver] [crate-ver]\n'
+    printf 'usage: kiss-carg-urlgen [crate+ver] [crate+ver]\n'
     exit 1
 }
 
+# We convert the name-version seperator from '+' to '-' to
+# avoid issues that may arise from version numbers that include
+# a '-'.
+
 for crate in "$@"; do
     printf 'https://static.crates.io/crates/%s/%s.crate vendor\n' \
-        "${crate%-*}" "$crate"
+        "${crate%+*}" "$(echo "$crate" | sed 's/+/-/')"
 done
