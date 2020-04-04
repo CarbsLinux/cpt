@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Converts the given Cargo.lock file to static cargo urls
+
+[ -r "$1" ] || {
+    printf 'usage: %s <Cargo.lock file>\n' "${0##*/}"
+    exit 1
+}
+
+# Word splitting is intentional
+# shellcheck disable=2046
+set -- $(sed '/name =/b;/version =/b;d' "$1" |
+             sed 's/version = /#/g;s/name = //;s/"//g' |
+             tr '\n' ' ' | sed 's/ #/#/g')
+
+# We convert the name-version seperator to '#' and back to '-'
+# to avoid issues that may arise from version names with a '-'
+for crate in "$@" ; do
+    printf 'https://static.crates.io/crates/%s/%s.crate vendor\n' \
+           "${crate%#*}" "$crate" | sed 's/#/-/g'
+done
