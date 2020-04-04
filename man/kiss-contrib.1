@@ -1,0 +1,140 @@
+.TH KISS-CONTRIB 1 2020-04-04 "CARBS LINUX" "General Commands Manual"
+.SH NAME
+kiss utilities
+.SH DESCRIPTION
+This manual page is not for a single program, but for multiple
+utilities. Programs are explained in their own sections. They
+are listed alphabetically.
+.SH KISS-CARGO-URLGEN
+.B kiss-cargo-urlgen
+[pkg+ver] [pkg+ver]
+
+Creates a list of static cargo urls which can be added to the \fBsources\fR
+file of a \fIRust\fR package. It takes arguments as the package name, plus
+sign, and the version number.
+.SH KISS-CARGOLOCK-URLGEN
+.B kiss-cargolock-urlgen
+<Cargo.lock file>
+
+Does the same as \fBkiss-cargo-urlgen\fR, but gets the package and version
+information from a \fICargo.lock\fR file.
+.SH KISS-CAT
+.B kiss-cat
+<pkg> [file] [file]
+
+Concatanates a package's files inside the system database. If no file is
+specified, it looks for \fBbuild\fR, \fBdepends\fR, \fBsources\fR, and
+\fBversion\fR.
+.SH KISS-CHBUILD
+.B kiss-chbuild
+
+kiss-chbuild, creates a temporary rootfs, and chroots into it.
+
+If it doesn't already exist, kiss-chbuild downloads the rootfs tarball to
+your cache directory and extracts it into a \fBcarbs-chroot\fR directory.
+
+It then copies the chroot to a temporary directory, and runs kiss-chroot
+to it. It removes the temporary chroot after the user exits.
+.SH KISS-CHROOT
+.B kiss-chroot
+<directory>
+
+Mounts the required devices to the given directory, copies /etc/resolv.conf
+from host, and chroots into the given directory. Cleans up after exit.
+.SH KISS-DEPENDS
+.B kiss-depends
+<pkg>
+
+Checks the dependencies of an installed package.
+.SH KISS-DEPENDSFINDER
+.B kiss-depends-finder
+<pkg>
+
+Finds the missing dependencies of packages by checking linked libraries/files.
+.SH KISS-EXPORT
+.B kiss-export
+<pkg>
+
+Exports a package tarball of an installed package.
+.SH KISS-FORK
+.B kiss-fork
+<pkg>
+
+Copies the repository directory of the given package to the current working
+directory.
+.SH KISS-LINK
+.B kiss-link
+[file] [file]
+
+Links files from a package in the repository. It looks for the package by
+the directory name, but this can be overriden by getting a PKG environment
+value.
+
+.IP \fBExample:\fR
+.nf
+$ kiss-fork git
+forked package to /home/cem/.local/repositories/overrides/git
+$ cd git
+$ kiss-link checksums version sources
+linked /home/cem/.local/repositories/main/core/git/version to /home/cem/.local/repositories/overrides/git/version
+linked /home/cem/.local/repositories/main/core/git/sources to /home/cem/.local/repositories/overrides/git/sources
+linked /home/cem/.local/repositories/main/core/git/checksums to /home/cem/.local/repositories/overrides/git/checksums
+.fi
+.PP
+.SH KISS-MAINTAINER
+.B kiss-maintainer
+<pkg>
+
+Checks repository commit information of the given package to find out
+the maintainer of the package.
+.SH KISS-MANIFEST
+.B kiss-manifest
+<pkg>
+
+Prints the manifest file.
+.SH KISS-MANIFEST-TREE
+.B kiss-manifest-tree
+<pkg>
+
+Prints the manifest file in a tree view.
+.SH KISS-NEW
+.B kiss-new
+<name> [version] [sources]
+
+Creates a boilerplate KISS package.
+.SH KISS-ORPHANS
+.B kiss-orphans
+
+Shows orphaned packages. These packages do not have any dependent packages
+installed and can be removed.
+.SH KISS-OUTDATED
+.B kiss-outdated
+
+Checks \fIrepology.org\fR to see if any installed packages are outdated. This
+can be used to check if personal packages are outdated.
+.SH KISS-OWNS
+.B kiss-owns
+<file>
+
+Checks which package has installed the given file.
+.SH KISS-REPODEPENDS
+.B kiss-repodepends
+<pkg>
+
+Prints the dependencies of the given package as they are defined in the repository.
+.SH KISS-RESET
+.B kiss-reset
+
+Removes all packages except the base packages.
+.SH KISS-REVDEPENDS
+.B kiss-revdepends
+<pkg>
+
+Prints the packages that depend on the given package. (Reverse dependencies)
+.SH KISS-SIZE
+.B kiss-size
+<pkg>
+
+Prints the given package's size, and its individual files.
+.SH SEE ALSO
+kiss(1)
