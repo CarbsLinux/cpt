@@ -18,6 +18,12 @@ while read -r file; do
 done < "$KISS_ROOT/var/db/kiss/installed/$pkg/manifest"
 
 # Turn the list of files back into a package.
-tar czf "$pkg#$ver-$rel.tar.gz" -C / -- "$@"
+KISS_COMPRESS="${KISS_COMPRESS:-gz}"
+tar cf - -C / -- "$@" | case "$KISS_COMPRESS" in
+    bz2) bzip2 -z ;;
+    gz)  gzip -6  ;;
+    xz)  xz -zT 0 ;;
+    zst) zstd -3  ;;
+esac > "$pkg#$ver-$rel.tar.$KISS_COMPRESS"
 
-printf 'tarball created in %s\n' "$PWD/$pkg#$ver-$rel.tar.gz"
+printf 'tarball created in %s\n' "$PWD/$pkg#$ver-$rel.tar.$KISS_COMPRESS"
