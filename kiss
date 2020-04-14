@@ -1263,7 +1263,13 @@ args() {
 
     case $action in
         b|build|c|checksum|i|install|r|remove)
-            [ "$1" ] || set -- "${PWD##*/}" ; esac
+            [ "$1" ] || {
+                # We are exporting the KISS_PATH, so if another
+                # instance of 'kiss' is spawned from the current
+                # one, they continue to use the same KISS_PATH
+                export KISS_PATH="${PWD%/*}"
+                set -- "${PWD##*/}"
+            } ; esac
 
     # Actions can be abbreviated to their first letter. This saves
     # keystrokes once you memorize the commands.
