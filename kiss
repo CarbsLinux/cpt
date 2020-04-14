@@ -300,6 +300,12 @@ pkg_extract() {
                     die "$1" "Couldn't extract ${src##*/}"
             ;;
 
+            *://*.zip)
+                unzip "$src_dir/$1/${src##*/}" ||
+                    die "$1" "Couldn't extract ${src##*/}"
+
+            ;;
+
             *)
                 # Local file.
                 if [ -f "$repo_dir/$src" ]; then
