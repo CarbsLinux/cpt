@@ -436,13 +436,13 @@ pkg_fixdeps() {
             dep=$(readlink -f "$dep")
 
             # Figure out which package owns the file.
-            own=$("$grep" -lFx "${dep##$KISS_ROOT}" "$@")
+            own=$("$grep" -lFx "${dep#$KISS_ROOT}" "$@")
 
             # If the package wasn't found, retry by removing
             # the '/usr' prefix.
-            if [ -z "$own" ] && [ -z "${dep%%/usr*}" ]; then
+            if [ -z "$own" ] && [ -z "${dep##$KISS_ROOT/usr*}" ]; then
+                own=$("$grep" -lFx "${dep#$KISS_ROOT/usr}" "$@")
                 dep=${dep#/usr}
-                own=$("$grep" -lFx "${dep##$KISS_ROOT}" "$@")
             fi
 
             # Extract package name from 'grep' match.
