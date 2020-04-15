@@ -1267,7 +1267,7 @@ args() {
                 # We are exporting the KISS_PATH, so if another
                 # instance of 'kiss' is spawned from the current
                 # one, they continue to use the same KISS_PATH
-                export KISS_PATH="${PWD%/*}"
+                export KISS_PATH="${PWD%/*}:$KISS_PATH"
                 set -- "${PWD##*/}"
             } ; esac
 
