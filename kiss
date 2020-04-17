@@ -81,6 +81,8 @@ pop() {
 }
 
 run_hook() {
+    # This is not a misspelling, can be ignored safely.
+    # shellcheck disable=2153
     [ "$KISS_HOOK" ] || return 0
 
     log "$2" "Running $1 hook"
