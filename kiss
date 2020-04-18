@@ -1338,7 +1338,7 @@ args() {
         v|version) log kiss 1.12.3 ;;
 
         h|help|-h|--help|'')
-            log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
+            log 'kiss [a|b|c|f|i|l|r|s|ss|u|v] [pkg] [pkg] [pkg]'
             log 'alternatives: List and swap to alternatives'
             log 'build:        Build a package'
             log 'checksum:     Generate checksums'
