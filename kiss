@@ -120,7 +120,7 @@ pkg_find() {
     # Figure out which repository a package belongs to by
     # searching for directories matching the package name
     # in $KISS_PATH/*.
-    query=$1 IFS=:; set --
+    query=$1 match=$2 IFS=:; set --
 
     # Word splitting is intentional here.
     # shellcheck disable=2086
@@ -140,7 +140,7 @@ pkg_find() {
 
     # Show all search results if called from 'kiss search', else
     # print only the first match.
-    [ -t 1 ] && printf '%s\n' "$@" || printf '%s\n' "$1"
+    [ "$match" ] && printf '%s\n' "$@" || printf '%s\n' "$1"
 }
 
 pkg_list() {
@@ -1330,10 +1330,11 @@ args() {
             done
         ;;
 
-        b|build)   pkg_build "${@:?No packages installed}" ;;
-        l|list)    pkg_list "$@" ;;
-        u|update)  pkg_updates ;;
-        s|search)  for pkg do pkg_find "$pkg"; done ;;
+        b|build)         pkg_build "${@:?No packages installed}" ;;
+        l|list)          pkg_list "$@" ;;
+        u|update)        pkg_updates ;;
+        s|search)        for pkg do pkg_find "$pkg" all; done ;;
+        ss|singlesearch) for pkg do pkg_find "$pkg"; done ;;
         v|version) log kiss 1.12.3 ;;
 
         h|help|-h|--help|'')
@@ -1346,6 +1347,7 @@ args() {
             log 'list:         List installed packages'
             log 'remove:       Remove a package'
             log 'search:       Search for a package'
+            log 'singlesearch: Output the first match of a package'
             log 'update:       Check for updates'
             log 'version:      Package manager version'
         ;;
