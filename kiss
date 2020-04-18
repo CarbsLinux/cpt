@@ -1294,10 +1294,6 @@ args() {
             fi
         ;;
 
-        b|build)
-            pkg_build "${@:?No packages installed}"
-        ;;
-
         c|checksum)
             for pkg do pkg_lint    "$pkg" c; done
             for pkg do pkg_sources "$pkg" c; done
@@ -1334,6 +1330,7 @@ args() {
             done
         ;;
 
+        b|build)   pkg_build "${@:?No packages installed}" ;;
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg"; done ;;
