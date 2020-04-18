@@ -1335,7 +1335,7 @@ args() {
         u|update)        pkg_updates ;;
         s|search)        for pkg do pkg_find "$pkg" all; done ;;
         ss|singlesearch) for pkg do pkg_find "$pkg"; done ;;
-        v|version) log kiss 1.12.3 ;;
+        v|version) log kiss 1.13.0 ;;
 
         h|help|-h|--help|'')
             log 'kiss [a|b|c|f|i|l|r|s|ss|u|v] [pkg] [pkg] [pkg]'
