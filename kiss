@@ -1330,15 +1330,14 @@ args() {
             done
         ;;
 
-        b|build)         pkg_build "${@:?No packages installed}" ;;
-        l|list)          pkg_list "$@" ;;
-        u|update)        pkg_updates ;;
-        s|search)        for pkg do pkg_find "$pkg" all; done ;;
-        ss|singlesearch) for pkg do pkg_find "$pkg"; done ;;
-        v|version) log kiss 1.13.0 ;;
+        b|build)   pkg_build "${@:?No packages installed}" ;;
+        l|list)    pkg_list "$@" ;;
+        u|update)  pkg_updates ;;
+        s|search)  for pkg do pkg_find "$pkg" all; done ;;
+        v|version) log kiss 1.13.1 ;;
 
         h|help|-h|--help|'')
-            log 'kiss [a|b|c|f|i|l|r|s|ss|u|v] [pkg] [pkg] [pkg]'
+            log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
             log 'alternatives: List and swap to alternatives'
             log 'build:        Build a package'
             log 'checksum:     Generate checksums'
@@ -1347,7 +1346,6 @@ args() {
             log 'list:         List installed packages'
             log 'remove:       Remove a package'
             log 'search:       Search for a package'
-            log 'singlesearch: Output the first match of a package'
             log 'update:       Check for updates'
             log 'version:      Package manager version'
         ;;

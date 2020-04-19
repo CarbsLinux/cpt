@@ -2,4 +2,4 @@
 #
 # kiss-repodepends
 
-cat "$(kiss ss "$1")/depends" 2>/dev/null
+cat "$(kiss s "$1" | sed 1q)/depends" 2>/dev/null
