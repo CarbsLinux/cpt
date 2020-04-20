@@ -2,9 +2,7 @@
 #
 # Create/destroy temporary chroots.
 
-log() {
-    printf '\033[31;1m->\033[m %s.\n' "$@"
-}
+log() { printf '\033[31;1m->\033[m %s.\n' "$@" ;}
 
 clean() {
     log "Destroying chroot"
