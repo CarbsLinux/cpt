@@ -1422,7 +1422,10 @@ main() {
 
     # Make sure that the KISS_ROOT doesn't end with a '/'. This might
     # break some operations.
-    KISS_ROOT=${KISS_ROOT%/}
+    [ -z "$KISS_ROOT" ] || [ "${KISS_ROOT##*/}" ] || {
+        log warning "Your KISS_ROOT variable shouldn't end with '/'" "!>"
+        KISS_ROOT=${KISS_ROOT%/}
+    }
 
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
