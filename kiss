@@ -120,19 +120,19 @@ pkg_find() {
     # Figure out which repository a package belongs to by
     # searching for directories matching the package name
     # in $KISS_PATH/*.
-    query=$1 match=$2 IFS=:; set --
+    query=$1 match=$2
 
     # Word splitting is intentional here.
     # shellcheck disable=2086
-    for path in $KISS_PATH "$sys_db" ; do
+    IFS=: set -- $KISS_PATH "$sys_db"; searchpath="$*" ; set --
+
+    for path in $searchpath; do
         set +f
 
         for path2 in "$path/"$query; do
             [ -x "$path2" ] || [ -d "$path2" ] && set -f -- "$@" "$path2"
         done
     done
-
-    IFS=$old_ifs
 
     # A package may also not be found due to a repository not being
     # readable by the current user. Either way, we need to die here.
@@ -1072,8 +1072,8 @@ pkg_fetch() {
 
     # Create a list of all repositories.
     # See [1] at top of script.
-    # shellcheck disable=2046,2086
-    { IFS=:; set -- $KISS_PATH; IFS=$old_ifs; }
+    # shellcheck disable=2086
+    { IFS=: set -- $KISS_PATH; }
 
     # Update each repository in '$KISS_PATH'. It is assumed that
     # each repository is 'git' tracked.
@@ -1388,10 +1388,6 @@ main() {
     # instances to be run at once. Store the value in another variable so
     # that it doesn't change beneath us.
     pid=${KISS_PID:-$$}
-
-    # Store the original value of IFS so we can revert back to it if the
-    # variable is ever changed.
-    old_ifs=$IFS
 
     # Force the C locale to speed up things like 'grep' which disable unicode
     # etc when this is set. We don't need unicode and a speed up is always
