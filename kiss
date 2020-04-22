@@ -978,16 +978,23 @@ pkg_install() {
     # Extract the tar-ball to catch any errors before installation begins.
     decompress "$tar_file" | "$tar" pxf - -C "$tar_dir/$pkg_name"
 
-    log "$pkg_name" "Checking that all dependencies are installed"
-
     [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest" ] ||
         die "'${tar_file##*/}' is not a valid KISS package"
 
     # Ensure that the tarball's manifest is correct by checking that
     # each file and directory inside of it actually exists.
-    while read -r line; do [ -e "$tar_dir/$pkg_name/$line" ] ||
-        die "File $line missing from tarball but mentioned in manifest"
+    [ -z "$KISS_FORCE" ] && log "$pkg_name" "Checking package manifest" &&
+        while read -r line; do [ -e "$tar_dir/$pkg_name/$line" ] || {
+        log "File $line missing from tarball but mentioned in manifest" "" "!>"
+        TARBALL_FAIL=1
+        }
     done < "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest"
+    [ "$TARBALL_FAIL" ] && {
+        log "You can still install this package by setting KISS_FORCE variable"
+        die "$pkg_name" "Missing files in manifest"
+    }
+
+    log "$pkg_name" "Checking that all dependencies are installed"
 
     # Make sure that all run-time dependencies are installed prior to
     # installing the package.
