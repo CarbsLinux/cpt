@@ -984,7 +984,10 @@ pkg_install() {
     # Ensure that the tarball's manifest is correct by checking that
     # each file and directory inside of it actually exists.
     [ -z "$KISS_FORCE" ] && log "$pkg_name" "Checking package manifest" &&
-        while read -r line; do [ -e "$tar_dir/$pkg_name/$line" ] || {
+        while read -r line; do
+            # Skip symbolic links
+            [ -L "$tar_dir/$pkg_name/$line" ] && continue
+            [ -e "$tar_dir/$pkg_name/$line" ] || {
         log "File $line missing from tarball but mentioned in manifest" "" "!>"
         TARBALL_FAIL=1
         }
