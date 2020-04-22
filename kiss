@@ -870,21 +870,18 @@ pkg_install_files() {
             # The 'test' will run with '-e' for no-overwrite and '-z'
             # for overwrite.
             case $line in /etc/*) ;;
-                */) [ -d "$line" ]   || mkdir -m "$perms" "$line"    ;;
-                *) test "$1" "$line" || cp -Pp "$2/$line" "${line%/*}"  ;;
+                */) [ -d "$line" ] ||
+                        install -o root -g root -m "$perms" -d "$line" ;;
+                 *) test "$1" "$line" ||
+                        if [ -L "$2/$line" ]; then
+                            cp -fPp "$2/$line" "${line%/*}"
+                            chown -h root:root "$line"
+                        else
+                            install -o root -g root -m "$perms" "$2/$line" "$line"
+                        fi
             esac
 
-            # Set the ownership of the result to root:root.
-            chown root:root "$line"
-
-            # Preserve permissions by using chmod. This runs after
-            # chown as chown will reset suid/guid when ownership changes.
-            #
-            # This only runs on non-directories as we desire the reset
-            # behavior mentioned above.
-            [ -d "$line" ] || chmod "$perms" "$line"
-
-            printf '%s %s (%s)\e[K\r' "$3" "$i/$man_tot" "$line"
+            printf '%s %s (%s)\e[J\r' "$3" "$i/$man_tot" "$line"
         done
 
     printf '\n'
