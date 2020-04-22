@@ -859,7 +859,7 @@ pkg_install_files() {
     man_tot=$(wc -l < "$2/$pkg_db/${2##*/}/manifest")
 
     # Do a dictionary sort of the file so that we list directories first.
-    sort -d "$2/$pkg_db/${2##*/}/manifest" |
+    sort "$2/$pkg_db/${2##*/}/manifest" |
         while read -r line; do i=$((i+1))
             # Grab the permissions so that we can preserve them.
             perms=$(stat -c %a "$tar_dir/$pkg_name/$line")
