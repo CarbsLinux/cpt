@@ -1,5 +1,8 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # kiss-repodepends
+
+[ "$1" ] || { printf '%s\n' "usage: kiss-repodepends <pkg>" ; exit 1 ;}
+kiss s "$1" >/dev/null
 
 cat "$(kiss s "$1" | sed 1q)/depends" 2>/dev/null

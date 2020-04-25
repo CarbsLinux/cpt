@@ -2,17 +2,12 @@
 #
 # kiss-size - Show the size on disk for a package.
 
-db_dir=$KISS_ROOT/var/db/kiss/installed/${1-null}
-
-# Check if package is installed and exit if it is not.
-[ -d "$db_dir" ] || {
-    printf '%s\n' "error: '$1' not installed." >&2
-    exit 1
-}
+[ "$1" ] || { printf '%s\n' "usage: kiss-size <pkg>" ; exit 1 ;}
+kiss s "$1" >/dev/null
 
 # Filter directories from manifest and leave only files.
 # Directories in the manifest end in a trailing '/'.
-files=$(sed 's|.*/$||' "$db_dir/manifest")
+files=$(sed 's|.*/$||' "$KISS_ROOT/var/db/kiss/installed/$1/manifest")
 
 # Send the file list to 'du'.
 # This unquoted variable is safe as word splitting is intended

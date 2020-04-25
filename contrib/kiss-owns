@@ -2,6 +2,8 @@
 #
 # kiss-owns - Check which package owns a file.
 
+[ "$1" ] || { printf '%s\n' "usage: kiss-owns <file>" ; exit 1 ;}
+
 # Strip 'KISS_ROOT' from the file path if passed and
 # follow symlinks.
 file=$(readlink -f "$KISS_ROOT/${1##$KISS_ROOT}")
