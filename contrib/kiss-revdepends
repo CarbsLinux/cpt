@@ -2,6 +2,9 @@
 #
 # kiss-revdepends - Display packages which depend on package.
 
+[ "$1" ] || { printf '%s\n' "usage: kiss-revdepends <pkg>" ; exit 1 ;}
+kiss s "$1" >/dev/null
+
 # 'cd' to the database directory as a simple way of
 # stripping the path and performing a 'basename'.
 cd "$KISS_ROOT/var/db/kiss/installed"
