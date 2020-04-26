@@ -871,7 +871,7 @@ pkg_install_files() {
                         install -o root -g root -m "$rwx" \
                             -d "$KISS_ROOT/$line" ;;
                 *)  test "$1" "$KISS_ROOT/$line" ||
-                        if [ -L "$2/$line" ]; then
+                        if [ -h "$2/$line" ]; then
                             [ -d "$KISS_ROOT/$line" ] && continue
                             
                             cp -fPp "$2/$line" "${line%/*}"
@@ -1021,7 +1021,7 @@ pkg_install() {
     [ -z "$KISS_FORCE" ] && log "$pkg_name" "Checking package manifest" &&
         while read -r line; do
             # Skip symbolic links
-            [ -L "$tar_dir/$pkg_name/$line" ] && continue
+            [ -h "$tar_dir/$pkg_name/$line" ] && continue
             [ -e "$tar_dir/$pkg_name/$line" ] || {
         log "File $line missing from tarball but mentioned in manifest" "" "!>"
         TARBALL_FAIL=1
@@ -1081,11 +1081,11 @@ pkg_install() {
             rm -f "$file"
 
         # Remove file symlinks.
-        elif [ -L "$file" ] && [ ! -d "$file" ]; then
+        elif [ -h "$file" ] && [ ! -d "$file" ]; then
             unlink "$file" ||:
 
         # Skip directory symlinks.
-        elif [ -L "$file" ] && [ -d "$file" ]; then :
+        elif [ -h "$file" ] && [ -d "$file" ]; then :
 
         # Remove directories if empty.
         elif [ -d "$file" ]; then
