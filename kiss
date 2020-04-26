@@ -871,6 +871,8 @@ pkg_install_files() {
                         install -o root -g root -m "$perms" -d "$line" ;;
                 *)  test "$1" "$line" ||
                         if [ -L "$2/$line" ]; then
+                            [ -d "$2/$line" ] && continue
+                            
                             cp -fPp "$2/$line" "${line%/*}"
                             chown -h root:root "$line"
                         else
