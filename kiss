@@ -869,7 +869,11 @@ pkg_install_files() {
             case $line in /etc/*) ;;
                 */) [ -d "$line" ] ||
                         install -o root -g root -m "$rwx" \
-                            -d "$KISS_ROOT/$line" ;;
+                            -d "$KISS_ROOT/$line"
+
+                    chmod -s "$KISS_ROOT/$line"
+                ;;
+
                 *)  test "$1" "$KISS_ROOT/$line" ||
                         if [ -h "$2/$line" ]; then
                             [ -d "$KISS_ROOT/$line" ] && continue
