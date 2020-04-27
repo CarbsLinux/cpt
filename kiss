@@ -878,7 +878,7 @@ pkg_install_files() {
                         if [ -h "$2/$line" ]; then
                             [ -d "$KISS_ROOT/$line" ] && continue
                             
-                            cp -fPp "$2/$line" "${line%/*}"
+                            cp -fPp "$2/$line" "$KISS_ROOT/${line%/*}"
                             chown -h root:root "$KISS_ROOT/$line"
                         else
                             install -o root -g root -m "$rwx" \
@@ -1383,7 +1383,7 @@ args() {
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.14.2 ;;
+        v|version) log kiss 1.14.3 ;;
 
         h|help|-h|--help|'')
             log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
