@@ -855,48 +855,6 @@ pkg_swap() {
     mv -f "../installed/$1/manifest.tmp" "../installed/$1/manifest"
 }
 
-pkg_install_files() {
-    # Store the total lines in the manifest file for use in the
-    # installation counter output.
-    man_tot=$(wc -l < "$2/$pkg_db/${2##*/}/manifest")
-
-    # Do a dictionary sort of the file so that we list directories first.
-    sort "$2/$pkg_db/${2##*/}/manifest" |
-        while read -r line; do i=$((i+1))
-            # Grab the permissions so that we can preserve them.
-            rwx=$(stat -c %a "$tar_dir/$pkg_name/$line")
-
-            # Copy files and create directories (preserving permissions),
-            # skipping anything located in /etc/.
-            #
-            # The 'test' will run with '-e' for no-overwrite and '-z'
-            # for overwrite.
-            case $line in /etc/*) ;;
-                */) [ -d "$KISS_ROOT/$line" ] ||
-                        install -o root -g root -m "$rwx" \
-                            -d "$KISS_ROOT/$line"
-
-                    chmod -s "$KISS_ROOT/$line"
-                ;;
-
-                *)  test "$1" "$KISS_ROOT/$line" ||
-                        if [ -h "$2/$line" ]; then
-                            [ -d "$KISS_ROOT/$line" ] && continue
-                            
-                            cp -fPp "$2/$line" "$KISS_ROOT/${line%/*}"
-                            chown -h root:root "$KISS_ROOT/$line"
-                        else
-                            install -o root -g root -m "$rwx" \
-                                "$2/$line" "$KISS_ROOT/$line"
-                        fi
-            esac
-
-            printf '%s %s (%s)\e[J\r' "$3" "$i/$man_tot" "$line"
-        done
-
-    printf '\n'
-}
-
 pkg_etc() {
     [ -d "$tar_dir/$pkg_name/etc" ] || return 0
 
@@ -1071,9 +1029,16 @@ pkg_install() {
     cp -f "$sys_db/$pkg_name/manifest" "$mak_dir/m" 2>/dev/null ||:
     cp -f "$sys_db/$pkg_name/etcsums"  "$mak_dir/c" 2>/dev/null ||:
 
-    # The sort command is used to list directories first.
+    # This is repeated multiple times. Better to make it a function.
+    pkg_rsync() {
+        rsync --chown=root:root --chmod=Du-s,Dg-s,Do-s \
+              -WhHKa --no-compress --exclude /etc "${1:---}" \
+              "$tar_dir/$pkg_name/" "$KISS_ROOT/"
+    }
 
-    pkg_install_files -z "$tar_dir/$pkg_name" "Installing file"
+    # Install the package by using 'rsync' and overwrite any existing files
+    # (excluding '/etc/').
+    pkg_rsync --info=progress2
     pkg_etc
 
     # Remove any leftover files if this is an upgrade.
@@ -1103,7 +1068,7 @@ pkg_install() {
     done ||:
 
     log "$pkg_name" "Verifying installation"
-    pkg_install_files -e "$tar_dir/$pkg_name" "Checking file"
+    { pkg_rsync; pkg_rsync; } ||:
 
     # Reset 'trap' to its original value. Installation is done so
     # we no longer need to block 'Ctrl+C'.
