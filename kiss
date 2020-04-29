@@ -1297,7 +1297,7 @@ args() {
             # Rerun the script with 'su' if the user isn't root.
             # Cheeky but 'su' can't be used on shell functions themselves.
             [ -z "$1" ] || [ "$uid" = 0 ] || {
-                as_root kiss "$action" "$@"
+                as_root "$0" "$action" "$@"
                 return
             }
         ;;
@@ -1306,7 +1306,7 @@ args() {
             # Rerun the script with 'su' if the user isn't root.
             # Cheeky but 'su' can't be used on shell functions themselves.
             [ "$uid" = 0 ] || {
-                KISS_FORCE="$KISS_FORCE" as_root kiss "$action" "$@"
+                KISS_FORCE="$KISS_FORCE" as_root "$0" "$action" "$@"
                 return
             }
         ;;
