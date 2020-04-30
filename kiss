@@ -91,10 +91,11 @@ run_hook() {
 
 decompress() {
     case $1 in
-        *.bz2)      bzip2 -d  ;;
+        *.tar)      cat       ;;
+        *.bz2)      bzip2 -cd ;;
         *.xz)       xz -dcT 0 ;;
-        *.tgz|*.gz) gzip -d   ;;
-        *.zst)      zstd -d   ;;
+        *.tgz|*.gz) gzip -cd  ;;
+        *.zst)      zstd -cd  ;;
     esac < "$1"
 }
 
