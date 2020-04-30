@@ -949,7 +949,7 @@ pkg_remove() {
         else
             rm -f "$KISS_ROOT/$file"
         fi
-    done < "$sys_db/$1/manifest"
+    done < "$pkg_db/$1/manifest"
 
     # Reset 'trap' to its original value. Removal is done so
     # we no longer need to block 'Ctrl+C'.
