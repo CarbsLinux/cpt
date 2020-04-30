@@ -989,7 +989,7 @@ pkg_install() {
     [ -z "$KISS_FORCE" ] && log "$pkg_name" "Checking package manifest" &&
         while read -r line; do
             # Skip symbolic links
-            [ -h "$tar_dir/$pkg_name/$line" ] && continue
+            [ -h "$tar_dir/$pkg_name/$line" ] ||
             [ -e "$tar_dir/$pkg_name/$line" ] || {
         log "File $line missing from tarball but mentioned in manifest" "" "!>"
         TARBALL_FAIL=1
