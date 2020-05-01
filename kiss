@@ -1340,7 +1340,19 @@ args() {
             pkg_order "$@"
 
             for pkg in $order; do pkg_install "$pkg"; done
-            for pkg in $order; do cat "$sys_db/$pkg/message" 2>/dev/null ||:; done
+
+            # After installation is complete, show a list
+            # of messages from packages.
+            log "Retrieving message queue"
+            for pkg in $order; do
+                [ -f "$sys_db/$pkg/message" ] && {
+                    printf '%s\n\033[1m%s\033[m\n%s\n\n' \
+                           "==============================" \
+                           "$pkg" \
+                           "==============================" >&2
+                    cat "$sys_db/$pkg/message" >&2
+                }
+            done
         ;;
 
         r|remove)
