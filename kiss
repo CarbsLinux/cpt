@@ -1340,6 +1340,7 @@ args() {
             pkg_order "$@"
 
             for pkg in $order; do pkg_install "$pkg"; done
+            for pkg in $order; do cat "$sys_db/$pkg/message" 2>/dev/null ||:; done
         ;;
 
         r|remove)
