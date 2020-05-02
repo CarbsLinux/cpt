@@ -1369,15 +1369,18 @@ args() {
 
             # After installation is complete, show a list
             # of messages from packages.
-            log "Retrieving message queue"
+            log "Retrieving post-installation message queue"
+            unset msg
             for pkg in $order; do
-                [ -f "$sys_db/$pkg/message" ] && {
+                if [ -f "$sys_db/$pkg/message" ]; then
                     printf '%s\n\033[1m%s\033[m\n%s\n\n' \
                            "==============================" \
                            "$pkg" \
                            "==============================" >&2
                     cat "$sys_db/$pkg/message" >&2
-                }
+                    msg=1
+                fi
+                [ "$msg" ] || log "No message in queue"
             done
         ;;
 
