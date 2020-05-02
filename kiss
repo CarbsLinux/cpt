@@ -743,6 +743,17 @@ pkg_conflicts() {
 
     [ -s "$cac_dir/$pid-m" ] || return 0
 
+    # In rare cases where the system only has one package installed
+    # and you are reinstalling that package, grep will try to read from
+    # standard input if we continue here.
+    #
+    # Also, if we don't have any packages installed grep will give an
+    # error. This will not cause the installation to fail, but we don't
+    # need to check for conflicts if that's the case anyway. If we have
+    # only zero packages or one package, just stop wasting time and continue
+    # with the installation.
+    [ "$1" ] && [ -f "$1" ] || return 0
+
     # Enable alternatives automatically if it is safe to do so.
     # This checks to see that the package that is about to be installed
     # doesn't overwrite anything it shouldn't in '/var/db/kiss/installed'.
