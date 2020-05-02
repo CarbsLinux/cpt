@@ -499,7 +499,9 @@ pkg_etcsums() (
     # prior directory before being able to continue.
     cd "$pkg_dir/$1/etc" 2>/dev/null || return 0; cd ..
 
-    find etc -type f -exec sha256sum {} + > "$pkg_dir/$1/$pkg_db/$1/etcsums"
+    # Word splitting is intentional here
+    # shellcheck disable=2086
+    find etc -type f -exec $sha256sum {} + > "$pkg_dir/$1/$pkg_db/$1/etcsums"
 )
 
 pkg_tar() {
@@ -698,7 +700,7 @@ pkg_checksums() {
 
         # An easy way to get 'sha256sum' to print with the 'basename'
         # of files is to 'cd' to the file's directory beforehand.
-        (cd "$src_path" && sha256sum "${src##*/}") ||
+        (cd "$src_path" && $sha256sum "${src##*/}") ||
             die "$1" "Failed to generate checksums"
     done < "$repo_dir/sources"
 }
@@ -879,8 +881,8 @@ pkg_etc() {
 
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
-        { sum_new=$(sha256sum "$file")
-          sum_sys=$(cd "$KISS_ROOT/"; sha256sum "$file")
+        { sum_new=$($sha256sum "$file")
+          sum_sys=$(cd "$KISS_ROOT/"; $sha256sum "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
         log "$pkg_name" "Doing 3-way handshake for $file"
@@ -1475,6 +1477,11 @@ main() {
     # This would cause a prompt to pass while the user would be trying
     # to cancel, or the user would want to abort building a package.
     stty intr "^C"
+
+    # BSD systems make use of sha256 instead of sha256sum, which has a
+    # different argument control than sha256sum. This fallbacks to sha256
+    # where sha256sum isn't available
+    sha256sum=$(command -v sha256sum) || sha256sum="sha256 -r"
 
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
