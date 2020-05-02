@@ -99,6 +99,19 @@ decompress() {
     esac < "$1"
 }
 
+hashcheck() {
+    # This is a sha256sum function for outputting a standard
+    # hash digest. sha256 on BSD systems require an '-r' flag
+    # for outputting the same way with sha256sum, and still,
+    # it outputs a single space between the hash and the file
+    # whereas sha256sum outputs double spaces. It fallbacks to
+    # openssl, but that is rarely ever needed.
+    { sha256sum "$1" 2>/dev/null || sha256 -r "$1" 2>/dev/null ||
+          openssl dgst -r -sha256 "$1" || die "No sha256 program could be run." ;} |
+
+        while read -r hash file; do printf '%s  %s\n' "$hash" "${file#\*}"; done
+}
+
 pkg_lint() {
     # Check that each mandatory file in the package entry exists.
     log "$1" "Checking repository files"
@@ -499,9 +512,9 @@ pkg_etcsums() (
     # prior directory before being able to continue.
     cd "$pkg_dir/$1/etc" 2>/dev/null || return 0; cd ..
 
-    # Word splitting is intentional here
-    # shellcheck disable=2086
-    find etc -type f -exec $sha256sum {} + > "$pkg_dir/$1/$pkg_db/$1/etcsums"
+    find etc -type f | while read -r file; do
+        hashcheck "$file"
+    done > "$pkg_dir/$1/$pkg/db/$1/etcsums"
 )
 
 pkg_tar() {
@@ -700,7 +713,7 @@ pkg_checksums() {
 
         # An easy way to get 'sha256sum' to print with the 'basename'
         # of files is to 'cd' to the file's directory beforehand.
-        (cd "$src_path" && $sha256sum "${src##*/}") ||
+        (cd "$src_path" && hashcheck "${src##*/}") ||
             die "$1" "Failed to generate checksums"
     done < "$repo_dir/sources"
 }
@@ -881,8 +894,8 @@ pkg_etc() {
 
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
-        { sum_new=$($sha256sum "$file")
-          sum_sys=$(cd "$KISS_ROOT/"; $sha256sum "$file")
+        { sum_new=$(hashcheck "$file")
+          sum_sys=$(cd "$KISS_ROOT/"; hashcheck "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
         log "$pkg_name" "Doing 3-way handshake for $file"
@@ -1477,11 +1490,6 @@ main() {
     # This would cause a prompt to pass while the user would be trying
     # to cancel, or the user would want to abort building a package.
     stty intr "^C"
-
-    # BSD systems make use of sha256 instead of sha256sum, which has a
-    # different argument control than sha256sum. This fallbacks to sha256
-    # where sha256sum isn't available
-    sha256sum=$(command -v sha256sum) || sha256sum="sha256 -r"
 
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
