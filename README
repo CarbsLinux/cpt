@@ -9,6 +9,10 @@ usage information can be obtained from the manual page.
 Changes since fork
 ------------------
 
+2020-05-02: Added a fallback for hash checking              668ab43
+2020-05-01: Added kiss-changelog                            e2372b7
+2020-05-01: Added kiss-which                                6e78c84
+2020-04-29: Reverted to rsync                               f0215a5
 2020-04-05: Added a manual page for contrib                 1da63b9
 2020-04-04: Rewritten kiss-link in a simpler way            e4c1489
 2020-04-04: Added kiss-cargolock-urlgen                     565648c
