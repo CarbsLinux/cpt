@@ -25,6 +25,11 @@ information from a \fICargo.lock\fR file.
 Concatanates a package's files inside the system database. If no file is
 specified, it looks for \fBbuild\fR, \fBdepends\fR, \fBsources\fR, and
 \fBversion\fR.
+.SH KISS-CHANGELOG
+.B kiss-changelog
+<pkg>
+
+Shows a git log of the specified package in an oneline format
 .SH KISS-CHBUILD
 .B kiss-chbuild
 
@@ -136,5 +141,10 @@ Prints the packages that depend on the given package. (Reverse dependencies)
 <pkg>
 
 Prints the given package's size, and its individual files.
+.SH KISS-WHICH
+.B kiss-which
+<pkg>
+
+A \fIwhich\fR-like utility for KISS packages.
 .SH SEE ALSO
 kiss(1)
