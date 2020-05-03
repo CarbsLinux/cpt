@@ -504,13 +504,14 @@ pkg_manifest() (
 )
 
 pkg_etcsums() (
+    # This function runs as a sub-shell to avoid having to 'cd' back to the
+    # prior directory before being able to continue.
+    cd "$pkg_dir/$1/etc" 2>/dev/null || return 0; cd ..
+
     # Generate checksums for each configuration file in the package's
     # /etc/ directory for use in "smart" handling of these files.
     log "$1" "Generating etcsums"
 
-    # This function runs as a sub-shell to avoid having to 'cd' back to the
-    # prior directory before being able to continue.
-    cd "$pkg_dir/$1/etc" 2>/dev/null || return 0; cd ..
 
     find etc -type f | while read -r file; do
         hashcheck "$file"
