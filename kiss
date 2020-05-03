@@ -1167,7 +1167,7 @@ pkg_fetch() {
                 # ownership of files and directories in the rare
                 # case that the repository is owned by a 3rd user.
                 (
-                    user=$(stat -c %U "$PWD") || user=root
+                    user=$(kiss-stat "$PWD") || user=root
 
                     id -u "$user" >/dev/null 2>&1 ||
                         user=root
@@ -1353,7 +1353,7 @@ args() {
                     else
                         log "$pkg" "Need permissions to generate checksums"
 
-                        user=$(stat -c %U "$repo_dir") as_root tee "$repo_dir/checksums"
+                        user=$(kiss-stat "$repo_dir") as_root tee "$repo_dir/checksums"
                     fi
                 }
 
