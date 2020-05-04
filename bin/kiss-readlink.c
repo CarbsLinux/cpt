@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
     return(1);
   }
 
-  // fputs(buf,stdout);
   printf("%s\n", buf);
   return(0);
 }
