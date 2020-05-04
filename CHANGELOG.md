@@ -13,6 +13,8 @@ UNRELEASED
 ### Added
 - Added editorconfig file since we now have 4 languages (roff, Makefile, sh, C) in the repository.
 - Added `kiss-readlink` as a `readlink -f` replacement.
+- Added `kiss-message` for checking package messages.
+- Added this CHANGELOG
 
 ### Removed
 - Dropped the usage of `readlink` in `kiss`.
