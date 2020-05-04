@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (!realpath(argv[1], buf)) {
-    perror("realpath:");
+    perror("realpath");
     return(1);
   }
 
