@@ -6,10 +6,10 @@ CC        = cc
 
 all: kiss-stat kiss-readlink
 
-kiss-stat:
+kiss-stat: bin/kiss-stat.c
 	${CC} -o kiss-stat bin/kiss-stat.c
 
-kiss-readlink:
+kiss-readlink: bin/kiss-readlink.c
 	${CC} -o kiss-readlink bin/kiss-readlink.c
 
 clean:
