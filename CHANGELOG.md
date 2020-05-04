@@ -7,8 +7,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-UNRELEASED
-----------
+1.18.0 - 2020-05-04
+-------------------
 
 ### Added
 - Added editorconfig file since we now have 4 languages (roff, Makefile, sh, C) in the repository.
