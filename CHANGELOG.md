@@ -16,6 +16,9 @@ UNRELEASED
 - Added `kiss-message` for checking package messages.
 - Added this CHANGELOG
 
+### Changed
+- Made tar calls portable. `kiss` is no longer limited to busybox, bsdtar, or gnu tar!
+
 ### Removed
 - Dropped the usage of `readlink` in `kiss`.
 
