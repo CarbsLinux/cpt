@@ -310,9 +310,46 @@ pkg_extract() {
             # extraction. Other filetypes are simply copied to '$mak_dir'
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz)
-                decompress "$src_dir/$1/${src##*/}"  |
-                    "$tar" xf - --strip-components 1 ||
+                decompress "$src_dir/$1/${src##*/}"  | "$tar" xf - ||
                     die "$1" "Couldn't extract ${src##*/}"
+
+                # Again, decompress but to 'tar tf -' this time. We get the
+                # base files in the package. We use this to do our version
+                # of 'strip-components'.
+                decompress "$src_dir/$1/${src##*/}"  | "$tar" tf - |
+                    while read -r file; do
+                        printf '%s\n' "${file%%/*}"
+                    done | uniq |
+
+                    # For every directory in the base we move each file
+                    # to the upper directory.
+                    while read -r dir ; do
+                        # Skip if we are not dealing with a directory here.
+                        [ -d "$dir" ] || continue
+
+                        # Change into the directory in a subshell so we don't
+                        # need to cd back to the upper directory.
+                        (
+                            cd "$dir"
+
+                            # We use find because we want to move hidden files
+                            # as well.
+                            #
+                            # Skip the file if it has the same name as the directory.
+                            # We will deal with it later.
+                            find . \( ! -name . -prune \) \
+                                 ! -name "$dir" -exec mv {} .. +
+
+                            # If a file/directory with the same name as the directory
+                            # exists, append a '.kissbak' to it and move it to the
+                            # upper directory.
+                            ! [ -e "$dir" ] || mv "$dir" "../${dir}.kissbak"
+                        )
+                        rmdir "$dir"
+
+                        # If a backup file exists, move it into the original location.
+                        ! [ -e "${dir}.kissbak" ] || mv "${dir}.kissbak" "$dir"
+                done
             ;;
 
             *://*.zip)
