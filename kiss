@@ -310,21 +310,34 @@ pkg_extract() {
             # extraction. Other filetypes are simply copied to '$mak_dir'
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz)
-                decompress "$src_dir/$1/${src##*/}"  | "$tar" -xf - ||
-                    die "$1" "Couldn't extract ${src##*/}"
 
-                # Again, decompress but to 'tar tf -' this time. We get the
-                # base files in the package. We use this to do our version
-                # of 'strip-components'.
-                decompress "$src_dir/$1/${src##*/}"  | "$tar" -tf - |
-                    while read -r file; do
-                        printf '%s\n' "${file%%/*}"
-                    done | uniq |
+                # Remove the possible tar extensions so we can decompress it
+                # into that location.
+                src_tar="${src##*/}" src_tar="${src_tar%.tar*}" src_tar="${src_tar%.tgz}.tar"
+
+                # Skip decompression if the source is already a decompressed tarball
+                [ "$src_tar" = "${src##*/}" ] || {
+                    decompress "$src_dir/$1/${src##*/}" > "$src_dir/$1/$src_tar" ||
+                        die "$1" "Couldn't decompres ${src##*/}"
+                }
+
+                "$tar" -xf "$src_dir/$1/$src_tar" || die "$1" "Couldn't extract $src_tar"
+
+                # We now list the contents of the tarball so we can do our
+                # version of 'strip-components'.
+                "$tar" -tf "$src_dir/$1/$src_tar" |
+                    while read -r file; do printf '%s\n' "${file%%/*}"; done |
+
+                    # Do not repeat files.
+                    uniq |
 
                     # For every directory in the base we move each file
-                    # to the upper directory.
+                    # inside it to the upper directory.
                     while read -r dir ; do
+
                         # Skip if we are not dealing with a directory here.
+                        # This way we don't remove files on the upper directory
+                        # if a tar archive doesn't need directory stripping.
                         [ -d "$dir" ] || continue
 
                         # Change into the directory in a subshell so we don't
@@ -350,6 +363,9 @@ pkg_extract() {
                         # If a backup file exists, move it into the original location.
                         ! [ -e "${dir}.kissbak" ] || mv "${dir}.kissbak" "$dir"
                 done
+
+                # Remove the decompressed tarball if it isn't the original source
+                [ "$src_tar" = "${src##*/}" ] || rm -f "$src_dir/$1/$src_tar"
             ;;
 
             *://*.zip)
