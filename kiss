@@ -321,11 +321,11 @@ pkg_extract() {
                         die "$1" "Couldn't decompres ${src##*/}"
                 }
 
-                "$tar" -xf "$src_dir/$1/$src_tar" || die "$1" "Couldn't extract $src_tar"
+                "$tar" xf "$src_dir/$1/$src_tar" || die "$1" "Couldn't extract $src_tar"
 
                 # We now list the contents of the tarball so we can do our
                 # version of 'strip-components'.
-                "$tar" -tf "$src_dir/$1/$src_tar" |
+                "$tar" tf "$src_dir/$1/$src_tar" |
                     while read -r file; do printf '%s\n' "${file%%/*}"; done |
 
                     # Do not repeat files.
@@ -580,7 +580,7 @@ pkg_tar() {
     read -r version release < "$(pkg_find "$1")/version"
 
     # Create a tarball from the contents of the built package.
-    "$tar" -cf - -C "$pkg_dir/$1" . |
+    "$tar" cf - -C "$pkg_dir/$1" . |
         case ${KISS_COMPRESS:=gz} in
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
@@ -1059,7 +1059,7 @@ pkg_install() {
     log "$pkg_name" "Extracting $tar_file"
 
     # Extract the tarball to catch any errors before installation begins.
-    decompress "$tar_file" | "$tar" -pxf - -C "$tar_dir/$pkg_name"
+    decompress "$tar_file" | "$tar" pxf - -C "$tar_dir/$pkg_name"
 
     [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest" ] ||
         die "'${tar_file##*/}' is not a valid KISS package"
