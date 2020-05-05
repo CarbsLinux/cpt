@@ -7,6 +7,17 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+UNRELEASED
+----------
+
+### Changed
+- Removed the `-p` flag from tar while installing packages. busybox ignores it and we
+  don't need it.
+- Replaced tar flags with keys for historical compatibility.
+- `kiss` now decompresses a tarball once and uses the decompressed tarball for listing
+  and extraction
+
+
 1.18.0 - 2020-05-04
 -------------------
 
