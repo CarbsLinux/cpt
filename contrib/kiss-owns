@@ -1,6 +1,5 @@
 #!/bin/sh -e
-#
-# kiss-owns - Check which package owns a file.
+# Check which package owns a file
 
 [ "$1" ] || { printf '%s\n' "usage: kiss-owns <file>" ; exit 1 ;}
 

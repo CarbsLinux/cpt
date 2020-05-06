@@ -1,6 +1,5 @@
 #!/bin/sh
-
-# Converts the given Cargo.lock file to static cargo urls
+# Convert the given Cargo.lock file to sources
 
 case "$1" in
     -)  set -- /dev/stdin ;;

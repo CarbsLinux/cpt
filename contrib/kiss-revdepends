@@ -1,6 +1,5 @@
 #!/bin/sh -e
-#
-# kiss-revdepends - Display packages which depend on package.
+# Display packages which depend on package
 
 [ "$1" ] || { printf '%s\n' "usage: kiss-revdepends <pkg>" ; exit 1 ;}
 kiss s "$1" >/dev/null
