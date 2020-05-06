@@ -17,16 +17,16 @@ clean:
 
 install: all
 	mkdir -p ${DESTDIR}${BINDIR}
-	cp kiss kiss-stat kiss-readlink ${DESTDIR}${BINDIR}
+	cp -f kiss kiss-stat kiss-readlink ${DESTDIR}${BINDIR}
 	chmod 755 ${DESTDIR}${BINDIR}/kiss \
 		${DESTDIR}${BINDIR}/kiss-stat \
 		${DESTDIR}${BINDIR}/kiss-readlink
 	for bin in contrib/* ; do \
-		cp $${bin} ${DESTDIR}${BINDIR}/$${bin##*/}; \
+		cp -f $${bin} ${DESTDIR}${BINDIR}/$${bin##*/}; \
 		chmod 755 ${DESTDIR}${BINDIR}/$${bin##*/} ; done
 
 	mkdir -p ${DESTDIR}${MAN1}
-	for man in man/*.1 ; do cp $${man} ${DESTDIR}${MAN1}/$${man##*/}; \
+	for man in man/*.1 ; do cp -f $${man} ${DESTDIR}${MAN1}/$${man##*/}; \
 		chmod 644 ${DESTDIR}${MAN1}/$${man##*/} ; done
 
 
