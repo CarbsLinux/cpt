@@ -7,8 +7,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-UNRELEASED
-----------
+1.19.0 - 2020-05-06
+-------------------
 
 ### Added
 - Added `kiss-reporevdepends` for finding all the packages on the repository that depends
