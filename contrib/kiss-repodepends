@@ -1,6 +1,5 @@
 #!/bin/sh -e
-#
-# kiss-repodepends
+# Display a package's dependencies in the repository
 
 [ "$1" ] || { printf '%s\n' "usage: kiss-repodepends <pkg>" ; exit 1 ;}
 kiss s "$1" >/dev/null

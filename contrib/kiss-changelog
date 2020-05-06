@@ -1,5 +1,4 @@
 #!/bin/sh -e
-
 # Print the git log of the specific package
 
 [ "$1" ] || {
