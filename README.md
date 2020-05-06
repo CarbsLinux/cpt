@@ -22,3 +22,9 @@ This is _mostly_ a shell implementation rather than a pure one.
     bin/     -- for C programs.
     man/     -- for manual pages / documentation.
     contrib/ -- for Shell scripts that wrap around kiss.
+
+### Contributing
+
+Please see the [style and contribution guidelines].
+
+[style and contribution guidelines]: https://github.com/carbslinux/contributing
