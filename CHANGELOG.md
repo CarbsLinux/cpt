@@ -10,6 +10,10 @@ this project _somewhat_ adheres to [Semantic Versioning].
 UNRELEASED
 ----------
 
+### Added
+- Added `kiss-reporevdepends` for finding all the packages on the repository that depends
+  on the specified package.
+
 ### Changed
 - Removed the `-p` flag from tar while installing packages. busybox ignores it and we
   don't need it.
@@ -18,7 +22,8 @@ UNRELEASED
   and extraction
 
 ### Fixed
-- Fixed the output of docstrings in kiss
+- Fixed the output of docstrings in contrib scripts.
+- `kiss` now ignores the binary programs in the repository for `kiss extensions`.
 
 
 1.18.0 - 2020-05-04
