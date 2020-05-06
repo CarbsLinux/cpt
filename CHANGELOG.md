@@ -17,6 +17,9 @@ UNRELEASED
 - `kiss` now decompresses a tarball once and uses the decompressed tarball for listing
   and extraction
 
+### Fixed
+- Fixed the output of docstrings in kiss
+
 
 1.18.0 - 2020-05-04
 -------------------
