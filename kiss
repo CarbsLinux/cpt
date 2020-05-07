@@ -1375,6 +1375,10 @@ args() {
 
     # Actions can be abbreviated to their first letter. This saves
     # keystrokes once you memorize the commands.
+    #
+    # This is to fix a shellcheck warning when using $PATH
+    # in kiss extensions help string.
+    # shellcheck disable=2016
     case $action in
         a|alternatives)
             if [ "$1" = - ]; then
@@ -1479,7 +1483,7 @@ args() {
             log 'alternatives  List and swap to alternatives'
             log 'build         Build a package'
             log 'checksum      Generate checksums'
-            log 'extension     List available kiss extensions (kiss-* in \$PATH)'
+            log 'extension     List available kiss extensions (kiss-* in $PATH)'
             log 'fetch         Fetch repositories'
             log 'install       Install a package'
             log 'list          List installed packages'
