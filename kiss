@@ -1477,7 +1477,7 @@ args() {
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.19.0 ;;
+        v|version) log kiss 1.19.1 ;;
 
         h|help|-h|--help|'')
             exec 2>&1
