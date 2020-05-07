@@ -1426,9 +1426,6 @@ args() {
             log "Retrieving post-installation message queue"
             unset msg
 
-            [ "$KISS_COLOUR" ] || [ -t 1 ] &&
-                colour=1
-
             for pkg in $order; do
                 if [ -f "$sys_db/$pkg/message" ]; then
                     printf '%s\n%b%s%b\n%s\n\n' \
@@ -1444,8 +1441,6 @@ args() {
 
         e|extension)
             log "Installed extensions"
-            [ "$KISS_COLOUR" ] ||
-                [ -t 1 ] && colour=1
 
             set --
 
@@ -1577,10 +1572,15 @@ main() {
              "${bin_dir:=$cac_dir/bin}"
 
     # Disable colour escape sequences if running in a subshell.
-    # This behaviour can be disabled by adding a KISS_COLOUR
-    # variable to the environment.
-    [ "$KISS_COLOUR" ] || [ -t 1 ] ||
+    # This behaviour can be changed by adding a KISS_COLOUR
+    # variable to the environment. If it is set to 1 it will
+    # always enable colour escapes, and if set to 0 it will
+    # always disable colour escapes.
+    if [ "$KISS_COLOUR" = 1 ]; then colour=1
+    elif [ "$KISS_COLOUR" = 0 ] || [ -t 0 ]; then
         log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
+    else colour=1
+    fi
 
     args "$@"
 }
