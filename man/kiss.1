@@ -7,7 +7,7 @@ written in POSIX sh. Forked from KISS Linux.
 .PP
 .SH SYNOPSIS
 .IP kiss
-[a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]
+[a|b|c|e|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]
 .PP
 .SH OPTIONS
 .TP
@@ -16,6 +16,8 @@ written in POSIX sh. Forked from KISS Linux.
 \fBbuild\fR        Build a package
 .TP
 \fBchecksum\fR     Generate checksums
+.TP
+\fBextension\fR    List available kiss extensions
 .TP
 \fBfetch\fR        Fetch repositories
 .TP
@@ -159,6 +161,16 @@ in \fIbuild-test\fR.
 Unset by default.
 .IP
 export KISS_PID=
+.PP
+.SS ENABLING/DISABLING COLOUR
+
+If run in a subshell, \fBKISS\fR disables colour output. However, this behaviour
+can be overriden. If a user defines a \fIKISS_COLOUR\fR environment value, it will
+be enabled or disabled globally
+.IP
+export KISS_COLOUR=1 # Enables globally
+.IP
+export KISS_COLOUR=0 # Disables globally
 .PP
 .SH ALTERNATIVES SYSTEM
 When a package with conflicts is installed the conflicting
