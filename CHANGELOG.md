@@ -7,6 +7,22 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+UNRELEASED
+----------
+
+### Added
+- Added `e|extension` to `kiss` which can be used to output kiss-extensions.
+
+### Changed
+- `kiss` no longer outputs the extensions when called with `kiss help`. The
+  output was too large for an average terminal, and a user had to scroll up
+  for actual package manager options. These can now be retrieved with `kiss e`.
+- When called from a subshell, `kiss` disables colour escape sequences. This
+  behaviour can be overriden by setting `KISS_COLOUR` environment variable.
+  If set to 1, it will be enabled globally, if set to 0 it will be disabled
+  globally.
+
+
 1.19.0 - 2020-05-06
 -------------------
 
