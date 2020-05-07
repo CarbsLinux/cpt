@@ -1425,11 +1425,15 @@ args() {
             # of messages from packages.
             log "Retrieving post-installation message queue"
             unset msg
+
+            [ "$KISS_COLOUR" ] || [ -t 1 ] &&
+                colour=1
+
             for pkg in $order; do
                 if [ -f "$sys_db/$pkg/message" ]; then
-                    printf '%s\n\033[1m%s\033[m\n%s\n\n' \
+                    printf '%s\n%b%s%b\n%s\n\n' \
                            "==============================" \
-                           "$pkg" \
+                           "${colour:+"\033[1m"}" "$pkg" "${colour:+"\033[m"}" \
                            "==============================" >&2
                     cat "$sys_db/$pkg/message" >&2
                     msg=1
@@ -1440,6 +1444,8 @@ args() {
 
         e|extension)
             log "Installed extensions"
+            [ "$KISS_COLOUR" ] ||
+                [ -t 1 ] && colour=1
 
             set --
 
@@ -1452,8 +1458,9 @@ args() {
                 # These are binary files so they should be ignored
                 contains "readlink stat" "$path" && continue
 
-                 printf '\033[31;1m->\033[m %-*s  ' "$max" "${path#*/kiss-}"
-                 sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
+                printf '%b->%b %-*s  ' "${colour:+"\033[1;31m"}" "${colour:+"\033[m"}" \
+                    "$max" "${path#*/kiss-}"
+                sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
              done | sort -uk1 >&2
 
         ;;
@@ -1568,6 +1575,12 @@ main() {
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
+
+    # Disable colour escape sequences if running in a subshell.
+    # This behaviour can be disabled by adding a KISS_COLOUR
+    # variable to the environment.
+    [ "$KISS_COLOUR" ] || [ -t 1 ] ||
+        log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
 
     args "$@"
 }
