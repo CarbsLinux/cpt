@@ -172,6 +172,13 @@ export KISS_COLOUR=1 # Enables globally
 .IP
 export KISS_COLOUR=0 # Disables globally
 .PP
+.SS DISABLING PROMPTS
+User can disable prompts by setting a \fIKISS_NOPROMPT\fR environment value. This
+can be useful for scripting purposes.
+
+.IP
+KISS_NOPROMPT=1 kiss b pkg1 pkg2
+.PP
 .SH ALTERNATIVES SYSTEM
 When a package with conflicts is installed the conflicting
 files will be added as "choices" to the alternatives system.

@@ -39,6 +39,11 @@ contains() {
 }
 
 prompt() {
+    # If a KISS_NOPROMPT variable is set, continue.
+    # This can be useful for installation scripts and
+    # bootstrapping.
+    [ "$KISS_NOPROMPT" ] && return 0
+
     # Ask the user for some input.
     [ "$1" ] && log "$1"
     log "Continue?: Press Enter to continue or Ctrl+C to abort here"
@@ -1477,7 +1482,7 @@ args() {
         l|list)    pkg_list "$@" ;;
         u|update)  pkg_updates ;;
         s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.19.1 ;;
+        v|version) log kiss 1.20.0 ;;
 
         h|help|-h|--help|'')
             exec 2>&1

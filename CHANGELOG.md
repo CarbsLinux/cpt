@@ -7,6 +7,12 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+1.20.0 - 2020-05-07
+-------------------
+
+### Added
+- `KISS_NOPROMPT` can be specified in order to skip prompts
+
 1.19.1 - 2020-05-07
 -------------------
 
