@@ -1581,7 +1581,7 @@ main() {
     # always enable colour escapes, and if set to 0 it will
     # always disable colour escapes.
     if [ "$KISS_COLOUR" = 1 ]; then colour=1
-    elif [ "$KISS_COLOUR" = 0 ] || [ -t 0 ]; then
+    elif [ "$KISS_COLOUR" = 0 ] || ! [ -t 1 ]; then
         log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
     else colour=1
     fi
