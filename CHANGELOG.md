@@ -105,7 +105,7 @@ UNRELEASED
 - New message queue system implementation. If a package includes a file named
   `message` it will output its contents in a pretty way.
 - Added `kiss-which`, a tool like `which` but for `kiss` packages.
-* Added `kiss-changelog`, a tool for outputting the git log of a given package.
+- Added `kiss-changelog`, a tool for outputting the git log of a given package.
 
 ### Fixed
 - Fixed colour outputting on `OpenBSD ksh`.
