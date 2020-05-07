@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   char buf[512];
 
   if (argc != 2) {
-    printf("usage: %s FILE\n", argv[0]);
+    printf("usage: %s <file>\n", argv[0]);
     return(1);
   }
 
