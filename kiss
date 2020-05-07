@@ -1438,34 +1438,8 @@ args() {
             done
         ;;
 
-        r|remove)
-            pkg_order "$@"
-
-            for pkg in $redro; do
-                pkg_remove "$pkg" "${KISS_FORCE:-check}"
-            done
-        ;;
-
-        b|build)   pkg_build "${@:?No packages installed}" ;;
-        l|list)    pkg_list "$@" ;;
-        u|update)  pkg_updates ;;
-        s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.19.0 ;;
-
-        h|help|-h|--help|'')
-            log 'kiss [a|b|c|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
-            log 'alternatives  List and swap to alternatives'
-            log 'build         Build a package'
-            log 'checksum      Generate checksums'
-            log 'fetch         Fetch repositories'
-            log 'install       Install a package'
-            log 'list          List installed packages'
-            log 'remove        Remove a package'
-            log 'search        Search for a package'
-            log 'update        Check for updates'
-            log 'version       Package manager version
-                '
-            log "Installed extensions (kiss-* in \$PATH)"
+        e|extension)
+            log "Installed extensions"
 
             set --
 
@@ -1481,6 +1455,36 @@ args() {
                  printf '\033[31;1m->\033[m %-*s  ' "$max" "${path#*/kiss-}"
                  sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
              done | sort -uk1 >&2
+
+        ;;
+
+        r|remove)
+            pkg_order "$@"
+
+            for pkg in $redro; do
+                pkg_remove "$pkg" "${KISS_FORCE:-check}"
+            done
+        ;;
+
+        b|build)   pkg_build "${@:?No packages installed}" ;;
+        l|list)    pkg_list "$@" ;;
+        u|update)  pkg_updates ;;
+        s|search)  for pkg do pkg_find "$pkg" all; done ;;
+        v|version) log kiss 1.19.0 ;;
+
+        h|help|-h|--help|'')
+            log 'kiss [a|b|c|e|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
+            log 'alternatives  List and swap to alternatives'
+            log 'build         Build a package'
+            log 'checksum      Generate checksums'
+            log 'extension     List available kiss extensions (kiss-* in \$PATH)'
+            log 'fetch         Fetch repositories'
+            log 'install       Install a package'
+            log 'list          List installed packages'
+            log 'remove        Remove a package'
+            log 'search        Search for a package'
+            log 'update        Check for updates'
+            log 'version       Package manager version'
 
         ;;
 
