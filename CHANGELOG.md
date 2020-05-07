@@ -7,8 +7,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-UNRELEASED
-----------
+1.19.1 - 2020-05-07
+-------------------
 
 ### Added
 - Added `e|extension` to `kiss` which can be used to output kiss-extensions.
