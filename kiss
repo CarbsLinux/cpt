@@ -1324,7 +1324,8 @@ pkg_clean() {
     trap '' INT
 
     # Remove temporary items.
-    rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" "$cac_dir/$pid-m"
+    rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
+       "$cac_dir/$pid-c" "$cac_dir/$pid-m"
 }
 
 args() {
