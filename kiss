@@ -1566,11 +1566,6 @@ main() {
         KISS_ROOT=${KISS_ROOT%/}
     }
 
-    # On 'ksh', Ctrl + C does not send an interrupt signal by default.
-    # This would cause a prompt to pass while the user would be trying
-    # to cancel, or the user would want to abort building a package.
-    stty intr "^C"
-
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
     mkdir -p "${sys_db:=$KISS_ROOT/$pkg_db}" 2>/dev/null ||:
