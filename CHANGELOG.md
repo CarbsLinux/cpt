@@ -7,6 +7,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+1.20.3 - 2020-05-09
+-------------------
+
+### Fixed
+- Fixed an alternatives bug caused by the previous patch, where the package
+  moving to `/var/db/kiss/choices` would take the name of the preferred package.
+
+
 1.20.2 - 2020-05-09
 -------------------
 
