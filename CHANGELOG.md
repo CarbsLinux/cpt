@@ -7,6 +7,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+1.20.2 - 2020-05-09
+-------------------
+
+### Fixed
+- Fixed an issue regarding manifest format when using pkg_swap (alternatives).
+
+
 1.20.1 - 2020-05-08
 -------------------
 
@@ -14,11 +21,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - Faster conflict resolution by using a conflict cache file.
 - Standardized `kiss-readlink` usage output.
 
+
 1.20.0 - 2020-05-07
 -------------------
 
 ### Added
 - `KISS_NOPROMPT` can be specified in order to skip prompts.
+
 
 1.19.1 - 2020-05-07
 -------------------
@@ -70,6 +79,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 ### Removed
 - Dropped the usage of `readlink` in `kiss`.
 
+
 1.17.0 - 2020-05-03
 -------------------
 
@@ -86,11 +96,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - `kiss` now uses `sys_db` instead of `pkg_db` when removing packages from the system.
 - `kiss` now explicitly exits if prompt returns with a status of 1. This is for `ksh` compatibility.
 
+
 1.16.3 - 2020-05-03
 -------------------
 
 ### Fixed
 - Fixed etcsum location.
+
 
 1.16.2 - 2020-05-03
 -------------------
@@ -105,11 +117,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - Fixed `pkg_conflicts()` getting stuck when you reinstall the same single package on a system.
 - Fixed `pkg_conflicts()` giving an error if no packages are installed on a system.
 
+
 1.16.1 - 2020-05-01
 -------------------
 
 ### Fixed
 - Fixed `ksh` Ctrl+C interrupt signals.
+
 
 1.16.0 - 2020-05-01
 -------------------
@@ -126,6 +140,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - Fixed an installation issue where `kiss` would look for the manifest with the
   `$KISS_ROOT` variable
 
+
 1.15.0 - 2020-04-30
 -------------------
 
@@ -140,6 +155,7 @@ at the trade-off.
 - Reverted to `rsync` for installation.
 - We are now forcing decompression to standard output while using `decompress()`
 - `kiss` now accepts decompressed tar archives for package installation as well.
+
 
 1.14.2/1.14.3 - 2020-04-27
 --------------------------
@@ -160,6 +176,7 @@ at the trade-off.
 - Added a check for symlinks that could overwrite a directory during installation.
 - Whitespace cleanup.
 
+
 1.14.0 - 2020-04-25
 -------------------
 
@@ -176,11 +193,13 @@ method.
 - usage of rsync as an installation method.
 - usage of `old_ifs`
 
+
 1.13.1 - 2020-04-19
 -------------------
 
 ### Removed
 - Reverted and removed `kiss ss` changes.
+
 
 1.13.0 - 2020-04-19
 -------------------
@@ -196,6 +215,7 @@ method.
 ### Fixed
 - Fixed a shellcheck error.
 
+
 1.12.3 - 2020-04-17
 -------------------
 
@@ -205,6 +225,7 @@ method.
 ### Fixed
 - `kiss-export` fallbacks to gzip if the compression method is unknown.
 - `kiss-repodepends` now outputs the proper depends file.
+
 
 1.12.2 - 2020-04-15
 -------------------
@@ -220,11 +241,13 @@ method.
 ### Fixed
 - `kiss-export` now honours your `KISS_COMPRESS` value
 
+
 1.12.1 - 2020-04-12
 -------------------
 
 ### Fixed
 - Fixed printing empty arguments in `kiss-outdated`.
+
 
 1.12.0 - 2020-04-05
 -------------------
@@ -242,6 +265,7 @@ method.
 ### Fixed
 - `kiss-cargo-urlgen`: Fixed an issue where if a package version contained a '-',
     it could lead to wrong url generation.
+
 
 1.9.0 - 1.11.2 - 2020-04-04
 ---------------------------
