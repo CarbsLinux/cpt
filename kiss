@@ -928,21 +928,19 @@ pkg_swap() {
         log "Swapping '$2' from '$pkg_owns' to '$1'"
 
         # Convert the current owner to an alternative and rewrite
-        # its manifest file to reflect this.
+        # its manifest file to reflect this. We then resort this file
+        # so no issues arise when removing packages.
         cp  -Pf "$2" "$pkg_owns>${alt#*>}"
         sed "$(esc "$2" "$PWD/$pkg_owns>${alt#*>}")" \
-            "../installed/$pkg_owns/manifest" > \
-            "../installed/$pkg_owns/manifest.tmp"
-        mv -f "../installed/$pkg_owns/manifest.tmp" \
-            "../installed/$pkg_owns/manifest"
+            "../installed/$pkg_owns/manifest" |
+            sort -r -o "../installed/$pkg_owns/manifest"
     fi
 
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
     mv  -f "$alt" "$2"
-    sed "$(esc "$PWD/$alt" "$2")" "../installed/$1/manifest" > \
-        "../installed/$1/manifest.tmp"
-    mv -f "../installed/$1/manifest.tmp" "../installed/$1/manifest"
+    sed "$(esc "$PWD/$alt" "$2")" "../installed/$1/manifest" |
+        sort -r -o "../installed/$pkg_owns/manifest"
 }
 
 pkg_etc() {
