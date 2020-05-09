@@ -66,15 +66,6 @@ as_root() {
     esac
 }
 
-esc() {
-    # Escape all required characters in both the search and
-    # replace portions of two strings for use in a 'sed' call
-    # as "plain-text".
-    printf 's/^%s$/%s/' \
-        "$(printf %s "$1" | sed 's/[]\/$*.^[]/\\&/g')" \
-        "$(printf %s "$2" | sed 's/[\/&]/\\&/g')"
-}
-
 pop() {
     # Remove an item from a "string list". This allows us
     # to remove a 'sed' call and reuse this code throughout.
@@ -923,7 +914,7 @@ pkg_swap() {
         # its manifest file to reflect this. We then resort this file
         # so no issues arise when removing packages.
         cp  -Pf "$2" "$pkg_owns>${alt#*>}"
-        sed "$(esc "$2" "$PWD/$pkg_owns>${alt#*>}")" \
+        sed "s#^$2#$PWD/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
     fi
@@ -931,7 +922,7 @@ pkg_swap() {
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
     mv  -f "$alt" "$2"
-    sed "$(esc "$PWD/$alt" "$2")" "../installed/$1/manifest" |
+    sed "s#^$PWD/$alt#$2#" "../installed/$1/manifest" |
         sort -r -o "../installed/$1/manifest"
 }
 
