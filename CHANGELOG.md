@@ -7,6 +7,21 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+
+UNRELEASED
+----------
+
+### Added
+- Added a `d|download` option to acquire the sources of given packages. If no
+  packages are given, it acquires the sources of outdated packages. This can be
+  used to acquire a package's sources to build it later, or periodically downloading
+  outdated package sources, so the user doesn't wait for the download when updating
+  the system.
+
+### Changed
+- Simplified tarball extraction method.
+
+
 1.20.3 - 2020-05-09
 -------------------
 
