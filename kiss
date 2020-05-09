@@ -33,6 +33,11 @@ die() {
     exit 1
 }
 
+warn() {
+    # Print a warning message
+    log "WARN" "$1" "${2:-!>}"
+}
+
 contains() {
     # Check if a "string list" contains a word.
     case " $1 " in *" $2 "*) return 0; esac; return 1
@@ -968,7 +973,7 @@ pkg_etc() {
 
             # All other cases.
             *)
-                log WARN "($pkg_name) saving /$file as /$file.new"
+                warn "($pkg_name) saving /$file as /$file.new" "->"
                 new=.new
             ;;
         esac
@@ -1565,7 +1570,7 @@ main() {
     # Make sure that the KISS_ROOT doesn't end with a '/'. This might
     # break some operations.
     [ -z "$KISS_ROOT" ] || [ "${KISS_ROOT##*/}" ] || {
-        log warning "Your KISS_ROOT variable shouldn't end with '/'" "!>"
+        warn "Your KISS_ROOT variable shouldn't end with '/'"
         KISS_ROOT=${KISS_ROOT%/}
     }
 
