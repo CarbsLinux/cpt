@@ -1277,6 +1277,16 @@ pkg_updates(){
 
     set -f
 
+    # If the download option is specified only download the outdated packages
+    # and exit.
+    [ "$download" ] && {
+        for pkg in $outdated; do
+            pkg_sources "$pkg"
+        done
+
+        exit 0
+    }
+
     contains "$outdated" kiss && {
         log "Detected package manager update"
         log "The package manager will be updated first"
@@ -1481,18 +1491,28 @@ args() {
             done
         ;;
 
-        b|build)   pkg_build "${@:?No packages installed}" ;;
-        l|list)    pkg_list "$@" ;;
-        u|update)  pkg_updates ;;
-        s|search)  for pkg do pkg_find "$pkg" all; done ;;
-        v|version) log kiss 1.20.3 ;;
+        d|download)
+            # If no arguments are given, download the sources
+            # for outdated packages.
+            [ "$1" ] || { download=1; pkg_updates ;}
+
+            # Acquire sources for all given packages.
+            for pkg do pkg_sources "$pkg"; done
+        ;;
+
+        b|build)    pkg_build "${@:?No packages installed}" ;;
+        l|list)     pkg_list "$@" ;;
+        u|update)   pkg_updates ;;
+        s|search)   for pkg do pkg_find "$pkg" all; done ;;
+        v|version)  log kiss 1.20.3 ;;
 
         h|help|-h|--help|'')
             exec 2>&1
-            log 'kiss [a|b|c|e|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
+            log 'kiss [a|b|c|d|e|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
             log 'alternatives  List and swap to alternatives'
             log 'build         Build a package'
             log 'checksum      Generate checksums'
+            log 'download      Download sources for the given package'
             log 'extension     List available kiss extensions (kiss-* in $PATH)'
             log 'fetch         Fetch repositories'
             log 'install       Install a package'
