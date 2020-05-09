@@ -20,6 +20,8 @@ UNRELEASED
 
 ### Changed
 - Simplified tarball extraction method.
+- Removed the 'esc' function inside kiss.
+- Added a 'warn' function to standardize warnings inside kiss
 
 
 1.20.3 - 2020-05-09
