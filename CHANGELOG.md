@@ -17,7 +17,7 @@ UNRELEASED
   used to acquire a package's sources to build it later, or periodically downloading
   outdated package sources, so the user doesn't wait for the download when updating
   the system.
-- kiss now understands `.txz` tarballs.
+- kiss now understands `.txz` tarballs. (BSD `src.txz` wink wink)
 
 ### Changed
 - Simplified tarball extraction method.
