@@ -94,7 +94,7 @@ decompress() {
     case $1 in
         *.tar)      cat       ;;
         *.bz2)      bzip2 -cd ;;
-        *.xz)       xz -dcT 0 ;;
+        *.xz|*.txz) xz -dcT 0 ;;
         *.tgz|*.gz) gzip -cd  ;;
         *.zst)      zstd -cd  ;;
     esac < "$1"
@@ -315,7 +315,7 @@ pkg_extract() {
             # Only 'tar' an 'zip' archives are currently supported for
             # extraction. Other filetypes are simply copied to '$mak_dir'
             # which allows for manual extraction.
-            *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz)
+            *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|*://*.txz)
 
                 decompress "$src_dir/$1/${src##*/}" > .ktar
 
