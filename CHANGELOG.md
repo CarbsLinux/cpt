@@ -17,11 +17,16 @@ UNRELEASED
   used to acquire a package's sources to build it later, or periodically downloading
   outdated package sources, so the user doesn't wait for the download when updating
   the system.
+- kiss now understands `.txz` tarballs.
 
 ### Changed
 - Simplified tarball extraction method.
 - Removed the 'esc' function inside kiss.
 - Added a 'warn' function to standardize warnings inside kiss
+
+### Fixed
+- Removed the `sys_db` usage on `pkg_find()` where directories could clash with
+  external utilities.
 
 
 1.20.3 - 2020-05-09
