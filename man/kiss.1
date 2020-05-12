@@ -164,6 +164,17 @@ Unset by default.
 .IP
 export KISS_PID=
 .PP
+.SS SPECIFYING BUILD DIRECTORY
+
+All build related files, by default, are stored in the cache directory. If the
+user specifies \fIKISS_TMPDIR\fR, it will be used instead of the cache directory
+for building packages. This can be useful if you want to build a package on ram
+or a different filesystem.
+
+Unset by default.
+.IP
+export KISS_TMPDIR=
+.PP
 .SS ENABLING/DISABLING COLOUR
 
 If run in a subshell, \fBKISS\fR disables colour output. However, this behaviour
