@@ -799,7 +799,7 @@ pkg_conflicts() {
         printf '%s/%s\n' \
             "$(kiss-readlink "$KISS_ROOT/${file%/*}" 2>/dev/null)" \
             "${file##*/}"
-    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$cac_dir/$pid-m"
+    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$KISS_TMPDIR/$pid-m"
 
     p_name=$1
 
@@ -808,7 +808,7 @@ pkg_conflicts() {
     # shellcheck disable=2046,2086
     set -- $(set +f; pop "$sys_db/$p_name/manifest" "$sys_db"/*/manifest)
 
-    [ -s "$cac_dir/$pid-m" ] || return 0
+    [ -s "$KISS_TMPDIR/$pid-m" ] || return 0
 
     # In rare cases where the system only has one package installed
     # and you are reinstalling that package, grep will try to read from
@@ -824,13 +824,13 @@ pkg_conflicts() {
     # Store the list of found conflicts in a file as we will be using the
     # information multiple times. Storing it in the cache dir allows us
     # to be lazy as they'll be automatically removed on script end.
-    "$grep" -Fxf "$cac_dir/$pid-m" -- "$@" > "$cac_dir/$pid-c" ||:
+    "$grep" -Fxf "$KISS_TMPDIR/$pid-m" -- "$@" > "$KISS_TMPDIR/$pid-c" ||:
 
 
     # Enable alternatives automatically if it is safe to do so.
     # This checks to see that the package that is about to be installed
     # doesn't overwrite anything it shouldn't in '/var/db/kiss/installed'.
-    "$grep" -q ":/var/db/kiss/installed/" "$cac_dir/$pid-c" || choice_auto=1
+    "$grep" -q ":/var/db/kiss/installed/" "$KISS_TMPDIR/$pid-c" || choice_auto=1
 
     # Use 'grep' to list matching lines between the to
     # be installed package's manifest and the above filtered
@@ -880,13 +880,13 @@ pkg_conflicts() {
                 log "this must be fixed in $p_name. Contact the maintainer"
                 die "by checking 'git log' or by running 'kiss-maintainer'"
             }
-        done < "$cac_dir/$pid-c"
+        done < "$KISS_TMPDIR/$pid-c"
 
         # Rewrite the package's manifest to update its location
         # to its new spot (and name) in the choices directory.
         pkg_manifest "$p_name" "$tar_dir" 2>/dev/null
 
-    elif [ -s "$cac_dir/$pid-c" ]; then
+    elif [ -s "$KISS_TMPDIR/$pid-c" ]; then
         log "Package '$p_name' conflicts with another package" "" "!>"
         log "Run 'KISS_CHOICE=1 kiss i $p_name' to add conflicts" "" "!>"
         die "as alternatives."
@@ -1326,7 +1326,7 @@ pkg_clean() {
 
     # Remove temporary items.
     rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
-       "$cac_dir/$pid-c" "$cac_dir/$pid-m"
+       "$KISS_TMPDIR/$pid-c" "$KISS_TMPDIR/$pid-m"
 }
 
 args() {
@@ -1583,12 +1583,18 @@ main() {
     # do nothing on a normal system.
     mkdir -p "${sys_db:=$KISS_ROOT/$pkg_db}" 2>/dev/null ||:
 
+    # A temporary directory can be specified apart from the cache
+    # directory in order to build in a user specified directory.
+    # /tmp could be used in order to build on ram, useful on SSDs.
+    # The user can specify KISS_TMPDIR for this.
+    #
     # Create the required temporary directories and set the variables
     # which point to them.
     mkdir -p "${cac_dir:=$KISS_ROOT${XDG_CACHE_HOME:-$HOME/.cache}/kiss}" \
-             "${mak_dir:=$cac_dir/build-$pid}" \
-             "${pkg_dir:=$cac_dir/pkg-$pid}" \
-             "${tar_dir:=$cac_dir/extract-$pid}" \
+             "${KISS_TMPDIR:=$cac_dir}" \
+             "${mak_dir:=$KISS_TMPDIR/build-$pid}" \
+             "${pkg_dir:=$KISS_TMPDIR/pkg-$pid}" \
+             "${tar_dir:=$KISS_TMPDIR/extract-$pid}" \
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
