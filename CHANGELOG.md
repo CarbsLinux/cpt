@@ -18,6 +18,8 @@ UNRELEASED
   outdated package sources, so the user doesn't wait for the download when updating
   the system.
 - kiss now understands `.txz` tarballs. (BSD `src.txz` wink wink)
+- `KISS_TMPDIR` can now be used to specify a temporary build directory. This will
+  be useful for those of you who would want to build on ram or a different filesystem.
 
 ### Changed
 - Simplified tarball extraction method.
