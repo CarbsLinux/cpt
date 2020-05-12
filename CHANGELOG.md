@@ -8,8 +8,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
-----------
+1.21.0 - 2020-05-12
+-------------------
 
 ### Added
 - Added a `d|download` option to acquire the sources of given packages. If no
