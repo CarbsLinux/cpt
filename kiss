@@ -348,8 +348,11 @@ pkg_extract() {
                             #
                             # Skip the file if it has the same name as the directory.
                             # We will deal with it later.
-                            find . \( ! -name . -prune \) \
-                                 ! -name "$dir" -exec mv {} .. +
+                            #
+                            # Word splitting is intentional here.
+                            # shellcheck disable=2046
+                            set -- $(find . \( ! -name . -prune \) ! -name "$dir")
+                            mv -f "$@" ..
 
                             # If a file/directory with the same name as the directory
                             # exists, append a '.kissbak' to it and move it to the
