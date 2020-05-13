@@ -2,10 +2,7 @@
 # Display packages on the repository which depend on package
 # shellcheck disable=2086
 
-[ "$1" ] || {
-    printf 'usage: %s <pkg>\n' "${0##*/}"
-    exit 1
-}
+case "$1" in ''|--help|-h) printf 'usage: %s <pkg>\n' "${0##*/}"; exit 0; esac
 
 pkg="$1"
 IFS=:; set -- $KISS_PATH; unset IFS

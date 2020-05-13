@@ -1,7 +1,7 @@
 #!/bin/sh -e
 # Display a package's dependencies in the repository
 
-[ "$1" ] || { printf '%s\n' "usage: kiss-repodepends <pkg>" ; exit 1 ;}
+case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-repodepends <pkg>" ; exit 0 ; esac
 kiss s "$1" >/dev/null
 
 cat "$(kiss s "$1" | sed 1q)/depends" 2>/dev/null
