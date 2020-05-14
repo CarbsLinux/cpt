@@ -75,7 +75,7 @@ pop() {
     # Remove an item from a "string list". This allows us
     # to remove a 'sed' call and reuse this code throughout.
     del=$1
-    shift
+    shift 2
 
     for i do [ "$i" = "$del" ] || printf %s " $i "; done
 }
@@ -619,7 +619,7 @@ pkg_build() {
     # installed as a dependency.
     # shellcheck disable=2086
     for pkg do
-        contains "$deps" "$pkg" && explicit=$(pop "$pkg" $explicit)
+        contains "$deps" "$pkg" && explicit=$(pop "$pkg" from $explicit)
     done
 
     # See [1] at top of script.
@@ -644,7 +644,7 @@ pkg_build() {
         # Remove the now installed package from the build list.
         # See [1] at top of script.
         # shellcheck disable=2046,2086
-        set -- $(pop "$pkg" "$@")
+        set -- $(pop "$pkg" from "$@")
     } done
 
     for pkg do pkg_sources "$pkg"; done
@@ -811,7 +811,7 @@ pkg_conflicts() {
     # Generate a list of all installed package manifests
     # and remove the current package from the list.
     # shellcheck disable=2046,2086
-    set -- $(set +f; pop "$sys_db/$p_name/manifest" "$sys_db"/*/manifest)
+    set -- $(set +f; pop "$sys_db/$p_name/manifest" from "$sys_db"/*/manifest)
 
     [ -s "$KISS_TMPDIR/$pid-m" ] || return 0
 
