@@ -8,8 +8,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
-----------
+1.22.0 - 2020-05-14
+-------------------
 
 ### Added
 - Added `kiss-exec`, a tool to execute commands inside the alternatives system.
