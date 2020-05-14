@@ -8,11 +8,12 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
-----------
+1.21.1 - 2020-05-14
+-------------------
 
 ### Changed
 - All contrib messages now output usage information when called with `--help` and `-h`.
+- `hashcheck` function now uses `$1` instead of `${file#\*}`.
 
 ### Fixed
 - Fixed a non-POSIX `find` call. Thanks to @illiliti.
