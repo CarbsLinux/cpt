@@ -14,6 +14,13 @@ UNRELEASED
 ### Changed
 - Replaced `KISS_COLOUR` with `KISS_COLOR` to match upstream.
 - Renamed `colour` variable to `color` for consistency.
+- The package manager no longer needs root priviliges if the `KISS_ROOT` is writable
+  by the user.
+- `kiss` now uses the host cache regardless of `KISS_ROOT`.
+
+### Fixed
+- Fixed an issue where `kiss-owns` would output the wrong package because of symbolic links.
+  The script now reads the link of the directory instead of the full file.
 
 
 1.21.1 - 2020-05-14
