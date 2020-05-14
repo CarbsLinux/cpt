@@ -11,6 +11,9 @@ this project _somewhat_ adheres to [Semantic Versioning].
 UNRELEASED
 ----------
 
+### Added
+- Added `kiss-exec`, a tool to execute commands inside the alternatives system.
+
 ### Changed
 - Replaced `KISS_COLOUR` with `KISS_COLOR` to match upstream.
 - Renamed `colour` variable to `color` for consistency.
