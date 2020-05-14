@@ -1450,7 +1450,7 @@ args() {
                 if [ -f "$sys_db/$pkg/message" ]; then
                     printf '%s\n%b%s%b\n%s\n\n' \
                            "==============================" \
-                           "${colour:+"\033[1m"}" "$pkg" "${colour:+"\033[m"}" \
+                           "${color:+"\033[1m"}" "$pkg" "${color:+"\033[m"}" \
                            "==============================" >&2
                     cat "$sys_db/$pkg/message" >&2
                     msg=1
@@ -1474,7 +1474,7 @@ args() {
                 # These are binary files so they should be ignored
                 contains "readlink stat" "$path" && continue
 
-                printf '%b->%b %-*s  ' "${colour:+"\033[1;31m"}" "${colour:+"\033[m"}" \
+                printf '%b->%b %-*s  ' "${color:+"\033[1;31m"}" "${color:+"\033[m"}" \
                     "$max" "${path#*/kiss-}"
                 sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
              done | sort -uk1 >&2
@@ -1604,15 +1604,15 @@ main() {
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
 
-    # Disable colour escape sequences if running in a subshell.
-    # This behaviour can be changed by adding a KISS_COLOUR
+    # Disable color escape sequences if running in a subshell.
+    # This behaviour can be changed by adding a KISS_COLOR
     # variable to the environment. If it is set to 1 it will
-    # always enable colour escapes, and if set to 0 it will
-    # always disable colour escapes.
-    if [ "$KISS_COLOUR" = 1 ]; then colour=1
-    elif [ "$KISS_COLOUR" = 0 ] || ! [ -t 1 ]; then
+    # always enable color escapes, and if set to 0 it will
+    # always disable color escapes.
+    if [ "$KISS_COLOR" = 1 ]; then color=1
+    elif [ "$KISS_COLOR" = 0 ] || ! [ -t 1 ]; then
         log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
-    else colour=1
+    else color=1
     fi
 
     args "$@"

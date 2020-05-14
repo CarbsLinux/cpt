@@ -8,6 +8,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+----------
+
+### Changed
+- Replaced `KISS_COLOUR` with `KISS_COLOR` to match upstream.
+- Renamed `colour` variable to `color` for consistency.
+
+
 1.21.1 - 2020-05-14
 -------------------
 
