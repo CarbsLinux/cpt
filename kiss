@@ -1584,9 +1584,13 @@ main() {
         KISS_ROOT=${KISS_ROOT%/}
     }
 
+    # Define this variable but don't create its directory structure from
+    # the get go. It will be created as needed by package installation.
+    sys_db=$KISS_ROOT/$pkg_db
+
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
-    mkdir -p "${sys_db:=$KISS_ROOT/$pkg_db}" 2>/dev/null ||:
+    mkdir -p "$KISS_ROOT/" 2>/dev/null ||:
 
     # A temporary directory can be specified apart from the cache
     # directory in order to build in a user specified directory.
