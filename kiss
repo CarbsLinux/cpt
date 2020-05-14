@@ -800,9 +800,10 @@ pkg_conflicts() {
     # (/bin/ls -> /usr/bin/ls).
     while read -r file; do
         case $file in */) continue; esac
+        dirname="$(kiss-readlink "$KISS_ROOT/${file%/*}" 2>/dev/null)"
 
         printf '%s/%s\n' \
-            "$(kiss-readlink "$KISS_ROOT/${file%/*}" 2>/dev/null)" \
+            "${dirname#$KISS_ROOT}" \
             "${file##*/}"
     done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$KISS_TMPDIR/$pid-m"
 
@@ -928,16 +929,16 @@ pkg_swap() {
         # Convert the current owner to an alternative and rewrite
         # its manifest file to reflect this. We then resort this file
         # so no issues arise when removing packages.
-        cp  -Pf "$2" "$pkg_owns>${alt#*>}"
-        sed "s#^$2#$PWD/$pkg_owns>${alt#*>}#" \
+        cp  -Pf "$KISS_ROOT/$2" "$pkg_owns>${alt#*>}"
+        sed "s#^$2#${PWD#$KISS_ROOT}/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
     fi
 
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
-    mv  -f "$alt" "$2"
-    sed "s#^$PWD/$alt#$2#" "../installed/$1/manifest" |
+    mv -f "$alt" "$KISS_ROOT/$2"
+    sed "s#^${PWD#$KISS_ROOT}/$alt#$2#" "../installed/$1/manifest" |
         sort -r -o "../installed/$1/manifest"
 }
 
@@ -1117,7 +1118,7 @@ pkg_install() {
 
     # This is repeated multiple times. Better to make it a function.
     pkg_rsync() {
-        rsync --chown=root:root --chmod=Du-s,Dg-s,Do-s \
+        rsync "--chown=$USER:$USER" --chmod=Du-s,Dg-s,Do-s \
               -WhHKa --no-compress --exclude /etc "${1:---}" \
               "$tar_dir/$pkg_name/" "$KISS_ROOT/"
     }
@@ -1363,16 +1364,17 @@ args() {
         a|alternatives)
             # Rerun the script with 'su' if the user isn't root.
             # Cheeky but 'su' can't be used on shell functions themselves.
-            [ -z "$1" ] || [ "$uid" = 0 ] || {
+            [ -z "$1" ] || [ -w "$KISS_ROOT/" ] || [ "$uid" = 0 ] || {
                 as_root "$0" "$action" "$@"
                 return
             }
         ;;
 
         i|install|r|remove)
-            # Rerun the script with 'su' if the user isn't root.
-            # Cheeky but 'su' can't be used on shell functions themselves.
-            [ "$uid" = 0 ] || {
+            # Rerun the script with 'su' if the user does not have write
+            # permissions for the root. Cheeky but 'su' can't be used on
+            # shell functions themselves.
+            [ -w "$KISS_ROOT/" ] || [ "$uid" = 0 ] || {
                 KISS_FORCE="$KISS_FORCE" as_root "$0" "$action" "$@"
                 return
             }
