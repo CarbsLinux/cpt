@@ -7,6 +7,35 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+1.22.1 - 2020-05-15
+-------------------
+
+**NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not be doing any
+releases except for patches and fixes. My attention is now on implementing binary repositories.
+I will be doing some 'release candidates' before release, as binary repositories will need user
+feedback.
+
+### REMOVED
+- Removed some contrib scripts and moved them to [kiss-extra]
+- `kiss-cargo-urlgen`
+- `kiss-cargolock-urlgen`
+- `kiss-changelog`
+- `kiss-depends-finder`
+- `kiss-exec`
+- `kiss-message`
+- `kiss-orphans`
+- `kiss-reporevdepends`
+
+
+### Fixed
+- Fixed a `kiss-owns` typo that caused it to fail.
+- Fixed a `kiss-readlink` bug where it would fail if the last component wouldn't exist.
+- Fixed an error on tarball extraction where a file name containing spaces would be parsed as
+  two files.
+
+
+[kiss-extra]: https://github.com/carbslinux/kiss-extra
+
 
 1.22.0 - 2020-05-14
 -------------------
