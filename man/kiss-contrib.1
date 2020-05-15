@@ -5,19 +5,6 @@ kiss utilities
 This manual page is not for a single program, but for multiple
 utilities. Programs are explained in their own sections. They
 are listed alphabetically.
-.SH KISS-CARGO-URLGEN
-.B kiss-cargo-urlgen
-[pkg+ver] [pkg+ver]
-
-Creates a list of static cargo urls which can be added to the \fBsources\fR
-file of a \fIRust\fR package. It takes arguments as the package name, plus
-sign, and the version number.
-.SH KISS-CARGOLOCK-URLGEN
-.B kiss-cargolock-urlgen
-<Cargo.lock file>
-
-Does the same as \fBkiss-cargo-urlgen\fR, but gets the package and version
-information from a \fICargo.lock\fR file.
 .SH KISS-CAT
 .B kiss-cat
 <pkg> [file] [file]
@@ -25,11 +12,6 @@ information from a \fICargo.lock\fR file.
 Concatanates a package's files inside the system database. If no file is
 specified, it looks for \fBbuild\fR, \fBdepends\fR, \fBsources\fR, and
 \fBversion\fR.
-.SH KISS-CHANGELOG
-.B kiss-changelog
-<pkg>
-
-Shows a git log of the specified package in an oneline format
 .SH KISS-CHBUILD
 .B kiss-chbuild
 
@@ -51,11 +33,6 @@ from host, and chroots into the given directory. Cleans up after exit.
 <pkg>
 
 Checks the dependencies of an installed package.
-.SH KISS-DEPENDSFINDER
-.B kiss-depends-finder
-<pkg>
-
-Finds the missing dependencies of packages by checking linked libraries/files.
 .SH KISS-EXPORT
 .B kiss-export
 <pkg>
@@ -102,25 +79,11 @@ Prints the manifest file.
 <pkg>
 
 Prints the manifest file in a tree view.
-.SH KISS-MESSAGE
-.B kiss-message
-<pkg> [pkg] [pkg]
-
-Outputs the messages of the given packages. A user could run
-.IP
-kiss-message /var/db/kiss/installed/*
-.PP
-to see all the messages they have.
 .SH KISS-NEW
 .B kiss-new
 <name> [version] [sources]
 
 Creates a boilerplate KISS package.
-.SH KISS-ORPHANS
-.B kiss-orphans
-
-Shows orphaned packages. These packages do not have any dependent packages
-installed and can be removed.
 .SH KISS-OUTDATED
 .B kiss-outdated
 
@@ -141,11 +104,6 @@ A 'readlink -f' replacement to be used inside the package manager.
 <pkg>
 
 Prints the dependencies of the given package as they are defined in the repository.
-.SH KISS-REPOREVDEPENDS
-.B kiss-reporevdepends
-<pkg>
-
-Prints all the packages on your \fIKISS_PATH\fR that depends on package.
 .SH KISS-RESET
 .B kiss-reset
 
