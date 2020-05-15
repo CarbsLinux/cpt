@@ -7,13 +7,22 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-1.22.1 - 2020-05-15
+1.22.2 - 2020-05-16
 -------------------
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not be doing any
 releases except for patches and fixes. My attention is now on implementing binary repositories.
 I will be doing some 'release candidates' before release, as binary repositories will need user
 feedback.
+
+### Fixed
+- Fixed an issue where `pkg_conflicts` would abort if `kiss-readlink` failed due to missing
+  components. It now fallbacks to the original directory name.
+
+
+
+1.22.1 - 2020-05-15
+-------------------
 
 ### REMOVED
 - Removed some contrib scripts and moved them to [kiss-extra]

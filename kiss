@@ -800,11 +800,25 @@ pkg_conflicts() {
     # (/bin/ls -> /usr/bin/ls).
     while read -r file; do
         case $file in */) continue; esac
-        dirname="$(kiss-readlink "$KISS_ROOT/${file%/*}" 2>/dev/null)"
 
-        printf '%s/%s\n' \
-            "${dirname#$KISS_ROOT}" \
-            "${file##*/}"
+        # Use $KISS_ROOT in filename so that we follow its symlinks.
+        file=$KISS_ROOT/${file#/}
+
+        # We will only follow the symlinks of the directories, so we
+        # reserve the directory name in this 'dirname' value. kiss-readlink
+        # functions in a similar fashion to 'readlink -f', it makes sure
+        # every component except for the first one to be available on
+        # the directory structure. If we cannot find it in the system,
+        # we don't need to make this much more complex by trying so
+        # hard to find it. Simply use the original directory name.
+        dirname="$(kiss-readlink "${file%/*}" 2>/dev/null)" ||
+            dirname="${file%/*}"
+
+
+        # Combine the dirname and file values, and print them into the
+        # temporary manifest to be parsed.
+        printf '%s/%s\n' "${dirname#$KISS_ROOT}" "${file##*/}"
+
     done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$KISS_TMPDIR/$pid-m"
 
     p_name=$1
@@ -1504,7 +1518,7 @@ args() {
         l|list)     pkg_list "$@" ;;
         u|update)   pkg_updates ;;
         s|search)   for pkg do pkg_find "$pkg" all; done ;;
-        v|version)  log kiss 1.22.1 ;;
+        v|version)  log kiss 1.22.2 ;;
 
         h|help|-h|--help|'')
             exec 2>&1
