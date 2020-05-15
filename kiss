@@ -353,8 +353,8 @@ pkg_extract() {
                             #
                             # Word splitting is intentional here.
                             # shellcheck disable=2046
-                            set -- $(find . \( ! -name . -prune \) ! -name "$dir")
-                            mv -f "$@" ..
+                            find . \( ! -name . -prune \) ! -name "$dir" \
+                                 -exec mv -f {} .. \;
 
                             # If a file/directory with the same name as the directory
                             # exists, append a '.kissbak' to it and move it to the
