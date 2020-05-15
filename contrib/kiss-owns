@@ -6,7 +6,7 @@ case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-owns <file>" ; exit 0 ; es
 # Strip 'KISS_ROOT' from the file path if passed and
 # follow symlinks.
 file="${1#$KISS_ROOT}"
-dirname=$(kiss-readlink "$KISS_ROOT/{$file%/*}")
+dirname=$(kiss-readlink "$KISS_ROOT/${file%/*}")
 file="$dirname/${file##*/}"
 
 # Check if the file exists and exit if it is not.
