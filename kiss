@@ -81,9 +81,14 @@ pop() {
 }
 
 run_hook() {
+    # If a fourth parameter 'root' is specified, source
+    # the hook from a predefined location to avoid privilige
+    # escalation through user scripts.
+    [ "$4" ] && KISS_HOOK=$KISS_ROOT/etc/kiss-hook
+
     # This is not a misspelling, can be ignored safely.
     # shellcheck disable=2153
-    [ "$KISS_HOOK" ] || return 0
+    [ -f "$KISS_HOOK" ] || return 0
 
     log "$2" "Running $1 hook"
 
@@ -1114,7 +1119,7 @@ pkg_install() {
 
     [ "$install_dep" ] && die "$1" "Package requires ${install_dep%, }"
 
-    run_hook pre-install "$pkg_name" "$tar_dir/$pkg_name"
+    run_hook pre-install "$pkg_name" "$tar_dir/$pkg_name" root
 
     pkg_conflicts "$pkg_name"
 
@@ -1180,7 +1185,7 @@ pkg_install() {
         "$sys_db/$pkg_name/post-install" ||:
     fi
 
-    run_hook post-install "$pkg_name" "$sys_db/$pkg_name"
+    run_hook post-install "$pkg_name" "$sys_db/$pkg_name" root
 
     log "$pkg_name" "Installed successfully"
 }
@@ -1518,7 +1523,7 @@ args() {
         l|list)     pkg_list "$@" ;;
         u|update)   pkg_updates ;;
         s|search)   for pkg do pkg_find "$pkg" all; done ;;
-        v|version)  log kiss 1.22.2 ;;
+        v|version)  log kiss 1.22.3 ;;
 
         h|help|-h|--help|'')
             exec 2>&1

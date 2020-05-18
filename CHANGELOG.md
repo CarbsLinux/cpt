@@ -7,13 +7,23 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-1.22.2 - 2020-05-16
+
+1.22.3 - 2020-05-18
 -------------------
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not be doing any
 releases except for patches and fixes. My attention is now on implementing binary repositories.
 I will be doing some 'release candidates' before release, as binary repositories will need user
 feedback.
+
+### SECURITY
+- Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now use
+  `$KISS_ROOT/etc/kiss-hook` on installation operations (which are run by root) so that the hooks
+  are defined by the system administrator rather than the user.
+
+
+1.22.2 - 2020-05-16
+-------------------
 
 ### Fixed
 - Fixed an issue where `pkg_conflicts` would abort if `kiss-readlink` failed due to missing
