@@ -19,7 +19,9 @@ feedback.
 ### SECURITY
 - Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now use
   `$KISS_ROOT/etc/kiss-hook` on installation operations (which are run by root) so that the hooks
-  are defined by the system administrator rather than the user.
+  are defined by the system administrator rather than the user. See [related proof-of-concept]
+
+[related proof-of-concept]: https://github.com/kisslinux/kiss/pull/157#issuecomment-629880775
 
 
 1.22.2 - 2020-05-16
