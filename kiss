@@ -1495,8 +1495,8 @@ args() {
                 # These are binary files so they should be ignored
                 contains "readlink stat" "$path" && continue
 
-                printf '%b->%b %-*s  ' "${color:+"\033[1;31m"}" "${color:+"\033[m"}" \
-                    "$max" "${path#*/kiss-}"
+                printf "%b->%b %-${max}s  " "${color:+"\033[1;31m"}" "${color:+"\033[m"}" \
+                    "${path#*/kiss-}"
                 sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
              done | sort -uk1 >&2
 
