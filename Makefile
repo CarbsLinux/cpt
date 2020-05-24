@@ -1,5 +1,7 @@
 PREFIX    = /usr/local
 BINDIR    = ${PREFIX}/bin
+DOCDIR    = ${PREFIX}/share/doc
+KISSDOC   = ${DOCDIR}/kiss
 MANPREFIX = ${PREFIX}/share/man
 MAN1      = ${MANPREFIX}/man1
 CC        = cc
@@ -28,6 +30,9 @@ install: all
 	mkdir -p ${DESTDIR}${MAN1}
 	for man in man/*.1 ; do cp -f $${man} ${DESTDIR}${MAN1}/$${man##*/}; \
 		chmod 644 ${DESTDIR}${MAN1}/$${man##*/} ; done
+	mkdir -p ${DESTDIR}${KISSDOC}
+	for doc in doc/*; do cp -f $${doc} ${DESTDIR}${KISSDOC}/$${doc##*/}; \
+		chmod 644 ${DESTDIR}${KISSDOC}/$${doc##*/} ; done
 
 
 uninstall:
@@ -37,6 +42,7 @@ uninstall:
 	for bin in contrib/* ; do rm -f ${DESTDIR}${BINDIR}/$${bin##*/} ; done
 	rm -f ${DESTDIR}${MAN1}/kiss.1 ${DESTDIR}${MAN1}/kiss.1
 	rm -f ${DESTDIR}${MAN1}/kiss-contrib.1 ${DESTDIR}${MAN1}/kiss-contrib.1
+	rm -rf ${DESTDIR}${KISSDOC}
 
 
 .PHONY: all install uninstall clean

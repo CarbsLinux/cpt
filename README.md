@@ -20,7 +20,8 @@ This is _mostly_ a shell implementation rather than a pure one.
 
     /        -- kiss, README, Makefile, LICENSE, CHANGELOG
     bin/     -- for C programs.
-    man/     -- for manual pages / documentation.
+    man/     -- for manual pages.
+    doc/     -- for documentation.
     contrib/ -- for Shell scripts that wrap around kiss.
 
 ### Contributing
