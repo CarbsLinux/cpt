@@ -80,13 +80,11 @@ single file where it will be named as the argument.
 
     kinstall() {
         # usage: kinstall 755 /usr/bin/file filename
-        mod=$1 target=$2; mkdir -p "${target%/*}"
-        shift 2
-        ! [ -d "$target" ] || {
+        ! [ -d "$2" ] || {
             printf '%s\n' "Error: $target is a directory" >&2
             return 1
         }
-        cp "$file" "$target"
-        chmod "$mod" "$target"
+        mkdir -p "${2%/*}"; cp "$3" "$2"
+        chmod "$1" "$2"
     }
 
