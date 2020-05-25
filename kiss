@@ -105,7 +105,7 @@ decompress() {
     esac < "$1"
 }
 
-hashcheck() {
+sh256() {
     # This is a sha256sum function for outputting a standard
     # hash digest. sha256 on BSD systems require an '-r' flag
     # for outputting the same way with sha256sum, and still,
@@ -575,7 +575,7 @@ pkg_etcsums() (
 
 
     find etc -type f | while read -r file; do
-        hashcheck "$file"
+        sh256 "$file"
     done > "$pkg_dir/$1/$pkg_db/$1/etcsums"
 )
 
@@ -775,7 +775,7 @@ pkg_checksums() {
 
         # An easy way to get 'sha256sum' to print with the 'basename'
         # of files is to 'cd' to the file's directory beforehand.
-        (cd "$src_path" && hashcheck "${src##*/}") ||
+        (cd "$src_path" && sh256 "${src##*/}") ||
             die "$1" "Failed to generate checksums"
     done < "$repo_dir/sources"
 }
@@ -973,8 +973,8 @@ pkg_etc() {
 
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
-        { sum_new=$(hashcheck "$file")
-          sum_sys=$(cd "$KISS_ROOT/"; hashcheck "$file")
+        { sum_new=$(sh256 "$file")
+          sum_sys=$(cd "$KISS_ROOT/"; sh256 "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
         log "$pkg_name" "Doing 3-way handshake for $file"
