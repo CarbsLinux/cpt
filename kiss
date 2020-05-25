@@ -1369,10 +1369,11 @@ args() {
     #
     # This handles the globbing characters '*', '!', '[' and ']' as per:
     # https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html
-    [ "${action##[as]*}" ] &&
+    case "$action" in a|alternatives|s|search|bin) ;; *)
         case $* in *\**|*\!*|*\[*|*\]*)
             die "Arguments contain invalid characters: '!*[]'"
         esac
+    esac
 
     # Parse some arguments earlier to remove the need to duplicate code.
     case $action in
