@@ -8,13 +8,25 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-1.22.3 - 2020-05-18
+1.22.4 - 2020-05-26
 -------------------
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not be doing any
 releases except for patches and fixes. My attention is now on implementing binary repositories.
 I will be doing some 'release candidates' before release, as binary repositories will need user
 feedback.
+
+### Added
+- Added new documents.
+- Added `post-package` hook.
+
+### Changed
+- Renamed the `hashcheck` function to `sh256` for compatibility.
+- Enabled the usage of glob characters for `kiss-bin`.
+
+
+1.22.3 - 2020-05-18
+-------------------
 
 ### SECURITY
 - Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now use
