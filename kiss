@@ -599,6 +599,8 @@ pkg_tar() {
     > "$bin_dir/$1#$version-$release.tar.${KISS_COMPRESS:=gz}"
 
     log "$1" "Successfully created tarball"
+
+    run_hook post-package "$1" "$bin_dir/$1#$version-$release.tar.$KISS_COMPRESS"
 }
 
 pkg_build() {
