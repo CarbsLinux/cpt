@@ -12,6 +12,7 @@ oPKG="$(kiss s "$PKG" | grep -v "^$PWD\$\|/var/db/kiss/installed/$PKG" | sed 1q)
 
 for file in "$@" ; do
     [ -e "${oPKG:?}/$file" ]
+    [ -d "$file" ] && rm -rf "$file"
     ln -sf "$oPKG/$file" "$file"
     printf 'linked %s to %s\n' "$oPKG/$file" "$PWD/$file"
 done
