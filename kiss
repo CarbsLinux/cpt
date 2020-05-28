@@ -589,14 +589,14 @@ pkg_tar() {
 
     # Create a tarball from the contents of the built package.
     "$tar" cf - -C "$pkg_dir/$1" . |
-        case ${KISS_COMPRESS:=gz} in
+        case $KISS_COMPRESS in
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
             gz)  gzip -6  ;;
             zst) zstd -3  ;;
             *)   gzip -6  ;;  # Fallback to gzip
         esac \
-    > "$bin_dir/$1#$version-$release.tar.${KISS_COMPRESS:=gz}"
+    > "$bin_dir/$1#$version-$release.tar.$KISS_COMPRESS"
 
     log "$1" "Successfully created tarball"
 
@@ -1627,6 +1627,9 @@ main() {
     # This allows for automatic setup of a KISS chroot and will
     # do nothing on a normal system.
     mkdir -p "$KISS_ROOT/" 2>/dev/null ||:
+
+    # Set a value for KISS_COMPRESS if it isn't set.
+    : "${KISS_COMPRESS:=gz}"
 
     # A temporary directory can be specified apart from the cache
     # directory in order to build in a user specified directory.
