@@ -1,0 +1,69 @@
+RSYNC REPOSITORIES
+
+RSYNC repositories are simple to serve and simple to use. In the repository
+directory, there needs to be a '.rsync' file that points to the remote of
+the repository. This is used in order to fetch changes from the upstream.
+'.rsync' file looks like this for the core repository:
+
+    rsync://carbslinux.org/repo/core
+
+RSYNC repositories have some few distinctions when it comes to fetching
+them. Unlike GIT repositories, they don't have a defined "root" directory.
+When there are multiple repositories in a shared repository (such as the
+Carbs Linux and KISS Linux repositories), individual repositories need to
+have this '.rsync' file. This doesn't, however, slow down operations.
+Fetching from rsync repositories are still considerably faster and smaller.
+
+
+SETTING UP AN RSYNC REPOSITORY
+
+Carbs Linux repositories automatically sync from the git repostitories
+and serve it through the rsync daemon. Here is a sample shell script
+that I use in order to sync repositories. Feel free to customize for your
+own use.
+
+
+    #!/bin/sh
+    HOSTNAME=rsync://carbslinux.org/repo
+    GITDIR=/pub/git/repo
+    SHAREDIR=/pub/share/repo
+    _rsync() { rsync -aC --delete --exclude=.rsync "$@" ;}
+
+    git -C "$GITDIR" pull
+    _rsync "$GITDIR/." "$SHAREDIR"
+
+    # For some reason the core repositories were not synced
+    # so I resorted to this solution
+    for dir in "$GITDIR/"*; do
+        [ -d "$dir" ] || continue
+        _rsync "$dir/." "$SHAREDIR/${dir##*/}"
+
+        [ -f "$SHAREDIR/${dir##*/}/.rsync" ] ||
+            printf '%s/%s\n' "$HOSTNAME" "${dir##*/}" > "$SHAREDIR/${dir##*/}/.rsync"
+    done
+
+
+You can then create an 'rsync' user for serving the repositories.
+
+    -> adduser -SD rsync
+
+
+Create '/etc/rsyncd.conf' and a service configuration as well.
+
+rsyncd.conf:
+
+    uid = rsync
+    gid = rsync
+    address = example.com
+    max connections = 10
+    use chroot = yes
+
+    [repo]
+            path = /pub/share/repo
+            comment = My Repository
+
+
+/etc/sysmgr/rsync or what have you:
+
+    #!/bin/sh
+    exec rsync --daemon --no-detach
