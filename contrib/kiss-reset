@@ -8,7 +8,7 @@ set --
 
 while read -r pkg _; do
     case $pkg in
-        baselayout|binutils|bison|busybox|bzip2|curl|flex|gcc|git|\
+        baselayout|binutils|bison|busybox|bzip2|curl|flex|gcc|rsync|\
         gzip|kiss|libressl|linux-headers|m4|make|musl|pkgconf|xz|zlib) ;;
 
         *) set -- "$@" "$pkg" ;;
