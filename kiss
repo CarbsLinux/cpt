@@ -233,6 +233,11 @@ pkg_sources() {
             # This is a checksums check, skip it.
             [ "$2" ] && continue
 
+            # Since git is an optional dependency, make sure
+            # it is available on the system.
+            command -v git >/dev/null 2>&1 ||
+                die "git must be installed in order to acquire ${src##git+}"
+
             mkdir -p "$mak_dir/$1/$dest"
 
             # Run in a subshell to keep the variables, path and
