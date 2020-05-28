@@ -451,19 +451,29 @@ pkg_strip() {
 
     log "$1" "Stripping binaries and libraries"
 
-    # Strip only files matching the below ELF types.
-    # NOTE: 'readelf' is used in place of 'file' as
-    #       it allows us to remove 'file' from the
-    #       core repositories altogether.
     find "$pkg_dir/$1" -type f | while read -r file; do
-        case $(readelf -h "$file") in
-            *" DYN "*)  strip_opt=unneeded ;;
-            *" EXEC "*) strip_opt=all ;;
-            *" REL "*)  strip_opt=debug ;;
-            *) continue
-        esac
+        case $(od -A o -t c -N 18 "$file") in
+            # REL (object files (.o), static libraries (.a)).
+            *177*E*L*F*0000020\ 001\ *|*\!*\<*a*r*c*h*\>*)
+                strip -g -R .comment -R .note "$file"
+                strip_opt=DEBUG
+            ;;
 
-        strip "--strip-$strip_opt" "$file" &&
+            # EXEC (static binaries).
+            *177*E*L*F*0000020\ 002\ *)
+                strip -s -R .comment -R .note "$file"
+                strip_opt=ALL
+            ;;
+
+            # DYN (shared libraries, dynamic binaries).
+            # Shared libraries keep global symbols in a separate ELF section
+            # called '.dynsym'. '--strip-all/-s' does not touch the dynamic
+            # symbol entries which makes this safe to do.
+            *177*E*L*F*0000020\ 003\ *)
+                strip -s -R .comment -R .note "$file"
+                strip_opt=UNNEEDED
+            ;;
+        esac
         printf 'Stripped %10s %s\n' "($strip_opt)" "${file##$pkg_dir/$1}"
     done 2>/dev/null ||:
 }
