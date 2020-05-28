@@ -8,6 +8,25 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+----------
+
+### Added
+- Rsync repository support.
+- pre/post hooks for package removal (pre-remove, post-remove).
+- pre/post hooks for git pulls (pre-pull, post-pull).
+
+### Changed
+- `kiss` no longer removes empty directories if they are defined on a different package.
+- `$KISS_NOPROMPT` has been renamed to `$KISS_PROMPT` and must be set to 0 in order to disable
+  prompts.
+- `kiss-chbuild` now checks tarball digest.
+- `kiss-chbuild` now downloads tarballs according to arch (x86_64 or i686 currently).
+- Submodule repository fetching has been modified to match compatibility.
+
+
+
+
 1.22.4 - 2020-05-26
 -------------------
 
