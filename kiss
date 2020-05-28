@@ -1219,66 +1219,83 @@ pkg_fetch() {
         cd "$repo"
         cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null ||:
 
-        [ -d .git ] || {
-            log "$repo" " "
-            printf '%s\n' "Not a git repository, skipping."
-            continue
-        }
+        if [ -d .git ]; then
 
-        [ "$(git remote 2>/dev/null)" ] || {
-            log "$repo" " "
-            printf '%s\n' "No remote, skipping."
-            continue
-        }
+            [ "$(git remote 2>/dev/null)" ] || {
+                log "$repo" " "
+                printf '%s\n' "No remote, skipping."
+                continue
+            }
 
-        contains "$repos" "$PWD" || {
-            repos="$repos $PWD "
+            contains "$repos" "$PWD" || {
+                repos="$repos $PWD "
 
-            # Display a tick if signing is enabled for this
-            # repository.
-            case $(git config merge.verifySignatures) in
-                true) log "$PWD" "[signed ✓] " ;;
-                *)    log "$PWD" " " ;;
-            esac
+                # Display a tick if signing is enabled for this
+                # repository.
+                case $(git config merge.verifySignatures) in
+                    true) log "$PWD" "[signed ✓] " ;;
+                    *)    log "$PWD" " " ;;
+                esac
 
-            run_hook pre-pull '' "$PWD"
+                run_hook pre-pull '' "$PWD"
 
+                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+                    git fetch
+                    git merge
+                    git submodule update --remote --init -f
+
+                else
+                    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
+
+                    # Find out the owner of the repository and spawn
+                    # git as this user below.
+                    #
+                    # This prevents 'git' from changing the original
+                    # ownership of files and directories in the rare
+                    # case that the repository is owned by a 3rd user.
+                    (
+                        user=$(kiss-stat "$PWD")      || user=root
+                        id -u "$user" >/dev/null 2>&1 || user=root
+
+                        [ "$user" = root ] ||
+                            log "Dropping permissions to $user for pull"
+
+                        git_cmd="git fetch && git merge && git submodule update --remote --init -f"
+                        case $su in *su) git_cmd="'$git_cmd'"; esac
+
+                        # Spawn a subshell to run multiple commands as
+                        # root at once. This makes things easier on users
+                        # who aren't using persist/timestamps for auth
+                        # caching.
+                        user=$user as_root sh -c "$git_cmd"
+                    )
+                fi
+
+                run_hook post-pull '' "$PWD"
+            }
+        elif [ -f .rsync ]; then
+            read -r remote < .rsync
             if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
-                git fetch
-                git merge
-                git submodule update --remote --init -f
-
+                rsync -avzC --delete "$remote/" "$PWD"
             else
                 [ "$uid" = 0 ] || log "$PWD" "Need root to update"
 
-                # Find out the owner of the repository and spawn
-                # git as this user below.
-                #
-                # This prevents 'git' from changing the original
-                # ownership of files and directories in the rare
-                # case that the repository is owned by a 3rd user.
+                # Similar to the git update, we find the owner of
+                # the repository and spawn rsync as that user.
                 (
-                    user=$(kiss-stat "$PWD") || user=root
-
-                    id -u "$user" >/dev/null 2>&1 ||
-                        user=root
+                    user=$(kiss-stat "$PWD")      || user=root
+                    id -u "$user" >/dev/null 2>&1 || user=root
 
                     [ "$user" = root ] ||
                         log "Dropping permissions to $user for pull"
 
-                    git_cmd="git fetch && git merge && git submodule update --remote --init -f"
-                    case $su in *su) git_cmd="'$git_cmd'"; esac
-
-                    # Spawn a subshell to run multiple commands as
-                    # root at once. This makes things easier on users
-                    # who aren't using persist/timestamps for auth
-                    # caching.
-                    user=$user as_root sh -c "$git_cmd"
+                    user=$user as_root rsync -avzC --delete "$remote/" "$PWD"
                 )
             fi
-
-            run_hook post-pull '' "$PWD"
-        }
+        else
+            log "$repo" " "
+            printf '%s\n' "Not a remote repository, skipping."
+        fi
     done
 }
 
