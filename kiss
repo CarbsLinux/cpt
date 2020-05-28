@@ -47,7 +47,7 @@ prompt() {
     # If a KISS_NOPROMPT variable is set, continue.
     # This can be useful for installation scripts and
     # bootstrapping.
-    [ "$KISS_NOPROMPT" ] && return 0
+    [ "$KISS_PROMPT" = 0 ] && return 0
 
     # Ask the user for some input.
     [ "$1" ] && log "$1"
