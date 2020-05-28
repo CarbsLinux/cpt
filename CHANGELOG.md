@@ -8,8 +8,8 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
-----------
+2.0.0 - 2020-05-28
+------------------
 
 ### Added
 - Rsync repository support.
@@ -24,7 +24,10 @@ UNRELEASED
 - `kiss-chbuild` now downloads tarballs according to arch (x86_64 or i686 currently).
 - Submodule repository fetching has been modified to match compatibility.
 
+### Removed
+- Removed `kiss-maintainer` and moved it to [kiss-extra]
 
+[kiss-extra]: https://github.com/carbslinux/kiss-extra
 
 
 1.22.4 - 2020-05-26
