@@ -1046,6 +1046,8 @@ pkg_remove() {
         "$sys_db/$1/pre-remove" ||:
     fi
 
+    run_hook pre-remove "$1" "/var/db/kiss/installed/$1"
+
     while read -r file; do
         # The file is in '/etc' skip it. This prevents the package
         # manager from removing user edited configuration files.
@@ -1061,6 +1063,8 @@ pkg_remove() {
     # Reset 'trap' to its original value. Removal is done so
     # we no longer need to block 'Ctrl+C'.
     trap pkg_clean EXIT INT
+
+    run_hook post-remove "$1" "$KISS_ROOT/"
 
     log "$1" "Removed successfully"
 }
