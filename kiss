@@ -235,7 +235,7 @@ pkg_sources() {
 
             # Since git is an optional dependency, make sure
             # it is available on the system.
-            command -v git >/dev/null 2>&1 ||
+            command -v git >/dev/null ||
                 die "git must be installed in order to acquire ${src##git+}"
 
             mkdir -p "$mak_dir/$1/$dest"
