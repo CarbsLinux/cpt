@@ -1061,7 +1061,7 @@ pkg_remove() {
         [ "${file##/etc/*}" ] || continue
 
         if [ -d "$KISS_ROOT/$file" ]; then
-            "$grep" -q "^$file/\$" "$mak_dir/dirs" && continue
+            "$grep" -q "^$file\$" "$mak_dir/dirs" && continue
             rmdir "$KISS_ROOT/$file" 2>/dev/null || continue
         else
             rm -f "$KISS_ROOT/$file"
