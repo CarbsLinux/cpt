@@ -1046,7 +1046,7 @@ pkg_remove() {
         "$sys_db/$1/pre-remove" ||:
     fi
 
-    run_hook pre-remove "$1" "/var/db/kiss/installed/$1" root
+    run_hook pre-remove "$1" "$sys_db/$1" root
 
     while read -r file; do
         # The file is in '/etc' skip it. This prevents the package
