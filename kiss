@@ -1233,6 +1233,8 @@ pkg_fetch() {
                 *)    log "$PWD" " " ;;
             esac
 
+            run_hook pre-pull '' "$PWD"
+
             if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
                 git fetch
                 git merge
@@ -1266,6 +1268,8 @@ pkg_fetch() {
                     user=$user as_root sh -c "$git_cmd"
                 )
             fi
+
+            run_hook post-pull '' "$PWD"
         }
     done
 }
