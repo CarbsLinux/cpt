@@ -1097,7 +1097,7 @@ pkg_install() {
 
     # Ensure that the tarball's manifest is correct by checking that
     # each file and directory inside of it actually exists.
-    [ -z "$KISS_FORCE" ] && log "$pkg_name" "Checking package manifest" &&
+    [ "$KISS_FORCE" != 1 ] && log "$pkg_name" "Checking package manifest" &&
         while read -r line; do
             # Skip symbolic links
             [ -h "$tar_dir/$pkg_name/$line" ] ||
@@ -1116,7 +1116,7 @@ pkg_install() {
     # Make sure that all run-time dependencies are installed prior to
     # installing the package.
     [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/depends" ] &&
-    [ -z "$KISS_FORCE" ] &&
+    [ "$KISS_FORCE" != 1 ] &&
         while read -r dep dep_type || [ "$dep" ]; do
             [ "${dep##\#*}" ] || continue
             [ "$dep_type" ]   || pkg_list "$dep" >/dev/null ||
