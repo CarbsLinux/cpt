@@ -479,7 +479,7 @@ pkg_strip() {
                 strip_opt=UNNEEDED
             ;;
         esac
-        printf 'Stripped %10s %s\n' "($strip_opt)" "${file##$pkg_dir/$1}"
+        [ "$strip_opt" ] && printf 'Stripped %10s %s\n' "($strip_opt)" "${file##$pkg_dir/$1}"
     done 2>/dev/null ||:
 }
 
