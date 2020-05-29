@@ -27,19 +27,15 @@ own use.
     HOSTNAME=rsync://carbslinux.org/repo
     GITDIR=/pub/git/repo
     SHAREDIR=/pub/share/repo
-    _rsync() { rsync -aC --delete --exclude=.rsync "$@" ;}
 
     git -C "$GITDIR" pull
-    _rsync "$GITDIR/." "$SHAREDIR"
+    rsync -aC --delete --include=core --exclude=.rsync \
+        "$GITDIR/" "$SHAREDIR"
 
-    # For some reason the core repositories were not synced
-    # so I resorted to this solution
-    for dir in "$GITDIR/"*; do
+    for dir in "$SHAREDIR/"*; do
         [ -d "$dir" ] || continue
-        _rsync "$dir/." "$SHAREDIR/${dir##*/}"
-
-        [ -f "$SHAREDIR/${dir##*/}/.rsync" ] ||
-            printf '%s/%s\n' "$HOSTNAME" "${dir##*/}" > "$SHAREDIR/${dir##*/}/.rsync"
+        [ -f "$dir/.rsync" ] ||
+            printf '%s/%s\n' "$HOSTNAME" "${dir##*/}" > "$dir/.rsync"
     done
 
 
