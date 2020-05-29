@@ -8,6 +8,20 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+2.1.0 - 2020-05-29
+------------------
+
+### Added
+- Added '$2' '$3' for build scripts which specifies version and architecture information.
+
+### Changed
+- `kiss-chroot` now sets architecture based on the system
+- Updated documentation
+
+### Removed
+- Removed strip messages
+
+
 2.0.0 - 2020-05-28
 ------------------
 
