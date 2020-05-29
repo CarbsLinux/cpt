@@ -461,25 +461,17 @@ pkg_strip() {
             # REL (object files (.o), static libraries (.a)).
             *177*E*L*F*0000020\ 001\ *|*\!*\<*a*r*c*h*\>*)
                 strip -g -R .comment -R .note "$file"
-                strip_opt=DEBUG
             ;;
 
             # EXEC (static binaries).
-            *177*E*L*F*0000020\ 002\ *)
-                strip -s -R .comment -R .note "$file"
-                strip_opt=ALL
-            ;;
-
             # DYN (shared libraries, dynamic binaries).
             # Shared libraries keep global symbols in a separate ELF section
             # called '.dynsym'. '--strip-all/-s' does not touch the dynamic
             # symbol entries which makes this safe to do.
-            *177*E*L*F*0000020\ 003\ *)
+            *177*E*L*F*0000020\ 00[23]\ *)
                 strip -s -R .comment -R .note "$file"
-                strip_opt=UNNEEDED
             ;;
         esac
-        [ "$strip_opt" ] && printf 'Stripped %10s %s\n' "($strip_opt)" "${file##$pkg_dir/$1}"
     done 2>/dev/null ||:
 }
 
