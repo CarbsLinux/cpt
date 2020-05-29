@@ -681,6 +681,8 @@ pkg_build() {
         pkg_extract "$pkg"
         repo_dir=$(pkg_find "$pkg")
 
+        read -r build_version _ < "$repo_dir/version"
+
         # Install built packages to a directory under the package name
         # to avoid collisions with other packages.
         mkdir -p "$pkg_dir/$pkg/$pkg_db"
@@ -695,7 +697,7 @@ pkg_build() {
         # Call the build script, log the output to the terminal
         # and to a file. There's no PIPEFAIL in POSIX shelll so
         # we must resort to tricks like killing the script ourselves.
-        { "$repo_dir/build" "$pkg_dir/$pkg" 2>&1 || {
+        { "$repo_dir/build" "$pkg_dir/$pkg" "$build_version" "$sys_arch" 2>&1 || {
             log "$pkg" "Build failed"
             log "$pkg" "Log stored to $log_dir/$pkg-$time-$pid"
             run_hook build-fail "$pkg" "$pkg_dir/$pkg"
@@ -1649,6 +1651,10 @@ main() {
         warn "Your KISS_ROOT variable shouldn't end with '/'"
         KISS_ROOT=${KISS_ROOT%/}
     }
+
+    # Define an optional sys_arch variable in order to provide
+    # information to build files with architectural information.
+    sys_arch=$(uname -m 2>/dev/null) ||:
 
     # Define this variable but don't create its directory structure from
     # the get go. It will be created as needed by package installation.
