@@ -38,6 +38,11 @@ to execute the file.
 An important advice is to append an '-e' to the shebang (#!/bin/sh -e) so
 that the build script exits on compilation error.
 
+Build is run with three arguments
+$1: Location of the package directory (DESTDIR)
+$2: Package version
+$3: System Architecture
+
 
 SOURCES
 -------
