@@ -79,12 +79,12 @@ single file where it will be named as the argument.
 
 
     kinstall() {
-        # usage: kinstall 755 /usr/bin/file filename
-        ! [ -d "$2" ] || {
+        # usage: kinstall 755 filename /usr/bin/file
+        ! [ -d "$3" ] || {
             printf '%s\n' "Error: $target is a directory" >&2
             return 1
         }
-        mkdir -p "${2%/*}"; cp "$3" "$2"
-        chmod "$1" "$2"
+        mkdir -p "${3%/*}"; cp "$2" "$3"
+        chmod "$1" "$3"
     }
 
