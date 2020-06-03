@@ -1515,8 +1515,8 @@ args() {
                     cat "$sys_db/$pkg/message" >&2
                     msg=1
                 fi
-                [ "$msg" ] || log "No message in queue"
             done
+            [ "$msg" ] || log "No message in queue"
         ;;
 
         e|extension)
