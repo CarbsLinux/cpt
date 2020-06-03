@@ -32,8 +32,9 @@ main() {
     [ "$2" ] || {
         march=$(uname -m 2>/dev/null) ||:
         case "$march" in
-            '')   march=native ;;
-            i*86) march=i686 ;;
+            '')     march=native ;;
+            x86_64) march=x86-64 ;;
+            i*86)   march=i686 ;;
         esac
     }
 
