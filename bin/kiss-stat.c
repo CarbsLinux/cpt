@@ -14,19 +14,24 @@
 int main (int argc, char *argv[]) {
   struct stat sb;
 
-  // Exit if no or multiple arguments are given
+  // Exit if no or multiple arguments are given.
   if (argc != 2 || strcmp(argv[1], "--help") == 0) {
     fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
     return(1);
   }
 
-  // Exit if file stat cannot be obtained
+  // Exit if file stat cannot be obtained.
   if (lstat(argv[1], &sb) == -1) {
     perror(argv[0]);
     return(1);
   }
 
-  // Print the user name of file owner
+  // Exit if name of the owner cannot be retrieved.
+  if (!getpwuid(sb.st_uid)) {
+    return(1);
+  }
+
+  // Print the user name of file owner.
   struct passwd *pw = getpwuid(sb.st_uid);
   printf("%s\n", pw->pw_name);
   return(0);
