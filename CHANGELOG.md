@@ -8,6 +8,15 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+2.1.1 - 2020-06-03
+------------------
+
+### Fixed
+- Fixed 'No message in queue' message being outputted for every single package.
+- Fixed CFLAGS for x86_64 on `kiss-chroot`.
+- Fixed setting binary packages as dependencies.
+
+
 2.1.0 - 2020-05-29
 ------------------
 
