@@ -1562,7 +1562,7 @@ args() {
         l|list)     pkg_list "$@" ;;
         u|update)   pkg_updates ;;
         s|search)   for pkg do pkg_find "$pkg" all; done ;;
-        v|version)  log kiss 2.1.1 ;;
+        v|version)  log kiss 2.1.2 ;;
 
         h|help|-h|--help|'')
             exec 2>&1

@@ -8,6 +8,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+2.1.2 - 2020-06-03
+------------------
+
+### Fixed
+- Fixed a segmentation fault on `kiss-stat` when a file didn't have on owner on the
+  `passwd` database.
+
+
 2.1.1 - 2020-06-03
 ------------------
 
