@@ -532,7 +532,7 @@ pkg_fixdeps() {
             own=${own%/*}
             own=${own##*/}
 
-            case $own in musl|gcc|"$pkg_name"|"$pkg_name-bin"|"") continue ; esac
+            case $own in "$pkg_name"|"$pkg_name-bin"|"") continue ; esac
             printf 'Found %s (%s) in (%s)\n' "$own" "$dep" \
                    "${file##$pkg_dir/$pkg_name}" >/dev/tty
 
