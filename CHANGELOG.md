@@ -15,8 +15,12 @@ UNRELEASED
 - Makefile configurations were moved to config.mk.
 
 ### Changed
-- `kiss` no longer ignores musl and gcc on `fixdeps()`. This will result in a
-- Makefile now accepts `LIBS`, `LDFLAGS`, and `CFLAGS`
+- `kiss` no longer ignores musl and gcc on `fixdeps()`. This will result in an
+  influx of musl dependencies. But you will be needing the C library to be
+  installed anyway if you want your programs to work. If your program links
+  to `libgcc`, you will need the gcc package for that given program to function.
+- Makefile now accepts `LIBS`, `LDFLAGS`, and `CFLAGS`.
+- Updated documentation.
 
 ### Fixed
 - `C89` compatibility on C programs.
