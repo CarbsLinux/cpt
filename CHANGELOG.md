@@ -8,6 +8,20 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+----------
+
+### Added
+- Makefile configurations were moved to config.mk.
+
+### Changed
+- `kiss` no longer ignores musl and gcc on `fixdeps()`. This will result in a
+- Makefile now accepts `LIBS`, `LDFLAGS`, and `CFLAGS`
+
+### Fixed
+- `C89` compatibility on C programs.
+
+
 2.1.2 - 2020-06-03
 ------------------
 
