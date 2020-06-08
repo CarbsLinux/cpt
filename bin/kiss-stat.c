@@ -16,7 +16,7 @@ int main (int argc, char *argv[]) {
 
   // Exit if no or multiple arguments are given.
   if (argc != 2 || strcmp(argv[1], "--help") == 0) {
-    fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
+    fprintf(stderr, "Usage: %s [pathname]\n", argv[0]);
     return(1);
   }
 
