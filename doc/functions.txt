@@ -1,29 +1,27 @@
 FUNCTIONS
+=================================================================================
 
-This is a document for example functions to ensure portability
-across different systems. These are mere examples as we currently
-depend on non POSIX utilities on packages. These dependencies will
-be removed as we go forward.
+This is a document for example functions to ensure portability across different
+systems. These are mere examples as we currently depend on non-POSIX utilities on
+packages. These dependencies will be removed as we go forward.
 
-I don't want to turn the functions in here into a library because
-these are really simple, and I believe that the build scripts sho-
-uld be self-contained. What's the point of creating portable func-
-tions if the functions themselves depend on a library file to be
-installed on a system?
+I don't want to turn the functions in here into a library because these are
+really simple, and I believe that the build scripts should be self-contained.
+What's the point of creating portable functions if the functions themselves
+depend on a library file to be installed on a system?
 
-These obviously have their own limitations, but not every limitation
-has to be solved in a single function. Use your imagination, non-
-standard flags/commands may save you some keypresses, but they are
-not standard, because you can already do these with your brain and
-a few more keypresses.
+These obviously have their own limitations, but not every limitation has to be
+solved in a single function. Use your imagination, non-standard flags/commands
+may save you some keypresses, but they are not standard, because you can already
+do these with your brain and a few more keypresses.
 
 SED -i
-------
+---------------------------------------------------------------------------------
 
-The -i function isn't portable across systems, and isn't defined
-by POSIX. But it isn't too valuable as it can be replaced with a
-simple function. I present you sed_i. This function only depends
-on the fact that the file name is the last argument.
+The -i function isn't portable across systems, and isn't defined by POSIX. But it
+isn't too valuable as it can be replaced with a simple function. I present you
+sed_i. This function only depends on the fact that the file name is the last
+argument.
 
 
     sed_i() {
@@ -40,11 +38,10 @@ on the fact that the file name is the last argument.
         cat _ > "$file"; rm -f _
     }
 
-In build scripts with multiple 'sed -i' usage, such a function
-can be defined for and used. If only it is used a single time,
-defining such a function is quite unnecessary. In such a case
-prefer doing it manually. Assume the file is named 'file.h' and
-we are calling 's/this/that/g'.
+In build scripts with multiple 'sed -i' usage, such a function can be defined for
+and used. If only it is used a single time, defining such a function is quite
+unnecessary. In such a case prefer doing it manually. Assume the file is named
+'file.h' and we are calling 's/this/that/g'.
 
 
     sed 's/this/that/g' file.h >_
@@ -52,14 +49,13 @@ we are calling 's/this/that/g'.
 
 
 INSTALL -D,-t
--------------
+---------------------------------------------------------------------------------
 
-'install' does not have a standard. Options such as '-D' and '-t',
-even though they are the most used, do not exist on every impleme-
-ntation. Avoid using these flags where possible. You can prefer us-
-ing functions such as these. The first function is similar to '-t'
-flag, where you can install multiple files to a given target. The
-second function is similar to the usage without the '-t' flag, a
+'install' does not have a standard. Options such as '-D' and '-t', even though
+they are the most used, do not exist on every implementation. Avoid using these
+flags where possible. You can prefer using functions such as these. The first
+function is similar to '-t' flag, where you can install multiple files to a given
+target. The second function is similar to the usage without the '-t' flag, a
 single file where it will be named as the argument.
 
 
