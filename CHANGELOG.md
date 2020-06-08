@@ -26,8 +26,8 @@ UNRELEASED
 ------------------
 
 ### Fixed
-- Fixed a segmentation fault on `kiss-stat` when a file didn't have on owner on the
-  `passwd` database.
+- Fixed a segmentation fault on `kiss-stat` when a file didn't have on owner on
+  the `passwd` database.
 
 
 2.1.1 - 2020-06-03
@@ -43,7 +43,8 @@ UNRELEASED
 ------------------
 
 ### Added
-- Added '$2' '$3' for build scripts which specifies version and architecture information.
+- Added '$2' '$3' for build scripts which specifies version and architecture
+  information.
 
 ### Changed
 - `kiss-chroot` now sets architecture based on the system
@@ -62,11 +63,13 @@ UNRELEASED
 - pre/post hooks for git pulls (pre-pull, post-pull).
 
 ### Changed
-- `kiss` no longer removes empty directories if they are defined on a different package.
-- `$KISS_NOPROMPT` has been renamed to `$KISS_PROMPT` and must be set to 0 in order to disable
-  prompts.
+- `kiss` no longer removes empty directories if they are defined on a different
+  package.
+- `$KISS_NOPROMPT` has been renamed to `$KISS_PROMPT` and must be set to 0 in
+  order to disable prompts.
 - `kiss-chbuild` now checks tarball digest.
-- `kiss-chbuild` now downloads tarballs according to arch (x86_64 or i686 currently).
+- `kiss-chbuild` now downloads tarballs according to arch (x86_64 or i686
+  currently).
 - Submodule repository fetching has been modified to match compatibility.
 
 ### Removed
@@ -78,10 +81,10 @@ UNRELEASED
 1.22.4 - 2020-05-26
 -------------------
 
-**NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not be doing any
-releases except for patches and fixes. My attention is now on implementing binary repositories.
-I will be doing some 'release candidates' before release, as binary repositories will need user
-feedback.
+**NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not
+be doing any releases except for patches and fixes. My attention is now on
+impllementing binary repositories. I will be doing some 'release candidates'
+before release, as binary repositories will need user feedback.
 
 ### Added
 - Added new documents.
@@ -96,9 +99,10 @@ feedback.
 -------------------
 
 ### SECURITY
-- Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now use
-  `$KISS_ROOT/etc/kiss-hook` on installation operations (which are run by root) so that the hooks
-  are defined by the system administrator rather than the user. See [related proof-of-concept]
+- Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now
+  use `$KISS_ROOT/etc/kiss-hook` on installation operations (which are run by
+  root) so that the hooks are defined by the system administrator rather than the
+  user. See [related proof-of-concept]
 
 [related proof-of-concept]: https://github.com/kisslinux/kiss/pull/157#issuecomment-629880775
 
@@ -107,8 +111,8 @@ feedback.
 -------------------
 
 ### Fixed
-- Fixed an issue where `pkg_conflicts` would abort if `kiss-readlink` failed due to missing
-  components. It now fallbacks to the original directory name.
+- Fixed an issue where `pkg_conflicts` would abort if `kiss-readlink` failed due
+  to missing components. It now fallbacks to the original directory name.
 
 
 
@@ -129,9 +133,10 @@ feedback.
 
 ### Fixed
 - Fixed a `kiss-owns` typo that caused it to fail.
-- Fixed a `kiss-readlink` bug where it would fail if the last component wouldn't exist.
-- Fixed an error on tarball extraction where a file name containing spaces would be parsed as
-  two files.
+- Fixed a `kiss-readlink` bug where it would fail if the last component wouldn't
+  exist.
+- Fixed an error on tarball extraction where a file name containing spaces would
+  be parsed as two files.
 
 
 [kiss-extra]: https://github.com/carbslinux/kiss-extra
@@ -146,20 +151,22 @@ feedback.
 ### Changed
 - Replaced `KISS_COLOUR` with `KISS_COLOR` to match upstream.
 - Renamed `colour` variable to `color` for consistency.
-- The package manager no longer needs root priviliges if the `KISS_ROOT` is writable
-  by the user.
+- The package manager no longer needs root priviliges if the `KISS_ROOT` is
+  writable by the user.
 - `kiss` now uses the host cache regardless of `KISS_ROOT`.
 
 ### Fixed
-- Fixed an issue where `kiss-owns` would output the wrong package because of symbolic links.
-  The script now reads the link of the directory instead of the full file.
+- Fixed an issue where `kiss-owns` would output the wrong package because of
+  symbolic links. The script now reads the link of the directory instead of the
+  full file.
 
 
 1.21.1 - 2020-05-14
 -------------------
 
 ### Changed
-- All contrib messages now output usage information when called with `--help` and `-h`.
+- All contrib messages now output usage information when called with `--help`
+  and `-h`.
 - `hashcheck` function now uses `$1` instead of `${file#\*}`.
 
 ### Fixed
@@ -172,12 +179,13 @@ feedback.
 ### Added
 - Added a `d|download` option to acquire the sources of given packages. If no
   packages are given, it acquires the sources of outdated packages. This can be
-  used to acquire a package's sources to build it later, or periodically downloading
-  outdated package sources, so the user doesn't wait for the download when updating
-  the system.
+  used to acquire a package's sources to build it later, or periodically
+  downloading outdated package sources, so the user doesn't wait for the download
+  when updating the system.
 - kiss now understands `.txz` tarballs. (BSD `src.txz` wink wink)
 - `KISS_TMPDIR` can now be used to specify a temporary build directory. This will
-  be useful for those of you who would want to build on ram or a different filesystem.
+  be useful for those of you who would want to build on ram or a different
+  filesystem.
 
 ### Changed
 - Simplified tarball extraction method.
@@ -239,15 +247,15 @@ feedback.
 -------------------
 
 ### Added
-- Added `kiss-reporevdepends` for finding all the packages on the repository that depends
-  on the specified package.
+- Added `kiss-reporevdepends` for finding all the packages on the repository that
+  depends on the specified package.
 
 ### Changed
-- Removed the `-p` flag from tar while installing packages. busybox ignores it and we
-  don't need it.
+- Removed the `-p` flag from tar while installing packages. busybox ignores it
+  and we don't need it.
 - Replaced tar flags with keys for historical compatibility.
-- `kiss` now decompresses a tarball once and uses the decompressed tarball for listing
-  and extraction
+- `kiss` now decompresses a tarball once and uses the decompressed tarball for
+  listing and extraction.
 
 ### Fixed
 - Fixed the output of docstrings in contrib scripts.
@@ -258,13 +266,15 @@ feedback.
 -------------------
 
 ### Added
-- Added editorconfig file since we now have 4 languages (roff, Makefile, sh, C) in the repository.
+- Added editorconfig file since we now have 4 languages (roff, Makefile, sh, C)
+  in the repository.
 - Added `kiss-readlink` as a `readlink -f` replacement.
 - Added `kiss-message` for checking package messages.
 - Added this CHANGELOG
 
 ### Changed
-- Made tar calls portable. `kiss` is no longer limited to busybox, bsdtar, or gnu tar!
+- Made tar calls portable. `kiss` is no longer limited to busybox, bsdtar, or
+  gnu tar!
 
 ### Removed
 - Dropped the usage of `readlink` in `kiss`.
@@ -300,12 +310,15 @@ feedback.
 ### Added
 - Added fallbacks for sha256sum. `kiss` now fallbacks to `sha256`, and `openssl`
   for hash checking, respectively.
-- Added `kiss-changelog` and `kiss-which` entries to the `kiss-contrib.1` manual page.
+- Added `kiss-changelog` and `kiss-which` entries to the `kiss-contrib.1` manual
+  page.
 
 ### Fixed
 - Fixed `kiss` not using the preferred `tar` program on decompression.
-- Fixed `pkg_conflicts()` getting stuck when you reinstall the same single package on a system.
-- Fixed `pkg_conflicts()` giving an error if no packages are installed on a system.
+- Fixed `pkg_conflicts()` getting stuck when you reinstall the same single
+  package on a system.
+- Fixed `pkg_conflicts()` giving an error if no packages are installed on a
+  system.
 
 
 1.16.1 - 2020-05-01
@@ -374,9 +387,10 @@ This release removes `rsync` from `kiss` and implements its own installation
 method.
 
 ### Added
-- `kiss` now implements user scripts available in the `$PATH`. This can be used to
-  call `kiss manifest` from `kiss` itself.
-- `kiss` now displays a warning if the user has a `$KISS_ROOT` that ends with a `/`.
+- `kiss` now implements user scripts available in the `$PATH`. This can be used
+  to call `kiss manifest` from `kiss` itself.
+- `kiss` now displays a warning if the user has a `$KISS_ROOT` that ends with
+  a `/`.
 - `kiss` now uses its own new package installation method.
 
 ### Removed
@@ -443,18 +457,20 @@ method.
 -------------------
 
 ### Added
-- `kiss-cargolock-urlgen`: a tool that can read a Cargo.lock file to generate a list of urls.
+- `kiss-cargolock-urlgen`: a tool that can read a Cargo.lock file to generate a
+  list of urls.
 - `kiss-cat`: a tool to concatanate package build files.
 - Manual page for `kiss-contrib`.
 
 ### Changed
 - `kiss-owns` now gives an error on directories.
-- `kiss-link` can now take multiple file names and will create symbolic links of them all.
+- `kiss-link` can now take multiple file names and will create symbolic links
+  of them all.
 - Simplified `kiss-link`
 
 ### Fixed
 - `kiss-cargo-urlgen`: Fixed an issue where if a package version contained a '-',
-    it could lead to wrong url generation.
+  it could lead to wrong url generation.
 
 
 1.9.0 - 1.11.2 - 2020-04-04
