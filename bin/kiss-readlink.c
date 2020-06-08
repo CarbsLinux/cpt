@@ -1,7 +1,8 @@
-// kiss-readlink --- a utility replacement for readlink
-// See LICENSE for copyright information
-
-// This is basically a 'readlink -f' command.
+/* kiss-readlink --- a utility replacement for readlink
+ * See LICENSE for copyright information
+ *
+ * This is basically a 'readlink -f' command.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <libgen.h>
