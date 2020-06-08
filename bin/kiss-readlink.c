@@ -7,6 +7,8 @@
 #include <libgen.h>
 #include <string.h>
 
+char *realpath(const char *path, char *resolved_path);
+
 int main(int argc, char *argv[]) {
 
   char buf[512];
