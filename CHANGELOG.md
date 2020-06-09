@@ -9,7 +9,7 @@ to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
+2.2.0 - 2020-06-10
 --------------------------------------------------------------------------------
 
 ### Added
@@ -25,6 +25,8 @@ UNRELEASED
 
 ### Fixed
 - `C89` compatibility on C programs.
+- Fixed an alternatives issue where a file containing special regular expression
+  characters (such as `/usr/bin/[`) would result in a manifest deletion.
 
 
 2.1.2 - 2020-06-03
