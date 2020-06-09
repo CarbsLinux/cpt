@@ -43,6 +43,13 @@ contains() {
     case " $1 " in *" $2 "*) return 0; esac; return 1
 }
 
+regesc() {
+    # Escape special regular expression characters as
+    # defined in POSIX BRE. '$.*[\^'
+    printf '%s\n' "$1" | sed 's|\\|\\\\|g;s|\[|\\[|g;s|\$|\\$|g;s|\.|\\.|g;s|\*|\\*|g;s|\^|\\^|g'
+}
+
+
 prompt() {
     # If a KISS_NOPROMPT variable is set, continue.
     # This can be useful for installation scripts and
@@ -940,8 +947,8 @@ pkg_swap() {
         die "Alternative '$1 $2' doesn't exist"
 
     if [ -f "$2" ]; then
-        # Figure out which package owns the file we are going to
-        # swap for another package's.
+        # Figure out which package owns the file we are going to swap for
+        # another package's.
         #
         # Print the full path to the manifest file which contains
         # the match to our search.
@@ -960,7 +967,7 @@ pkg_swap() {
         # its manifest file to reflect this. We then resort this file
         # so no issues arise when removing packages.
         cp  -Pf "$KISS_ROOT/$2" "$pkg_owns>${alt#*>}"
-        sed "s#^$2#${PWD#$KISS_ROOT}/$pkg_owns>${alt#*>}#" \
+        sed "s#^$(regesc "$2")#${PWD#$KISS_ROOT}/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
     fi
@@ -968,7 +975,7 @@ pkg_swap() {
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
     mv -f "$alt" "$KISS_ROOT/$2"
-    sed "s#^${PWD#$KISS_ROOT}/$alt#$2#" "../installed/$1/manifest" |
+    sed "s#^${PWD#$KISS_ROOT}/$(regesc "$alt")#$2#" "../installed/$1/manifest" |
         sort -r -o "../installed/$1/manifest"
 }
 
