@@ -1,15 +1,16 @@
 CHANGELOG
-=================================================================================
+================================================================================
 
-List of important changes will be in this file. The format is based on
-[Keep a Changelog], and this project _somewhat_ adheres to [Semantic Versioning].
+This is the CHANGELOG for the Carbs Linux fork of the `kiss` package manager.
+The format is based on [Keep a Changelog], and this project _somewhat_ adheres
+to [Semantic Versioning].
 
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
 UNRELEASED
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Makefile configurations were moved to config.mk.
@@ -19,7 +20,7 @@ UNRELEASED
   influx of musl dependencies. But you will be needing the C library to be
   installed anyway if you want your programs to work. If your program links
   to `libgcc`, you will need the gcc package for that given program to function.
-- Makefile now accepts `LIBS`, `LDFLAGS`, and `CFLAGS`.
+- Makefile now properly accepts `LIBS`, `LDFLAGS`, and `CFLAGS`.
 - Updated documentation.
 
 ### Fixed
@@ -27,7 +28,7 @@ UNRELEASED
 
 
 2.1.2 - 2020-06-03
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed a segmentation fault on `kiss-stat` when a file didn't have on owner on
@@ -35,7 +36,7 @@ UNRELEASED
 
 
 2.1.1 - 2020-06-03
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed 'No message in queue' message being outputted for every single package.
@@ -44,7 +45,7 @@ UNRELEASED
 
 
 2.1.0 - 2020-05-29
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added '$2' '$3' for build scripts which specifies version and architecture
@@ -59,7 +60,7 @@ UNRELEASED
 
 
 2.0.0 - 2020-05-28
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Rsync repository support.
@@ -83,7 +84,7 @@ UNRELEASED
 
 
 1.22.4 - 2020-05-26
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not
 be doing any releases except for patches and fixes. My attention is now on
@@ -100,7 +101,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.22.3 - 2020-05-18
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### SECURITY
 - Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now
@@ -112,7 +113,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.22.2 - 2020-05-16
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed an issue where `pkg_conflicts` would abort if `kiss-readlink` failed due
@@ -121,7 +122,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.22.1 - 2020-05-15
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### REMOVED
 - Removed some contrib scripts and moved them to [kiss-extra]
@@ -147,7 +148,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.22.0 - 2020-05-14
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added `kiss-exec`, a tool to execute commands inside the alternatives system.
@@ -166,7 +167,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.21.1 - 2020-05-14
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Changed
 - All contrib messages now output usage information when called with `--help`
@@ -178,7 +179,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.21.0 - 2020-05-12
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added a `d|download` option to acquire the sources of given packages. If no
@@ -187,8 +188,8 @@ before release, as binary repositories will need user feedback.
   downloading outdated package sources, so the user doesn't wait for the download
   when updating the system.
 - kiss now understands `.txz` tarballs. (BSD `src.txz` wink wink)
-- `KISS_TMPDIR` can now be used to specify a temporary build directory. This will
-  be useful for those of you who would want to build on ram or a different
+- `KISS_TMPDIR` can now be used to specify a temporary build directory. This
+  will be useful for those of you who would want to build on ram or a different
   filesystem.
 
 ### Changed
@@ -202,7 +203,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.20.3 - 2020-05-09
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed an alternatives bug caused by the previous patch, where the package
@@ -210,14 +211,14 @@ before release, as binary repositories will need user feedback.
 
 
 1.20.2 - 2020-05-09
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed an issue regarding manifest format when using pkg_swap (alternatives).
 
 
 1.20.1 - 2020-05-08
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Changed
 - Faster conflict resolution by using a conflict cache file.
@@ -225,14 +226,14 @@ before release, as binary repositories will need user feedback.
 
 
 1.20.0 - 2020-05-07
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - `KISS_NOPROMPT` can be specified in order to skip prompts.
 
 
 1.19.1 - 2020-05-07
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added `e|extension` to `kiss` which can be used to output kiss-extensions.
@@ -248,11 +249,11 @@ before release, as binary repositories will need user feedback.
 
 
 1.19.0 - 2020-05-06
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
-- Added `kiss-reporevdepends` for finding all the packages on the repository that
-  depends on the specified package.
+- Added `kiss-reporevdepends` for finding all the packages on the repository
+  that depends on the specified package.
 
 ### Changed
 - Removed the `-p` flag from tar while installing packages. busybox ignores it
@@ -263,11 +264,12 @@ before release, as binary repositories will need user feedback.
 
 ### Fixed
 - Fixed the output of docstrings in contrib scripts.
-- `kiss` now ignores the binary programs in the repository for `kiss extensions`.
+- `kiss` now ignores the binary programs in the repository for
+  `kiss extensions`.
 
 
 1.18.0 - 2020-05-04
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added editorconfig file since we now have 4 languages (roff, Makefile, sh, C)
@@ -285,31 +287,35 @@ before release, as binary repositories will need user feedback.
 
 
 1.17.0 - 2020-05-03
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
-- Added `kiss-stat`, a simple C program for getting the owner name of a file/directory.
+- Added `kiss-stat`, a simple C program for getting the owner name of a
+  file/directory.
 
 ### Removed
 - Removed the usage of `stat` calls, as they are not standardized.
 
 ### Changed
-- `kiss` now doesn't report `Generating etcsums` if there isn't an `/etc` directory in the package
+- `kiss` now doesn't report `Generating etcsums` if there isn't an `/etc`
+  directory in the package
 
 ### Fixed
-- `kiss` now uses `sys_db` instead of `pkg_db` when removing packages from the system.
-- `kiss` now explicitly exits if prompt returns with a status of 1. This is for `ksh` compatibility.
+- `kiss` now uses `sys_db` instead of `pkg_db` when removing packages from the
+  system.
+- `kiss` now explicitly exits if prompt returns with a status of 1. This is for
+  `ksh` compatibility.
 
 
 1.16.3 - 2020-05-03
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed etcsum location.
 
 
 1.16.2 - 2020-05-03
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - Added fallbacks for sha256sum. `kiss` now fallbacks to `sha256`, and `openssl`
@@ -326,14 +332,14 @@ before release, as binary repositories will need user feedback.
 
 
 1.16.1 - 2020-05-01
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed `ksh` Ctrl+C interrupt signals.
 
 
 1.16.0 - 2020-05-01
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - New message queue system implementation. If a package includes a file named
@@ -349,7 +355,7 @@ before release, as binary repositories will need user feedback.
 
 
 1.15.0 - 2020-04-30
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 I have decided to revert to rsync installation method as it is faster and safer.
 Now, rsync is not a huge dependency. Saving 500Kb is not worth it when you look
@@ -365,14 +371,14 @@ at the trade-off.
 
 
 1.14.2/1.14.3 - 2020-04-27
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - The new installation method now complies to the `$KISS_ROOT` value.
 
 
 1.14.1 - 2020-04-27
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Removed
 - Removed the unnecessary `[ -d ]` from the path query.
@@ -380,12 +386,13 @@ at the trade-off.
 ### Fixed
 - Fixed directory permissions in the new installation method.
 - Added support for `$KISS_ROOT` to the new installation method.
-- Added a check for symlinks that could overwrite a directory during installation.
+- Added a check for symlinks that could overwrite a directory during
+  installation.
 - Whitespace cleanup.
 
 
 1.14.0 - 2020-04-25
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 This release removes `rsync` from `kiss` and implements its own installation
 method.
@@ -403,14 +410,14 @@ method.
 
 
 1.13.1 - 2020-04-19
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Removed
 - Reverted and removed `kiss ss` changes.
 
 
 1.13.0 - 2020-04-19
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - `kiss ss` for outputting a single location for scripting.
@@ -425,7 +432,7 @@ method.
 
 
 1.12.3 - 2020-04-17
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Changed
 - Changed indentation style on decompression.
@@ -436,7 +443,7 @@ method.
 
 
 1.12.2 - 2020-04-15
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - `kiss` can now decompress zip files.
@@ -451,14 +458,14 @@ method.
 
 
 1.12.1 - 2020-04-12
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed printing empty arguments in `kiss-outdated`.
 
 
 1.12.0 - 2020-04-05
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - `kiss-cargolock-urlgen`: a tool that can read a Cargo.lock file to generate a
@@ -473,12 +480,12 @@ method.
 - Simplified `kiss-link`
 
 ### Fixed
-- `kiss-cargo-urlgen`: Fixed an issue where if a package version contained a '-',
+- `kiss-cargo-urlgen`: Fixed an issue where if a package version contained a '-'
   it could lead to wrong url generation.
 
 
 1.9.0 - 1.11.2 - 2020-04-04
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Added
 - `kiss f` to fetch repositories without an update prompt.
