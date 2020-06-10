@@ -9,6 +9,13 @@ to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+2.2.1 - 2020-06-11
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed directory checking on package removal
+
+
 2.2.0 - 2020-06-10
 --------------------------------------------------------------------------------
 
