@@ -1059,7 +1059,7 @@ pkg_remove() {
     # purpose (such as baselayout).
     manifest_list="$(set +f; pop "$sys_db/$1/manifest" from "$sys_db/"*/manifest)"
     # shellcheck disable=2086
-    [ $manifest_list ] && grep -h '/$' $manifest_list | sort -ur > "$mak_dir/dirs"
+    [ "$manifest_list" ] && grep -h '/$' $manifest_list | sort -ur > "$mak_dir/dirs"
 
     run_hook pre-remove "$1" "$sys_db/$1" root
 
