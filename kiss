@@ -1573,7 +1573,7 @@ args() {
 
         h|help|-h|--help|'')
             exec 2>&1
-            log 'kiss [a|b|c|d|e|f|i|l|r|s|u|v] [pkg] [pkg] [pkg]'
+            log 'kiss [abcdefilrsuv] [pkg...]'
             log 'alternatives  List and swap to alternatives'
             log 'build         Build a package'
             log 'checksum      Generate checksums'
