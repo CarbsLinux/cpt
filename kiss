@@ -71,10 +71,11 @@ as_root() {
     # 'doas' or 'su'. Hurrah for choice.
     [ "$uid" = 0 ] || log "Using '${su:-su}' (to become ${user:=root})"
 
-    case $su in
-        *sudo) sudo -E -u "$user" -- "$@" ;;
-        *doas) doas    -u "$user" -- "$@" ;;
-        *)     su -pc "$* <&3" "$user" 3<&0 </dev/tty ;;
+    case ${su##*/} in
+        sudo) sudo -E -u "$user" -- "$@" ;;
+        doas) doas    -u "$user" -- "$@" ;;
+        su)   su -pc "env USER=$user $* <&3" "$user" 3<&0 </dev/tty ;;
+        *)    die "Invalid KISS_SU value: $su" ;;
     esac
 }
 
