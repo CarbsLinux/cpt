@@ -58,9 +58,9 @@ main() {
             SHELL=/bin/sh \
             USER=root \
             KISS_ASROOT=1 \
-            CFLAGS="${2:--march=$march -mtune=generic -pipe -Os}" \
-            CXXFLAGS="${2:--march=$march -mtune=generic -pipe -Os}" \
-            MAKEFLAGS="-j$(nproc 2>/dev/null || echo 1)" \
+            CFLAGS="${CFLAGS:--march=$march -mtune=generic -pipe -Os}" \
+            CXXFLAGS="${CXXFLAGS:--march=$march -mtune=generic -pipe -Os}" \
+            MAKEFLAGS="${MAKFLAGS:--j$(nproc 2>/dev/null || echo 1)}" \
             /bin/sh -l
     }
 }
