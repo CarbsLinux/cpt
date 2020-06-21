@@ -62,5 +62,10 @@ sh256 carbs-rootfs.tar.xz | diff - carbs-rootfs.tar.xz.sum ||
 log "Creating temporary chroot"
 cp -a carbs-chroot "chroot-$pid"
 
+[ "$1" ] && {
+    log "Installing extra packages"
+    KISS_ROOT=$PWD/chroot-$pid kiss i "$@"
+}
+
 log "Entering chroot"
 su -c "kiss-chroot chroot-$pid; rm -rf chroot-$pid"
