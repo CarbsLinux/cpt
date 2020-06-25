@@ -1,7 +1,7 @@
 #!/bin/sh -e
 # Check which package owns a file
 
-case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-owns <file>" ; exit 0 ; esac
+case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-owns [file]" ; exit 0 ; esac
 
 # Strip 'KISS_ROOT' from the file path if passed and
 # follow symlinks.
