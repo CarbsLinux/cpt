@@ -1291,7 +1291,7 @@ pkg_fetch() {
         elif [ -f .rsync ]; then
             read -r remote < .rsync
             if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
-                rsync -avzC --delete "$remote/" "$PWD"
+                rsync -acvzzC --include=core --delete "$remote/" "$PWD"
             else
                 [ "$uid" = 0 ] || log "$PWD" "Need root to update"
 
@@ -1304,7 +1304,7 @@ pkg_fetch() {
                     [ "$user" = root ] ||
                         log "Dropping permissions to $user for pull"
 
-                    user=$user as_root rsync -avzC --delete "$remote/" "$PWD"
+                    user=$user as_root rsync -acvzzC --include=core --delete "$remote/" "$PWD"
                 )
             fi
         else
