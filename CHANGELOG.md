@@ -9,6 +9,25 @@ to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+--------------------------------------------------------------------------------
+
+### Added
+- Added `KISS_FETCH` to optionally disable repository fetches while performing
+  a system update. You can now run `KISS_FETCH=0 kiss u` in order to update
+  your system without syncing repositories.
+
+### Changed
+- Changed usage outputs for kiss and contrib utilities.
+- `rsync` repositories are now synced based on checksums rather than timestamps.
+- `kiss-chroot` now uses system flags if available.
+- `kiss-chbuild` now installs extra packages if specified.
+
+### Fixed
+- Fixed an issue where using `su` to install packages resulted in a wrong
+  package ownership.
+
+
 2.2.1 - 2020-06-11
 --------------------------------------------------------------------------------
 
