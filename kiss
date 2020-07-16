@@ -1216,6 +1216,8 @@ pkg_install() {
 pkg_fetch() {
     log "Updating repositories"
 
+    run_hook pre-fetch
+
     # Create a list of all repositories.
     # See [1] at top of script.
     # shellcheck disable=2046,2086
@@ -1252,8 +1254,6 @@ pkg_fetch() {
                     *)    log "$PWD" " " ;;
                 esac
 
-                run_hook pre-pull '' "$PWD"
-
                 if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
                     git fetch
                     git merge
@@ -1285,8 +1285,6 @@ pkg_fetch() {
                         user=$user as_root sh -c "$git_cmd"
                     )
                 fi
-
-                run_hook post-pull '' "$PWD"
             }
         elif [ -f .rsync ]; then
             read -r remote < .rsync
@@ -1312,6 +1310,8 @@ pkg_fetch() {
             printf '%s\n' "Not a remote repository, skipping."
         fi
     done
+
+    run_hook post-fetch
 }
 
 pkg_updates(){
