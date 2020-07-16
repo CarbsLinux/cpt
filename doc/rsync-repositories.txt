@@ -6,7 +6,11 @@ directory, there needs to be a '.rsync' file that points to the remote of the
 repository. This is used in order to fetch changes from the upstream. '.rsync'
 file looks like this for the core repository:
 
-    rsync://carbslinux.org/repo/core
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | rsync://carbslinux.org/repo/core                                         |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
 
 RSYNC repositories have some few distinctions when it comes to fetching them.
@@ -24,46 +28,63 @@ Carbs Linux repositories automatically sync from the git repostitories and serve
 it through the rsync daemon. Here is a sample shell script that I use in order to
 sync repositories. Feel free to customize for your own use.
 
-    #!/bin/sh
-    HOSTNAME=rsync://carbslinux.org/repo
-    GITDIR=/pub/git/repo
-    SHAREDIR=/pub/share/repo
-
-    git -C "$GITDIR" pull
-    rsync -aC --delete --include=core --exclude=.rsync \
-        "$GITDIR/" "$SHAREDIR"
-
-    for dir in "$SHAREDIR/"*; do
-        [ -d "$dir" ] || continue
-        [ -f "$dir/.rsync" ] ||
-            printf '%s/%s\n' "$HOSTNAME" "${dir##*/}" > "$dir/.rsync"
-    done
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | #!/bin/sh                                                                |
+  | HOSTNAME=rsync://carbslinux.org/repo                                     |
+  | GITDIR=/pub/git/repo                                                     |
+  | SHAREDIR=/pub/share/repo                                                 |
+  |                                                                          |
+  | git -C "$GITDIR" pull                                                    |
+  | rsync -aC --delete --include=core --exclude=.rsync \                     |
+  |     "$GITDIR/" "$SHAREDIR"                                               |
+  |                                                                          |
+  | for dir in "$SHAREDIR/"*; do                                             |
+  |     [ -d "$dir" ] || continue                                            |
+  |     [ -f "$dir/.rsync" ] ||                                              |
+  |         printf '%s/%s\n' "$HOSTNAME" "${dir##*/}" > "$dir/.rsync"        |
+  | done                                                                     |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
 
 You can then create an 'rsync' user for serving the repositories.
 
-    $ adduser -SD rsync
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | $ adduser -SD rsync                                                      |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
 
 Create '/etc/rsyncd.conf' and a service configuration as well.
 
-rsyncd.conf:
+  +--------------------------------------------------------------------------+
+  | /etc/rsyncd.conf                                                         |
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | uid = rsync                                                              |
+  | gid = rsync                                                              |
+  | address = example.com                                                    |
+  | max connections = 10                                                     |
+  | use chroot = yes                                                         |
+  |                                                                          |
+  | [repo]                                                                   |
+  |         path = /pub/share/repo                                           |
+  |         comment = My Repository                                          |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
-    uid = rsync
-    gid = rsync
-    address = example.com
-    max connections = 10
-    use chroot = yes
+Create a service file:
 
-    [repo]
-            path = /pub/share/repo
-            comment = My Repository
-
-
-/etc/sysmgr/rsync or what have you:
-
-    #!/bin/sh
-    exec rsync --daemon --no-detach
+  +--------------------------------------------------------------------------+
+  | /etc/sysmgr/rsync or /etc/sv/rsync/run                                   |
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | #!/bin/sh                                                                |
+  | exec rsync --daemon --no-detach                                          |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
 
 Switching to an rsync repository
@@ -71,8 +92,12 @@ Switching to an rsync repository
 
 It is considerably easy to switch to the Carbs Linux rsync repository.
 
-    $ mkdir -p /path/to/repo
-    $ rsync -az rsync://carbslinux.org/repo/ /path/to/repo
+  +--------------------------------------------------------------------------+
+  |                                                                          |
+  | $ mkdir -p /path/to/repo                                                 |
+  | $ rsync -az rsync://carbslinux.org/repo/ /path/to/repo                   |
+  |                                                                          |
+  +--------------------------------------------------------------------------+
 
 This will fetch the repository to the given location, you can then add it to your
 $KISS_PATH.
