@@ -9,7 +9,7 @@ to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
+2.3.0 - 2020-07-16
 --------------------------------------------------------------------------------
 
 ### Added
@@ -22,6 +22,9 @@ UNRELEASED
 - `rsync` repositories are now synced based on checksums rather than timestamps.
 - `kiss-chroot` now uses system flags if available.
 - `kiss-chbuild` now installs extra packages if specified.
+- hooks now default to `null` if no arguments are given
+- `*-pull` hooks have been renamed to `*-fetch` and is run only once instead of
+  for every single git repository.
 
 ### Fixed
 - Fixed an issue where using `su` to install packages resulted in a wrong
