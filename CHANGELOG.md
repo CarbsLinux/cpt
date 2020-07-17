@@ -119,7 +119,7 @@ to [Semantic Versioning].
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not
 be doing any releases except for patches and fixes. My attention is now on
-impllementing binary repositories. I will be doing some 'release candidates'
+implementing binary repositories. I will be doing some 'release candidates'
 before release, as binary repositories will need user feedback.
 
 ### Added
@@ -135,7 +135,7 @@ before release, as binary repositories will need user feedback.
 --------------------------------------------------------------------------------
 
 ### SECURITY
-- Fixed a bug regarding privilige escalation using `$KISS_HOOK`. `kiss` will now
+- Fixed a bug regarding privilege escalation using `$KISS_HOOK`. `kiss` will now
   use `$KISS_ROOT/etc/kiss-hook` on installation operations (which are run by
   root) so that the hooks are defined by the system administrator rather than the
   user. See [related proof-of-concept]
@@ -187,7 +187,7 @@ before release, as binary repositories will need user feedback.
 ### Changed
 - Replaced `KISS_COLOUR` with `KISS_COLOR` to match upstream.
 - Renamed `colour` variable to `color` for consistency.
-- The package manager no longer needs root priviliges if the `KISS_ROOT` is
+- The package manager no longer needs root privileges if the `KISS_ROOT` is
   writable by the user.
 - `kiss` now uses the host cache regardless of `KISS_ROOT`.
 
@@ -221,12 +221,12 @@ before release, as binary repositories will need user feedback.
 - kiss now understands `.txz` tarballs. (BSD `src.txz` wink wink)
 - `KISS_TMPDIR` can now be used to specify a temporary build directory. This
   will be useful for those of you who would want to build on ram or a different
-  filesystem.
+  file system.
 
 ### Changed
 - Simplified tarball extraction method.
 - Removed the 'esc' function inside kiss.
-- Added a 'warn' function to standardize warnings inside kiss
+- Added a 'warn' function to standardise warnings inside kiss
 
 ### Fixed
 - Removed the `sys_db` usage on `pkg_find()` where directories could clash with
@@ -253,7 +253,7 @@ before release, as binary repositories will need user feedback.
 
 ### Changed
 - Faster conflict resolution by using a conflict cache file.
-- Standardized `kiss-readlink` usage output.
+- Standardised `kiss-readlink` usage output.
 
 
 1.20.0 - 2020-05-07
@@ -274,7 +274,7 @@ before release, as binary repositories will need user feedback.
   output was too large for an average terminal, and a user had to scroll up
   for actual package manager options. These can now be retrieved with `kiss e`.
 - When called from a subshell, `kiss` disables colour escape sequences. This
-  behaviour can be overriden by setting `KISS_COLOUR` environment variable.
+  behaviour can be overridden by setting `KISS_COLOUR` environment variable.
   If set to 1, it will be enabled globally, if set to 0 it will be disabled
   globally.
 
@@ -294,7 +294,7 @@ before release, as binary repositories will need user feedback.
   listing and extraction.
 
 ### Fixed
-- Fixed the output of docstrings in contrib scripts.
+- Fixed the output of doc-strings in contrib scripts.
 - `kiss` now ignores the binary programs in the repository for
   `kiss extensions`.
 
@@ -325,7 +325,7 @@ before release, as binary repositories will need user feedback.
   file/directory.
 
 ### Removed
-- Removed the usage of `stat` calls, as they are not standardized.
+- Removed the usage of `stat` calls, as they are not standardised.
 
 ### Changed
 - `kiss` now doesn't report `Generating etcsums` if there isn't an `/etc`
@@ -501,7 +501,7 @@ method.
 ### Added
 - `kiss-cargolock-urlgen`: a tool that can read a Cargo.lock file to generate a
   list of urls.
-- `kiss-cat`: a tool to concatanate package build files.
+- `kiss-cat`: a tool to concatenate package build files.
 - Manual page for `kiss-contrib`.
 
 ### Changed
@@ -521,7 +521,7 @@ method.
 ### Added
 - `kiss f` to fetch repositories without an update prompt.
 - Support for submodules in the repository.
-- Added a Makefile to standardize the installation.
+- Added a Makefile to standardise the installation.
 - Zstd compression method.
 
 ### Changed
