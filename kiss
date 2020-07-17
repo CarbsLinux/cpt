@@ -1343,7 +1343,10 @@ pkg_updates(){
 
     # If the download option is specified only download the outdated packages
     # and exit.
-    [ "$download" ] && {
+    [ "$download_only" = 1 ] && {
+        log "Only sources for the packages will be acquired"
+        prompt || exit 0
+
         for pkg in $outdated; do
             pkg_sources "$pkg"
         done
@@ -1448,7 +1451,7 @@ args() {
     esac
 
     case $action in
-        b|build|c|checksum|i|install|r|remove)
+        b|build|c|checksum|d|download|i|install|r|remove)
             [ "$1" ] || {
                 # We are exporting the KISS_PATH, so if another
                 # instance of 'kiss' is spawned from the current
@@ -1557,18 +1560,13 @@ args() {
             done
         ;;
 
-        d|download)
-            # If no arguments are given, download the sources
-            # for outdated packages.
-            [ "$1" ] || { download=1; pkg_updates ;}
-
-            # Acquire sources for all given packages.
-            for pkg do pkg_sources "$pkg"; done
-        ;;
+        u|update)
+            case "$1" in --download|-d) download_only=1; esac
+            pkg_updates ;;
 
         b|build)    pkg_build "${@:?No packages installed}" ;;
+        d|download) for pkg do pkg_sources "$pkg"; done ;;
         l|list)     pkg_list "$@" ;;
-        u|update)   pkg_updates ;;
         s|search)   for pkg do pkg_find "$pkg" all; done ;;
         v|version)  log kiss 2.3.0 ;;
 
