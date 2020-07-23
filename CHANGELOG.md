@@ -9,6 +9,20 @@ to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+--------------------------------------------------------------------------------
+
+### Added
+- Added optional `--download|-d` flags for `kiss [u]pdate` to only download
+  sources for the packages that needs an update.
+
+### Changed
+- Changed behaviour for `kiss [d]ownload`. When it receives no arguments, it
+  downloads the sources for the working package directory, instead of
+  downloading packages with updates.
+- Changed the code style and did some minor nitpicks for the C programs.
+
+
 2.3.0 - 2020-07-16
 --------------------------------------------------------------------------------
 
