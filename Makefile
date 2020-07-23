@@ -1,15 +1,20 @@
 # See LICENSE for copyright information
 include config.mk
 
-BIN = bin/kiss-readlink bin/kiss-stat
+SRC = bin/kiss-readlink.c bin/kiss-stat.c
+OBJ = ${SRC:.c=.o}
+BIN = ${SRC:.c=}
 
 all: ${BIN}
 
-.c:
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $< ${LIBS}
+.c.o:
+	${CC} ${CFLAGS} -c -o $@ $<
+
+${BIN}: ${OBJ}
+	${CC} ${LDFLAGS} -o $@ $< ${LIBS}
 
 clean:
-	rm -f ${BIN}
+	rm -f ${BIN} ${OBJ}
 
 install: all
 	mkdir -p ${DESTDIR}${BINDIR}
