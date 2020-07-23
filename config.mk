@@ -11,6 +11,7 @@ MAN1      = ${MANPREFIX}/man1
 
 # Flags
 CFLAGS  = -std=c99 -Wpedantic -Wall -Os
+CFLAGS += -D_XOPEN_SOURCE=700
 LDFLAGS = -s -static
 LIBS    = -lc
 

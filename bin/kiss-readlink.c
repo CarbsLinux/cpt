@@ -9,7 +9,6 @@
 #include <string.h>
 #include <limits.h>
 
-#define _XOPEN_SOURCE 700
 
 char *realpath(const char *path, char *resolved_path);
 
