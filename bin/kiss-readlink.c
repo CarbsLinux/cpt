@@ -9,6 +9,8 @@
 #include <string.h>
 #include <limits.h>
 
+#define DIR_MAX PATH_MAX - NAME_MAX - 1
+
 
 char *realpath(const char *path, char *resolved_path);
 
@@ -22,7 +24,7 @@ main(int argc, char *argv[])
 	 * use directories above the file. We are using dname and bname so that
 	 * they don't clash with the functions with the same name.
 	 */
-	char dname[PATH_MAX]; /* directory name */
+	char dname[DIR_MAX]; /* directory name */
 	char bname[NAME_MAX]; /* base name      */
 	sprintf(bname, "%s", (basename(argv[1])));
 
