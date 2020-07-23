@@ -42,5 +42,5 @@ main(int argc, char *argv[])
 	}
 
 	printf("%s\n", buf);
-	return(0);
+	return 0;
 }
