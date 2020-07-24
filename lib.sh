@@ -683,7 +683,7 @@ pkg_build() {
     # directory and are up to date.
     for pkg do ! contains "$explicit_build" "$pkg" && pkg_cache "$pkg" && {
         log "$pkg" "Found pre-built binary, installing"
-        (CPT_FORCE=1 args i "$tar_file")
+        (CPT_FORCE=1 cpt-install "$tar_file")
 
         # Remove the now installed package from the build list.
         # See [1] at top of script.
@@ -765,7 +765,7 @@ pkg_build() {
 
         log "$pkg" "Needed as a dependency or has an update, installing"
 
-        (CPT_FORCE=1 args i "$pkg")
+        (CPT_FORCE=1 cpt-install "$pkg")
     done
 
     # End here as this was a system update and all packages have been installed.
@@ -780,7 +780,7 @@ pkg_build() {
 
     # Only ask for confirmation if more than one package needs to be installed.
     [ $# -gt 1 ] && prompt "Install built packages? [$*]" && {
-        args i "$@"
+        cpt-install "$@"
         return
     }
 
@@ -1383,7 +1383,7 @@ pkg_updates(){
         prompt || exit 0
 
         pkg_build cpt
-        args i cpt
+        cpt-install cpt
 
         log "Updated the package manager"
         log "Re-run 'cpt update' to update your system"
@@ -1423,201 +1423,6 @@ pkg_clean() {
     # Remove temporary items.
     rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
        "$CPT_TMPDIR/$pid-c" "$CPT_TMPDIR/$pid-m"
-}
-
-args() {
-    # Parse script arguments manually. This is rather easy to do in
-    # our case since the first argument is always an "action" and
-    # the arguments that follow are all package names.
-    action=$1
-
-    # 'dash' gives an error when shift is used without any arguments.
-    [ "$1" ] && shift
-
-    # Unless this is a search, sanitize the user's input. The call to
-    # 'pkg_find()' supports basic globbing, ensure input doesn't expand
-    # to anything except for when this behavior is needed.
-    #
-    # This handles the globbing characters '*', '!', '[' and ']' as per:
-    # https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html
-    case "$action" in a|alternatives|s|search|bin) ;; *)
-        case $* in *\**|*\!*|*\[*|*\]*)
-            die "Arguments contain invalid characters: '!*[]'"
-        esac
-    esac
-
-    # Parse some arguments earlier to remove the need to duplicate code.
-    case $action in
-        s|search)
-            [ "$1" ] || die "'cpt $action' requires an argument"
-        ;;
-
-        a|alternatives)
-            # Rerun the script with 'su' if the user isn't root.
-            # Cheeky but 'su' can't be used on shell functions themselves.
-            [ -z "$1" ] || [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
-                as_root "$0" "$action" "$@"
-                return
-            }
-        ;;
-
-        i|install|r|remove)
-            # Rerun the script with 'su' if the user does not have write
-            # permissions for the root. Cheeky but 'su' can't be used on
-            # shell functions themselves.
-            [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
-                CPT_FORCE="$CPT_FORCE" as_root "$0" "$action" "$@"
-                return
-            }
-        ;;
-    esac
-
-    case $action in
-        b|build|c|checksum|d|download|i|install|r|remove)
-            [ "$1" ] || {
-                # We are exporting the CPT_PATH, so if another
-                # instance of 'cpt' is spawned from the current
-                # one, they continue to use the same CPT_PATH
-                export CPT_PATH="${PWD%/*}:$CPT_PATH"
-                set -- "${PWD##*/}"
-            } ; esac
-
-    # Actions can be abbreviated to their first letter. This saves
-    # keystrokes once you memorize the commands.
-    #
-    # This is to fix a shellcheck warning when using $PATH
-    # in cpt extensions help string.
-    # shellcheck disable=2016
-    case $action in
-        a|alternatives)
-            if [ "$1" = - ]; then
-                while read -r pkg path; do
-                    pkg_swap "$pkg" "$path"
-                done
-
-            elif [ "$1" ]; then
-                pkg_swap "$@"
-
-            else
-                # Go over each alternative and format the file
-                # name for listing. (pkg_name>usr>bin>ls)
-                set +f; for pkg in "$sys_db/../choices"/*; do
-                    printf '%s\n' "${pkg##*/}"
-                done | sed 's|>| /|; s|>|/|g; /\*/d'
-            fi
-        ;;
-
-        c|checksum)
-            for pkg do pkg_lint    "$pkg" c; done
-            for pkg do pkg_sources "$pkg" c; done
-            for pkg do
-                pkg_checksums "$pkg" | {
-                    repo_dir=$(pkg_find "$pkg")
-
-                    if [ -w "$repo_dir" ]; then
-                        tee "$repo_dir/checksums"
-                    else
-                        log "$pkg" "Need permissions to generate checksums"
-
-                        user=$(cpt-stat "$repo_dir") as_root tee "$repo_dir/checksums"
-                    fi
-                }
-
-                log "$pkg" "Generated checksums"
-            done
-        ;;
-
-        f|fetch) pkg_fetch ;;
-
-        i|install)
-            pkg_order "$@"
-
-            for pkg in $order; do pkg_install "$pkg"; done
-
-            # After installation is complete, show a list
-            # of messages from packages.
-            log "Retrieving post-installation message queue"
-            unset msg
-
-            for pkg in $order; do
-                if [ -f "$sys_db/$pkg/message" ]; then
-                    printf '%s\n%b%s%b\n%s\n\n' \
-                           "==============================" \
-                           "${color:+"\033[1m"}" "$pkg" "${color:+"\033[m"}" \
-                           "==============================" >&2
-                    cat "$sys_db/$pkg/message" >&2
-                    msg=1
-                fi
-            done
-            [ "$msg" ] || log "No message in queue"
-        ;;
-
-        e|extension)
-            exec 2>&1
-
-            log "Installed extensions"
-            set --
-
-            for path in $(SEARCH_PATH=$PATH pkg_find cpt-* all -x); do
-                set -- "${path#*/cpt-}" "$@"
-                max=$((${#1} > max ? ${#1} : max))
-             done
-
-            for path do
-                # These are binary files so they should be ignored
-                contains "readlink stat" "$path" && continue
-
-                printf "%b->%b %-${max}s  " "${color:+"\033[1;31m"}" "${color:+"\033[m"}" \
-                    "${path#*/cpt-}"
-                sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
-             done | sort -uk1 >&2
-
-        ;;
-
-        r|remove)
-            pkg_order "$@"
-
-            for pkg in $redro; do
-                pkg_remove "$pkg" "${CPT_FORCE:-check}"
-            done
-        ;;
-
-        u|update)
-            case "$1" in --download|-d) download_only=1; esac
-            pkg_updates ;;
-
-        b|build)    pkg_build "${@:?No packages installed}" ;;
-        d|download) for pkg do pkg_sources "$pkg"; done ;;
-        l|list)     pkg_list "$@" ;;
-        s|search)   for pkg do pkg_find "$pkg" all; done ;;
-        v|version)  log cpt 2.3.0 ;;
-
-        h|help|-h|--help|'')
-            exec 2>&1
-            log 'cpt [abcdefilrsuv] [pkg...]'
-            log 'alternatives  List and swap to alternatives'
-            log 'build         Build a package'
-            log 'checksum      Generate checksums'
-            log 'download      Download sources for the given package'
-            log 'extension     List available cpt extensions (cpt-* in $PATH)'
-            log 'fetch         Fetch repositories'
-            log 'install       Install a package'
-            log 'list          List installed packages'
-            log 'remove        Remove a package'
-            log 'search        Search for a package'
-            log 'update        Check for updates'
-            log 'version       Package manager version'
-
-        ;;
-
-        *)
-             util=$(SEARCH_PATH=$PATH pkg_find "cpt-$action"* "" -x 2>/dev/null) ||
-                 die "'cpt $action' is not a valid command"
-
-              "$util" "$@"
-         ;;
-
-    esac
 }
 
 main() {
