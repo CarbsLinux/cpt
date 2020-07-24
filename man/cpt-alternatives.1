@@ -1,0 +1,44 @@
+.TH "cpt-alternatives" "1" "2020-07-24" "CARBS LINUX" "General Commands Manual"
+.SH NAME
+cpt-alternatives
+.SH DESCRIPTION
+List and swap to alternatives
+.PP
+.SH SYNOPSIS
+\fBcpt-alternatives\fR [-] [pkg file]
+
+.SH USAGE
+cpt-alternatives can be used to list alternatives (when run without arguments).
+It can read from standard input if ('-' is given as an argument). If you want to
+otherwise
+
+.SH EXAMPLES
+.nf
++-----------------------------------------------------------------------+
+| List alternatives                                                     |
++-----------------------------------------------------------------------+
+|                                                                       |
+| $ kiss a                                                              |
+| ncurses /usr/bin/clear                                                |
+| ncurses /usr/bin/reset                                                |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Swap to 'clear' from ncurses.                                         |
++-----------------------------------------------------------------------+
+|                                                                       |
+| $ kiss a ncurses /usr/bin/clear                                       |
+| -> Swapping '/usr/bin/clear' from 'busybox' to 'ncurses'              |
+|                                                                       |
++-----------------------------------------------------------------------+
+| Swap in bulk (all of sbase).                                          |
++-----------------------------------------------------------------------+
+|                                                                       |
+| $ kiss a | grep ^sbase | kiss a -                                     |
+|                                                                       |
++-----------------------------------------------------------------------+
+.fi
+
+.SH LICENSE
+See LICENSE for copyright information.
+.SH SEE ALSO
+cpt(1)
