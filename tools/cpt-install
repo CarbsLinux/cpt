@@ -31,6 +31,20 @@ done
 pkg_order "$@"
 
 # shellcheck disable=2154
+for pkg in $order; do pkg_install "$pkg"; done
+
+# After installation is complete, show a list of messages from packages.
+log "Retrieving post-installation message queue"
+unset msg
+
 for pkg in $order; do
-    pkg_isbuilt "$pkg" || [ "$nobuild" != 1 ] || pkg_build "$pkg"
+    [ -f "$sys_db/$pkg/message" ] && {
+        printf '%s\n%s\n%s\n\n' \
+               "=======================================" \
+               "$pkg" \
+               "======================================="
+        cat "$sys_db/$pkg/message" >&2
+        msg=1
+    }
 done
+[ "$msg" ] || log "No message in queue"
