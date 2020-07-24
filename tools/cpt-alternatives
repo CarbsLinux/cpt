@@ -1,0 +1,32 @@
+#!/bin/sh -ef
+
+# shellcheck disable=1091
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+
+case "$1" in --version|--help|-v|-h|'') ;; *)
+    [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
+        as_root "$0" "$@"
+        exit $?
+    }
+esac
+
+case "$1" in
+    --help|-h)
+        out "usage: ${0##*/} [-] [pkg file]"
+        exit 1
+        ;;
+    --version|-v) version ;;
+    -)
+        while read -r pkg path; do
+            pkg_swap "$pkg" "$path"
+        done
+        ;;
+    '')
+        # Go over each alternative and format the file name for listing.
+        # (pkg_name>usr>bin>ls)
+        set +f; for pkg in "$sys_db/../choices/"*; do
+                    printf '%s\n' "${pkg##*/}"
+        done | sed 's|>| /|; s|>|/|g; /\*/d'
+        ;;
+    *) pkg_swap "$@" ;;
+esac

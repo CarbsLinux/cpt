@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# shellcheck disable=1091
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+
+while [ "$1" ]; do
+    case "$1" in
+        --help|-h)
+            out "usage: ${0##*/} [options] [pkg...]" "" \
+                "  Options:" \
+                "    --force           Force installation" \
+                "    --root [rootdir]  Use an alternate root directory"
+            exit 1
+            ;;
+        --version|-v) version                ;;
+        --force) export CPT_FORCE=1          ;;
+        --root) export CPT_ROOT=$2; shift 2 ;;
+        --) break ;;
+        -*) die "Unknown argument '$1'" ;;
+        '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH ;;
+        *) break ;;
+    esac
+done
+
+[ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
+    as_root "$0" "$@"
+    exit $?
+}
+
+pkg_order "$@"
+
+# shellcheck disable=2154
+for pkg in $order; do
+    pkg_isbuilt "$pkg" || [ "$nobuild" != 1 ] || pkg_build "$pkg"
+done
