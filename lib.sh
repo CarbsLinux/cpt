@@ -14,7 +14,7 @@
 # Dylan Araps.
 
 version() {
-    log "Carbs Packaging Tool" 3.0.0
+    log "Carbs Packaging Tools" 3.0.0
     exit 0
 }
 
