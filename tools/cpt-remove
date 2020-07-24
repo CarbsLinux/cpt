@@ -4,6 +4,8 @@
 # shellcheck disable=1091
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
 
+[ "$1" ] || set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH
+
 while [ "$1" ]; do
     case "$1" in
         --help|-h)
@@ -18,7 +20,6 @@ while [ "$1" ]; do
         --root)  export CPT_ROOT=$2; shift 2 ;;
         --) break ;;
         -*) die "Unknown argument '$1'" ;;
-        '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH ;;
         *) break ;;
     esac
 done
