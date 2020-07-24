@@ -5,7 +5,7 @@ PREFIX    = /usr/local
 BINDIR    = ${PREFIX}/bin
 SHAREDIR  = ${PREFIX}/share
 DOCDIR    = ${SHAREDIR}/doc
-KISSDOC   = ${DOCDIR}/kiss
+CPTDOC    = ${DOCDIR}/cpt
 MANPREFIX = ${SHAREDIR}/man
 MAN1      = ${MANPREFIX}/man1
 
