@@ -11,7 +11,7 @@ while [ "$1" ]; do
                 "  Options:" \
                 "    -d --download     Only download updatable packages" \
                 "    --no-fetch        Do not refresh the repositories" \
-                "    --root [rootdir]  Use an alternate root directory"
+                "    --root [rootdir]  Use an alternate root directory" ""
             exit 1
             ;;
         --version|-v) version ;;
