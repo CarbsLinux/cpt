@@ -12,15 +12,38 @@ to [Semantic Versioning].
 UNRELEASED
 --------------------------------------------------------------------------------
 
+This is the 3.0 release. This will make `kiss` (now renamed as `cpt`) a
+toolchain for package management rather than a single script program. The main
+functionality is moved into a `lib.sh` file which the tools will source. This
+comes with nice benefits such as:
+
+- Easier option parsing for each tool.
+- Easier to extend the package manager as it is only a library. It no longer
+  requires dirty hacks to source the package manager functions and variables.
+- Clearer usage information is outputted, so the user doesn't have to delve into
+  documents to see the syntax/options of a tool.
+
 ### Added
-- Added optional `--download|-d` flags for `kiss [u]pdate` to only download
-  sources for the packages that needs an update.
+- `$CPT_CACHE` to change the cache directory.
+- Added a bunch of flags, here is a table:
+
+| Flag       | Function                                  | Added tool             |
+|------------|-------------------------------------------|------------------------|
+| --force    | Force removal/installation                | cpt-remove/cpt-install |
+| --root     | Specify root directory                    | lots of tools          |
+| --download | Only download packages                    | cpt-update             |
+| --no-fetch | Do not fetch repositories before update   | cpt-update             |
+| --single   | Only show the first instance of a package | cpt-search             |
+
 
 ### Changed
-- Changed behaviour for `kiss [d]ownload`. When it receives no arguments, it
-  downloads the sources for the working package directory, instead of
-  downloading packages with updates.
+
+- Renamed all variables from `KISS-*` to `CPT-*`
+- Moved database to `/var/db/cpt`
 - Changed the code style and did some minor nitpicks for the C programs.
+
+### Removed
+- Removed `kiss-which` because it became unnecessary after this release.
 
 
 2.3.0 - 2020-07-16
