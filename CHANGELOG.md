@@ -43,8 +43,8 @@ comes with nice benefits such as:
 - Changed the code style and did some minor nitpicks for the C programs.
 
 ### Removed
-- Removed `kiss-which` because it became unnecessary after this release.
 - Removed the ability to control color output (for now).
+- Removed `kiss-outdated` and `kiss-which`.
 
 
 2.3.0 - 2020-07-16
