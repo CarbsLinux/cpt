@@ -2,7 +2,7 @@
 # Download sources for the given package
 
 # shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 
 case "$1" in
     --help|-h)

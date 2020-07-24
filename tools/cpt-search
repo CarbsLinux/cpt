@@ -2,7 +2,7 @@
 # Search for a package
 
 # shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 
 # By default we are showing all instances of a package. This value can be unset
 # in order to only find the first instance of a package.

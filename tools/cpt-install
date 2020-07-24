@@ -2,7 +2,7 @@
 # Install a package
 
 # shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 
 while [ "$1" ]; do
     case "$1" in
