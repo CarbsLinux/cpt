@@ -25,8 +25,8 @@ case "$arg" in
     --version|-v) version ;;
 
     *)
-        util=$(SEARCH_PATH=$PATH pkg_find "cpt-$1"* "" -x 2>/dev/null) ||
-            die "'cpt $action' is not a valid command"
+        util=$(SEARCH_PATH=$PATH pkg_find "cpt-$arg"* "" -x 2>/dev/null) ||
+            die "'cpt $arg' is not a valid command"
 
         "$util" "$@"
         ;;
