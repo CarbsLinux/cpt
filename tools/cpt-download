@@ -1,0 +1,15 @@
+#!/bin/sh -ef
+
+# shellcheck disable=1091
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+
+case "$1" in
+    --help|-h)
+        out "usage: ${0##*/} [pkg...]"
+        exit 1
+        ;;
+    --version|-v) version ;;
+    '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH
+esac
+
+for pkg; do pkg_sources "$pkg"; done

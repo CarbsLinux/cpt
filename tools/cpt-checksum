@@ -1,0 +1,29 @@
+#!/bin/sh -ef
+
+# shellcheck disable=1091
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
+
+case "$1" in
+    --help|-h) out "usage: ${0##*/} [pkg...]"; exit 1 ;;
+    --version|-v) version ;;
+    '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH ;;
+esac
+
+for pkg; do pkg_lint    "$pkg" c; done
+for pkg; do pkg_sources "$pkg" c; done
+
+for pkg; do
+    pkg_checksums "$pkg" | {
+        repo_dir=$(pkg_find "$pkg")
+
+        if [ -w "$repo_dir" ]; then
+            tee "$repo_dir/checksums"
+        else
+            log "$pkg" "Need permissions to generate checksums"
+
+            user=$(cpt-stat "$repo_dir") as_root tee "$repo_dir/checksums"
+        fi
+    }
+
+    log "$pkg" "Generated checksums"
+done
