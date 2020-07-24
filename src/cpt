@@ -1,7 +1,10 @@
 #!/bin/sh -ef
 # shellcheck disable=1091
 
-if command -v cpt-lib >/dev/null; then . cpt-lib; else ./cpt-lib; fi
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
+
+# If none of the tools below are specified, we will reenable glob
+unset glob
 
 [ "$1" ] && { arg=$1; shift; }
 case "$arg" in
@@ -26,19 +29,20 @@ case "$arg" in
     --version|-v|version) version ;;
 
     # Reserve these arguments for the following tools.
-    a) arg=alternatives ;;
-    b) arg=build ;;
-    c) arg=checksum ;;
-    d) arg=download ;;
-    f) arg=fetch ;;
-    i) arg=install ;;
-    l) arg=list ;;
-    r) arg=remove ;;
-    s) arg=search ;;
-    u) arg=update ;;
+    a|alternatives) arg=alternatives ;;
+    b|build)        arg=build ;;
+    c|checksum)     arg=checksum ;;
+    d|download)     arg=download ;;
+    f|fetch)        arg=fetch ;;
+    i|install)      arg=install ;;
+    l|list)         arg=list ;;
+    r|remove)       arg=remove ;;
+    s|search)       arg=search ;;
+    u|update)       arg=update ;;
+    *) glob=1 ;;
 esac
 
-util=$(SEARCH_PATH=$PATH pkg_find "cpt-$arg"* "" -x 2>/dev/null) ||
+util=$(SEARCH_PATH=$PATH pkg_find "cpt-$arg${glob:+*}" "" -x 2>/dev/null) ||
     die "'cpt $arg' is not a valid command"
 
 "$util" "$@"
