@@ -1359,6 +1359,7 @@ pkg_updates(){
 
     # If the download option is specified only download the outdated packages
     # and exit.
+    # shellcheck disable=2154
     [ "$download_only" = 1 ] && {
         log "Only sources for the packages will be acquired"
         prompt || exit 0
@@ -1503,17 +1504,6 @@ main() {
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
-
-    # Disable color escape sequences if running in a subshell.
-    # This behaviour can be changed by adding a CPT_COLOR
-    # variable to the environment. If it is set to 1 it will
-    # always enable color escapes, and if set to 0 it will
-    # always disable color escapes.
-    if [ "$CPT_COLOR" = 1 ]; then color=1
-    elif [ "$CPT_COLOR" = 0 ] || ! [ -t 1 ]; then
-        log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
-    else color=1
-    fi
 
 }
 
