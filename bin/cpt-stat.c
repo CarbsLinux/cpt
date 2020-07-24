@@ -1,4 +1,4 @@
-/* kiss-stat --- a utility for getting the user name of file owner
+/* cpt-stat --- a utility for getting the user name of file owner
  * See LICENSE for copyright information
  *
  * The reason this simple tool exists is because 'stat' is not

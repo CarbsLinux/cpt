@@ -1,6 +1,6 @@
 ### Binaries/Objects ###
-kiss-stat
-kiss-readlink
+cpt-stat
+cpt-readlink
 *.o
 
 ### Emacs ###

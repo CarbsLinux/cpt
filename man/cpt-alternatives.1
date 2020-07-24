@@ -18,7 +18,7 @@ otherwise
 | List alternatives                                                     |
 +-----------------------------------------------------------------------+
 |                                                                       |
-| $ kiss a                                                              |
+| $ cpt-alternatives                                                    |
 | ncurses /usr/bin/clear                                                |
 | ncurses /usr/bin/reset                                                |
 |                                                                       |
@@ -26,14 +26,14 @@ otherwise
 | Swap to 'clear' from ncurses.                                         |
 +-----------------------------------------------------------------------+
 |                                                                       |
-| $ kiss a ncurses /usr/bin/clear                                       |
+| $ cpt-alternatives ncurses /usr/bin/clear                             |
 | -> Swapping '/usr/bin/clear' from 'busybox' to 'ncurses'              |
 |                                                                       |
 +-----------------------------------------------------------------------+
 | Swap in bulk (all of sbase).                                          |
 +-----------------------------------------------------------------------+
 |                                                                       |
-| $ kiss a | grep ^sbase | kiss a -                                     |
+| $ cpt-alternatives | grep ^sbase | cpt-alternatives -                 |
 |                                                                       |
 +-----------------------------------------------------------------------+
 .fi
