@@ -1,4 +1,5 @@
 #!/bin/sh -ef
+# List installed packages
 
 # shellcheck disable=1091
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
