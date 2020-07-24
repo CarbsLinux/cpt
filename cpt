@@ -14,8 +14,8 @@ case "$arg" in
         done
 
         for path; do
-            # These are binary files so they should be ignored
-            contains "readlink stat" "$path" && continue
+            # These are the files to be ignored.
+            contains "lib readlink stat" "$path" && continue
 
             printf "%b->%b %-${max}s  " "${color:+\033[1;31m}" "${color:+\033[m}" "${path#*/cpt-}"
             sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
