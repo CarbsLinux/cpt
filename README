@@ -1,0 +1,23 @@
++------------------------------------------------------------------------------+
+|   ___          _       ___         _             _          _____         _  |
+|  / __|__ _ _ _| |__ __| _ \__ _ __| |____ _ __ _(_)_ _  __ |_   _|__  ___| | |
+| | (__/ _` | '_| '_ (_-<  _/ _` / _| / / _` / _` | | ' \/ _` || |/ _ \/ _ \ | |
+|  \___\__,_|_| |_.__/__/_| \__,_\__|_\_\__,_\__, |_|_||_\__, ||_|\___/\___/_| |
+|                                            |___/       |___/                 |
++------------------------------------------------------------------------------+
+
+Package management toolset for Carbs Linux. Forked from [KISS]. All usage
+information can be obtained from the manual page. For changes please refer to
+the `CHANGELOG.md` file.
+
+[KISS]: https://github.com/kisslinux/kiss
+
+
+Directory Structure
+--------------------------------------------------------------------------------
+
+    /        -- kiss, README, Makefile, LICENSE, CHANGELOG
+    bin/     -- for C programs.
+    man/     -- for manual pages.
+    doc/     -- for documentation.
+    contrib/ -- for Shell scripts that wrap around kiss.

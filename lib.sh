@@ -13,6 +13,16 @@
 #
 # Dylan Araps.
 
+version() {
+    log "Carbs Packaging Tool" 3.0.0
+    exit 0
+}
+
+out() {
+    # Print a message as is.
+    printf '%s\n' "$@"
+}
+
 log() {
     # Print a message prettily.
     #
@@ -51,10 +61,10 @@ regesc() {
 
 
 prompt() {
-    # If a KISS_NOPROMPT variable is set, continue.
+    # If a CPT_NOPROMPT variable is set, continue.
     # This can be useful for installation scripts and
     # bootstrapping.
-    [ "$KISS_PROMPT" = 0 ] && return 0
+    [ "$CPT_PROMPT" = 0 ] && return 0
 
     # Ask the user for some input.
     [ "$1" ] && log "$1"
@@ -75,7 +85,7 @@ as_root() {
         sudo) sudo -E -u "$user" -- "$@" ;;
         doas) doas    -u "$user" -- "$@" ;;
         su)   su -pc "env USER=$user $* <&3" "$user" 3<&0 </dev/tty ;;
-        *)    die "Invalid KISS_SU value: $su" ;;
+        *)    die "Invalid CPT_SU value: $su" ;;
     esac
 }
 
@@ -92,15 +102,15 @@ run_hook() {
     # If a fourth parameter 'root' is specified, source
     # the hook from a predefined location to avoid privilige
     # escalation through user scripts.
-    [ "$4" ] && KISS_HOOK=$KISS_ROOT/etc/kiss-hook
+    [ "$4" ] && CPT_HOOK=$CPT_ROOT/etc/cpt-hook
 
     # This is not a misspelling, can be ignored safely.
     # shellcheck disable=2153
-    [ -f "$KISS_HOOK" ] || return 0
+    [ -f "$CPT_HOOK" ] || return 0
 
     log "$2" "Running $1 hook"
 
-    TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$KISS_HOOK"
+    TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$CPT_HOOK"
 }
 
 decompress() {
@@ -128,6 +138,18 @@ sh256() {
         while read -r hash _; do printf '%s  %s\n' "$hash" "$1"; done
 }
 
+pkg_isbuilt() (
+    # Check if a package is built or not.
+    repo_dir=$(pkg_find "$1")
+    read -r ver rel < "$repo_dir/version"
+
+    set +f
+    for tarball in "$bin_dir/$1#$ver-$rel.tar."*; do
+        [ -f "$tarball" ] && return 0
+    done
+    return 1
+)
+
 pkg_lint() {
     # Check that each mandatory file in the package entry exists.
     log "$1" "Checking repository files"
@@ -147,13 +169,13 @@ pkg_lint() {
 
 pkg_find() {
     # Use a SEARCH_PATH variable so that we can get the sys_db into
-    # the same variable as KISS_PATH. This makes it easier when we are
-    # searching for executables instead of KISS_PATH.
-    : "${SEARCH_PATH:=$KISS_PATH:$sys_db}"
+    # the same variable as CPT_PATH. This makes it easier when we are
+    # searching for executables instead of CPT_PATH.
+    : "${SEARCH_PATH:=$CPT_PATH:$sys_db}"
 
     # Figure out which repository a package belongs to by
     # searching for directories matching the package name
-    # in $KISS_PATH/*.
+    # in $CPT_PATH/*.
     query=$1 match=$2 type=$3 IFS=:; set --
 
     # Word splitting is intentional here.
@@ -172,7 +194,7 @@ pkg_find() {
     # readable by the current user. Either way, we need to die here.
     [ "$1" ] || die "Package '$query' not in any repository"
 
-    # Show all search results if called from 'kiss search', else
+    # Show all search results if called from 'cpt search', else
     # print only the first match.
     [ "$match" ] && printf '%s\n' "$@" || printf '%s\n' "$1"
 }
@@ -272,7 +294,7 @@ pkg_sources() {
                     set -- -b "${src##*@}" "${repo_src%@*}"
 
                 # Maintain compatibility with older versions of
-                # kiss by shallow cloning all branches. This has
+                # cpt by shallow cloning all branches. This has
                 # the added benefit of allowing checkouts of
                 # specific commits in specific branches.
                 [ "${src##*#*}" ] ||
@@ -375,14 +397,14 @@ pkg_extract() {
                                  -exec mv -f {} .. \;
 
                             # If a file/directory with the same name as the directory
-                            # exists, append a '.kissbak' to it and move it to the
+                            # exists, append a '.cptbak' to it and move it to the
                             # upper directory.
-                            ! [ -e "$dir" ] || mv "$dir" "../${dir}.kissbak"
+                            ! [ -e "$dir" ] || mv "$dir" "../${dir}.cptbak"
                         )
                         rmdir "$dir"
 
                         # If a backup file exists, move it into the original location.
-                        ! [ -e "${dir}.kissbak" ] || mv "${dir}.kissbak" "$dir"
+                        ! [ -e "${dir}.cptbak" ] || mv "${dir}.cptbak" "$dir"
                 done
 
                 # Clean up the temporary tarball.
@@ -436,7 +458,7 @@ pkg_depends() {
 pkg_order() {
     # Order a list of packages based on dependence and
     # take into account pre-built tarballs if this is
-    # to be called from 'kiss i'.
+    # to be called from 'cpt i'.
     order=; redro=; deps=
 
     for pkg do case $pkg in
@@ -524,15 +546,15 @@ pkg_fixdeps() {
             # canonicalize the path.
             dep=${dep#* => }
             dep=${dep% *}
-            dep=$(kiss-readlink "$dep")
+            dep=$(cpt-readlink "$dep")
 
             # Figure out which package owns the file.
-            own=$("$grep" -lFx "${dep#$KISS_ROOT}" "$@")
+            own=$("$grep" -lFx "${dep#$CPT_ROOT}" "$@")
 
             # If the package wasn't found, retry by removing
             # the '/usr' prefix.
-            if [ -z "$own" ] && [ -z "${dep##$KISS_ROOT/usr*}" ]; then
-                own=$("$grep" -lFx "${dep#$KISS_ROOT/usr}" "$@")
+            if [ -z "$own" ] && [ -z "${dep##$CPT_ROOT/usr*}" ]; then
+                own=$("$grep" -lFx "${dep#$CPT_ROOT/usr}" "$@")
                 dep=${dep#/usr}
             fi
 
@@ -604,18 +626,18 @@ pkg_tar() {
 
     # Create a tarball from the contents of the built package.
     "$tar" cf - -C "$pkg_dir/$1" . |
-        case $KISS_COMPRESS in
+        case $CPT_COMPRESS in
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
             gz)  gzip -6  ;;
             zst) zstd -3  ;;
             *)   gzip -6  ;;  # Fallback to gzip
         esac \
-    > "$bin_dir/$1#$version-$release.tar.$KISS_COMPRESS"
+    > "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
 
     log "$1" "Successfully created tarball"
 
-    run_hook post-package "$1" "$bin_dir/$1#$version-$release.tar.$KISS_COMPRESS"
+    run_hook post-package "$1" "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
 }
 
 pkg_build() {
@@ -661,7 +683,7 @@ pkg_build() {
     # directory and are up to date.
     for pkg do ! contains "$explicit_build" "$pkg" && pkg_cache "$pkg" && {
         log "$pkg" "Found pre-built binary, installing"
-        (KISS_FORCE=1 args i "$tar_file")
+        (CPT_FORCE=1 args i "$tar_file")
 
         # Remove the now installed package from the build list.
         # See [1] at top of script.
@@ -707,7 +729,7 @@ pkg_build() {
 
         # Delete the log file if the build succeeded to prevent
         # the directory from filling very quickly with useless logs.
-        [ "$KISS_KEEPLOG" = 1 ] || rm -f "$log_dir/$pkg-$time-$pid"
+        [ "$CPT_KEEPLOG" = 1 ] || rm -f "$log_dir/$pkg-$time-$pid"
 
         # Copy the repository files to the package directory.
         # This acts as the database entry.
@@ -743,7 +765,7 @@ pkg_build() {
 
         log "$pkg" "Needed as a dependency or has an update, installing"
 
-        (KISS_FORCE=1 args i "$pkg")
+        (CPT_FORCE=1 args i "$pkg")
     done
 
     # End here as this was a system update and all packages have been installed.
@@ -762,7 +784,7 @@ pkg_build() {
         return
     }
 
-    log "Run 'kiss i $*' to install the package(s)"
+    log "Run 'cpt i $*' to install the package(s)"
 }
 
 pkg_checksums() {
@@ -825,25 +847,25 @@ pkg_conflicts() {
     while read -r file; do
         case $file in */) continue; esac
 
-        # Use $KISS_ROOT in filename so that we follow its symlinks.
-        file=$KISS_ROOT/${file#/}
+        # Use $CPT_ROOT in filename so that we follow its symlinks.
+        file=$CPT_ROOT/${file#/}
 
         # We will only follow the symlinks of the directories, so we
-        # reserve the directory name in this 'dirname' value. kiss-readlink
+        # reserve the directory name in this 'dirname' value. cpt-readlink
         # functions in a similar fashion to 'readlink -f', it makes sure
         # every component except for the first one to be available on
         # the directory structure. If we cannot find it in the system,
         # we don't need to make this much more complex by trying so
         # hard to find it. Simply use the original directory name.
-        dirname="$(kiss-readlink "${file%/*}" 2>/dev/null)" ||
+        dirname="$(cpt-readlink "${file%/*}" 2>/dev/null)" ||
             dirname="${file%/*}"
 
 
         # Combine the dirname and file values, and print them into the
         # temporary manifest to be parsed.
-        printf '%s/%s\n' "${dirname#$KISS_ROOT}" "${file##*/}"
+        printf '%s/%s\n' "${dirname#$CPT_ROOT}" "${file##*/}"
 
-    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$KISS_TMPDIR/$pid-m"
+    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$CPT_TMPDIR/$pid-m"
 
     p_name=$1
 
@@ -852,7 +874,7 @@ pkg_conflicts() {
     # shellcheck disable=2046,2086
     set -- $(set +f; pop "$sys_db/$p_name/manifest" from "$sys_db"/*/manifest)
 
-    [ -s "$KISS_TMPDIR/$pid-m" ] || return 0
+    [ -s "$CPT_TMPDIR/$pid-m" ] || return 0
 
     # In rare cases where the system only has one package installed
     # and you are reinstalling that package, grep will try to read from
@@ -868,18 +890,18 @@ pkg_conflicts() {
     # Store the list of found conflicts in a file as we will be using the
     # information multiple times. Storing it in the cache dir allows us
     # to be lazy as they'll be automatically removed on script end.
-    "$grep" -Fxf "$KISS_TMPDIR/$pid-m" -- "$@" > "$KISS_TMPDIR/$pid-c" ||:
+    "$grep" -Fxf "$CPT_TMPDIR/$pid-m" -- "$@" > "$CPT_TMPDIR/$pid-c" ||:
 
 
     # Enable alternatives automatically if it is safe to do so.
     # This checks to see that the package that is about to be installed
-    # doesn't overwrite anything it shouldn't in '/var/db/kiss/installed'.
-    "$grep" -q ":/var/db/kiss/installed/" "$KISS_TMPDIR/$pid-c" || choice_auto=1
+    # doesn't overwrite anything it shouldn't in '/var/db/cpt/installed'.
+    "$grep" -q ":/var/db/cpt/installed/" "$CPT_TMPDIR/$pid-c" || choice_auto=1
 
     # Use 'grep' to list matching lines between the to
     # be installed package's manifest and the above filtered
     # list.
-    if [ "$KISS_CHOICE" != 0 ] && [ "$choice_auto" = 1 ]; then
+    if [ "$CPT_CHOICE" != 0 ] && [ "$choice_auto" = 1 ]; then
 
         # This is a novel way of offering an "alternatives" system.
         # It is entirely dynamic and all "choices" are created and
@@ -893,7 +915,7 @@ pkg_conflicts() {
         # The package's manifest is then updated to reflect this
         # new location.
         #
-        # The 'kiss choices' command parses this directory and
+        # The 'cpt choices' command parses this directory and
         # offers you the CHOICE of *swapping* entries in this
         # directory for those on the filesystem.
         #
@@ -907,7 +929,7 @@ pkg_conflicts() {
 
             # Create the "choices" directory inside of the tarball.
             # This directory will store the conflicting file.
-            mkdir -p "$tar_dir/$p_name/${cho_dir:=var/db/kiss/choices}"
+            mkdir -p "$tar_dir/$p_name/${cho_dir:=var/db/cpt/choices}"
 
             # Construct the file name of the "db" entry of the
             # conflicting file. (pkg_name>usr>bin>ls)
@@ -922,17 +944,17 @@ pkg_conflicts() {
                 log "/sbin instead of /usr/bin (example)"
                 log "Before this package can be used as an alternative,"
                 log "this must be fixed in $p_name. Contact the maintainer"
-                die "by checking 'git log' or by running 'kiss-maintainer'"
+                die "by checking 'git log' or by running 'cpt-maintainer'"
             }
-        done < "$KISS_TMPDIR/$pid-c"
+        done < "$CPT_TMPDIR/$pid-c"
 
         # Rewrite the package's manifest to update its location
         # to its new spot (and name) in the choices directory.
         pkg_manifest "$p_name" "$tar_dir" 2>/dev/null
 
-    elif [ -s "$KISS_TMPDIR/$pid-c" ]; then
+    elif [ -s "$CPT_TMPDIR/$pid-c" ]; then
         log "Package '$p_name' conflicts with another package" "" "!>"
-        log "Run 'KISS_CHOICE=1 kiss i $p_name' to add conflicts" "" "!>"
+        log "Run 'CPT_CHOICE=1 cpt i $p_name' to add conflicts" "" "!>"
         die "as alternatives."
     fi
 }
@@ -967,16 +989,16 @@ pkg_swap() {
         # Convert the current owner to an alternative and rewrite
         # its manifest file to reflect this. We then resort this file
         # so no issues arise when removing packages.
-        cp  -Pf "$KISS_ROOT/$2" "$pkg_owns>${alt#*>}"
-        sed "s#^$(regesc "$2")#${PWD#$KISS_ROOT}/$pkg_owns>${alt#*>}#" \
+        cp  -Pf "$CPT_ROOT/$2" "$pkg_owns>${alt#*>}"
+        sed "s#^$(regesc "$2")#${PWD#$CPT_ROOT}/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
     fi
 
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
-    mv -f "$alt" "$KISS_ROOT/$2"
-    sed "s#^${PWD#$KISS_ROOT}/$(regesc "$alt")#$2#" "../installed/$1/manifest" |
+    mv -f "$alt" "$CPT_ROOT/$2"
+    sed "s#^${PWD#$CPT_ROOT}/$(regesc "$alt")#$2#" "../installed/$1/manifest" |
         sort -r -o "../installed/$1/manifest"
 }
 
@@ -987,13 +1009,13 @@ pkg_etc() {
 
     # Create all directories beforehand.
     find etc -type d | while read -r dir; do
-        mkdir -p "$KISS_ROOT/$dir"
+        mkdir -p "$CPT_ROOT/$dir"
     done
 
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
         { sum_new=$(sh256 "$file")
-          sum_sys=$(cd "$KISS_ROOT/"; sh256 "$file")
+          sum_sys=$(cd "$CPT_ROOT/"; sh256 "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
         log "$pkg_name" "Doing 3-way handshake for $file"
@@ -1027,8 +1049,8 @@ pkg_etc() {
             ;;
         esac
 
-        cp -fPp "$file"  "$KISS_ROOT/${file}${new}"
-        chown root:root "$KISS_ROOT/${file}${new}" 2>/dev/null
+        cp -fPp "$file"  "$CPT_ROOT/${file}${new}"
+        chown root:root "$CPT_ROOT/${file}${new}" 2>/dev/null
     done) ||:
 }
 
@@ -1039,7 +1061,7 @@ pkg_remove() {
     pkg_list "$1" >/dev/null || return
 
     # Make sure that nothing depends on this package.
-    [ "$KISS_FORCE" = 1 ] || {
+    [ "$CPT_FORCE" = 1 ] || {
         log "$1" "Checking for reverse dependencies"
 
         (cd "$sys_db"; set +f; grep -lFx "$1" -- */depends) &&
@@ -1069,11 +1091,11 @@ pkg_remove() {
         # manager from removing user edited configuration files.
         [ "${file##/etc/*}" ] || continue
 
-        if [ -d "$KISS_ROOT/$file" ]; then
+        if [ -d "$CPT_ROOT/$file" ]; then
             "$grep" -Fxq "$file" "$mak_dir/dirs" 2>/dev/null && continue
-            rmdir "$KISS_ROOT/$file" 2>/dev/null || continue
+            rmdir "$CPT_ROOT/$file" 2>/dev/null || continue
         else
-            rm -f "$KISS_ROOT/$file"
+            rm -f "$CPT_ROOT/$file"
         fi
     done < "$sys_db/$1/manifest"
 
@@ -1081,7 +1103,7 @@ pkg_remove() {
     # we no longer need to block 'Ctrl+C'.
     trap pkg_clean EXIT INT
 
-    run_hook post-remove "$1" "$KISS_ROOT/" root
+    run_hook post-remove "$1" "$CPT_ROOT/" root
 
     log "$1" "Removed successfully"
 }
@@ -1098,7 +1120,7 @@ pkg_install() {
 
     else
         pkg_cache "$1" ||
-            die "package has not been built, run 'kiss b pkg'"
+            die "package has not been built, run 'cpt b pkg'"
 
         pkg_name=$1
     fi
@@ -1110,11 +1132,11 @@ pkg_install() {
     decompress "$tar_file" | "$tar" xf - -C "$tar_dir/$pkg_name"
 
     [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest" ] ||
-        die "'${tar_file##*/}' is not a valid KISS package"
+        die "'${tar_file##*/}' is not a valid CPT package"
 
     # Ensure that the tarball's manifest is correct by checking that
     # each file and directory inside of it actually exists.
-    [ "$KISS_FORCE" != 1 ] && log "$pkg_name" "Checking package manifest" &&
+    [ "$CPT_FORCE" != 1 ] && log "$pkg_name" "Checking package manifest" &&
         while read -r line; do
             # Skip symbolic links
             [ -h "$tar_dir/$pkg_name/$line" ] ||
@@ -1124,7 +1146,7 @@ pkg_install() {
         }
     done < "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest"
     [ "$TARBALL_FAIL" ] && {
-        log "You can still install this package by setting KISS_FORCE variable"
+        log "You can still install this package by setting CPT_FORCE variable"
         die "$pkg_name" "Missing files in manifest"
     }
 
@@ -1133,7 +1155,7 @@ pkg_install() {
     # Make sure that all run-time dependencies are installed prior to
     # installing the package.
     [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/depends" ] &&
-    [ "$KISS_FORCE" != 1 ] &&
+    [ "$CPT_FORCE" != 1 ] &&
         while read -r dep dep_type || [ "$dep" ]; do
             [ "${dep##\#*}" ] || continue
             [ "$dep_type" ]   || pkg_list "$dep" >/dev/null ||
@@ -1162,7 +1184,7 @@ pkg_install() {
     pkg_rsync() {
         rsync "--chown=$USER:$USER" --chmod=Du-s,Dg-s,Do-s \
               -WhHKa --no-compress --exclude /etc "${1:---}" \
-              "$tar_dir/$pkg_name/" "$KISS_ROOT/"
+              "$tar_dir/$pkg_name/" "$CPT_ROOT/"
     }
 
     # Install the package by using 'rsync' and overwrite any existing files
@@ -1174,7 +1196,7 @@ pkg_install() {
     "$grep" -vFxf "$sys_db/$pkg_name/manifest" "$mak_dir/m" 2>/dev/null |
 
     while read -r file; do
-        file=$KISS_ROOT/$file
+        file=$CPT_ROOT/$file
 
         # Skip deleting some leftover files.
         case $file in /etc/*) continue; esac
@@ -1221,9 +1243,9 @@ pkg_fetch() {
     # Create a list of all repositories.
     # See [1] at top of script.
     # shellcheck disable=2046,2086
-    { IFS=:; set -- $KISS_PATH; unset IFS; }
+    { IFS=:; set -- $CPT_PATH; unset IFS; }
 
-    # Update each repository in '$KISS_PATH'. It is assumed that
+    # Update each repository in '$CPT_PATH'. It is assumed that
     # each repository is 'git' tracked.
     for repo do
         # Go to the root of the repository (if it exists).
@@ -1269,7 +1291,7 @@ pkg_fetch() {
                     # ownership of files and directories in the rare
                     # case that the repository is owned by a 3rd user.
                     (
-                        user=$(kiss-stat "$PWD")      || user=root
+                        user=$(cpt-stat "$PWD")      || user=root
                         id -u "$user" >/dev/null 2>&1 || user=root
 
                         [ "$user" = root ] ||
@@ -1296,7 +1318,7 @@ pkg_fetch() {
                 # Similar to the git update, we find the owner of
                 # the repository and spawn rsync as that user.
                 (
-                    user=$(kiss-stat "$PWD")      || user=root
+                    user=$(cpt-stat "$PWD")      || user=root
                     id -u "$user" >/dev/null 2>&1 || user=root
 
                     [ "$user" = root ] ||
@@ -1318,7 +1340,7 @@ pkg_updates(){
     # Check all installed packages for updates. So long as the installed
     # version and the version in the repositories differ, it's considered
     # an update.
-    [ "$KISS_FETCH" = 0 ] || pkg_fetch
+    [ "$CPT_FETCH" = 0 ] || pkg_fetch
 
     log "Checking for new package versions"
 
@@ -1354,17 +1376,17 @@ pkg_updates(){
         exit 0
     }
 
-    contains "$outdated" kiss && {
+    contains "$outdated" cpt && {
         log "Detected package manager update"
         log "The package manager will be updated first"
 
         prompt || exit 0
 
-        pkg_build kiss
-        args i kiss
+        pkg_build cpt
+        args i cpt
 
         log "Updated the package manager"
-        log "Re-run 'kiss update' to update your system"
+        log "Re-run 'cpt update' to update your system"
 
         exit 0
     }
@@ -1393,14 +1415,14 @@ pkg_updates(){
 pkg_clean() {
     # Clean up on exit or error. This removes everything related
     # to the build.
-    [ "$KISS_DEBUG" != 1 ] || return
+    [ "$CPT_DEBUG" != 1 ] || return
 
     # Block 'Ctrl+C' while cache is being cleaned.
     trap '' INT
 
     # Remove temporary items.
     rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
-       "$KISS_TMPDIR/$pid-c" "$KISS_TMPDIR/$pid-m"
+       "$CPT_TMPDIR/$pid-c" "$CPT_TMPDIR/$pid-m"
 }
 
 args() {
@@ -1427,13 +1449,13 @@ args() {
     # Parse some arguments earlier to remove the need to duplicate code.
     case $action in
         s|search)
-            [ "$1" ] || die "'kiss $action' requires an argument"
+            [ "$1" ] || die "'cpt $action' requires an argument"
         ;;
 
         a|alternatives)
             # Rerun the script with 'su' if the user isn't root.
             # Cheeky but 'su' can't be used on shell functions themselves.
-            [ -z "$1" ] || [ -w "$KISS_ROOT/" ] || [ "$uid" = 0 ] || {
+            [ -z "$1" ] || [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
                 as_root "$0" "$action" "$@"
                 return
             }
@@ -1443,8 +1465,8 @@ args() {
             # Rerun the script with 'su' if the user does not have write
             # permissions for the root. Cheeky but 'su' can't be used on
             # shell functions themselves.
-            [ -w "$KISS_ROOT/" ] || [ "$uid" = 0 ] || {
-                KISS_FORCE="$KISS_FORCE" as_root "$0" "$action" "$@"
+            [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
+                CPT_FORCE="$CPT_FORCE" as_root "$0" "$action" "$@"
                 return
             }
         ;;
@@ -1453,10 +1475,10 @@ args() {
     case $action in
         b|build|c|checksum|d|download|i|install|r|remove)
             [ "$1" ] || {
-                # We are exporting the KISS_PATH, so if another
-                # instance of 'kiss' is spawned from the current
-                # one, they continue to use the same KISS_PATH
-                export KISS_PATH="${PWD%/*}:$KISS_PATH"
+                # We are exporting the CPT_PATH, so if another
+                # instance of 'cpt' is spawned from the current
+                # one, they continue to use the same CPT_PATH
+                export CPT_PATH="${PWD%/*}:$CPT_PATH"
                 set -- "${PWD##*/}"
             } ; esac
 
@@ -1464,7 +1486,7 @@ args() {
     # keystrokes once you memorize the commands.
     #
     # This is to fix a shellcheck warning when using $PATH
-    # in kiss extensions help string.
+    # in cpt extensions help string.
     # shellcheck disable=2016
     case $action in
         a|alternatives)
@@ -1497,7 +1519,7 @@ args() {
                     else
                         log "$pkg" "Need permissions to generate checksums"
 
-                        user=$(kiss-stat "$repo_dir") as_root tee "$repo_dir/checksums"
+                        user=$(cpt-stat "$repo_dir") as_root tee "$repo_dir/checksums"
                     fi
                 }
 
@@ -1536,8 +1558,8 @@ args() {
             log "Installed extensions"
             set --
 
-            for path in $(SEARCH_PATH=$PATH pkg_find kiss-* all -x); do
-                set -- "${path#*/kiss-}" "$@"
+            for path in $(SEARCH_PATH=$PATH pkg_find cpt-* all -x); do
+                set -- "${path#*/cpt-}" "$@"
                 max=$((${#1} > max ? ${#1} : max))
              done
 
@@ -1546,8 +1568,8 @@ args() {
                 contains "readlink stat" "$path" && continue
 
                 printf "%b->%b %-${max}s  " "${color:+"\033[1;31m"}" "${color:+"\033[m"}" \
-                    "${path#*/kiss-}"
-                sed -n 's/^# *//;2p' "$(command -v "kiss-$path")"
+                    "${path#*/cpt-}"
+                sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
              done | sort -uk1 >&2
 
         ;;
@@ -1556,7 +1578,7 @@ args() {
             pkg_order "$@"
 
             for pkg in $redro; do
-                pkg_remove "$pkg" "${KISS_FORCE:-check}"
+                pkg_remove "$pkg" "${CPT_FORCE:-check}"
             done
         ;;
 
@@ -1568,16 +1590,16 @@ args() {
         d|download) for pkg do pkg_sources "$pkg"; done ;;
         l|list)     pkg_list "$@" ;;
         s|search)   for pkg do pkg_find "$pkg" all; done ;;
-        v|version)  log kiss 2.3.0 ;;
+        v|version)  log cpt 2.3.0 ;;
 
         h|help|-h|--help|'')
             exec 2>&1
-            log 'kiss [abcdefilrsuv] [pkg...]'
+            log 'cpt [abcdefilrsuv] [pkg...]'
             log 'alternatives  List and swap to alternatives'
             log 'build         Build a package'
             log 'checksum      Generate checksums'
             log 'download      Download sources for the given package'
-            log 'extension     List available kiss extensions (kiss-* in $PATH)'
+            log 'extension     List available cpt extensions (cpt-* in $PATH)'
             log 'fetch         Fetch repositories'
             log 'install       Install a package'
             log 'list          List installed packages'
@@ -1589,8 +1611,8 @@ args() {
         ;;
 
         *)
-             util=$(SEARCH_PATH=$PATH pkg_find "kiss-$action"* "" -x 2>/dev/null) ||
-                 die "'kiss $action' is not a valid command"
+             util=$(SEARCH_PATH=$PATH pkg_find "cpt-$action"* "" -x 2>/dev/null) ||
+                 die "'cpt $action' is not a valid command"
 
               "$util" "$@"
          ;;
@@ -1599,18 +1621,20 @@ args() {
 }
 
 main() {
-    # Die here if the user has no set KISS_PATH. This is a rare occurance
+    set -ef
+
+    # Die here if the user has no set CPT_PATH. This is a rare occurance
     # as the environment variable should always be defined.
-    [ "$KISS_PATH" ] || die "\$KISS_PATH needs to be set"
+    [ "$CPT_PATH" ] || die "\$CPT_PATH needs to be set"
 
     # Set the location to the repository and package database.
-    pkg_db=var/db/kiss/installed
+    pkg_db=var/db/cpt/installed
 
     # The PID of the current shell process is used to isolate directories
-    # to each specific KISS instance. This allows multiple package manager
+    # to each specific CPT instance. This allows multiple package manager
     # instances to be run at once. Store the value in another variable so
     # that it doesn't change beneath us.
-    pid=${KISS_PID:-$$}
+    pid=${CPT_PID:-$$}
 
     # Force the C locale to speed up things like 'grep' which disable unicode
     # etc when this is set. We don't need unicode and a speed up is always
@@ -1633,7 +1657,7 @@ main() {
 
     # Figure out which 'sudo' command to use based on the user's choice or
     # what is available on the system.
-    su=${KISS_SU:-$(command -v sudo || command -v doas)} || su=su
+    su=${CPT_SU:-$(command -v sudo || command -v doas)} || su=su
 
     # Store the date and time of script invocation to be used as the name
     # of the log files the package manager creates uring builds.
@@ -1643,11 +1667,11 @@ main() {
     # This is used enough to warrant a place here.
     uid=$(id -u)
 
-    # Make sure that the KISS_ROOT doesn't end with a '/'. This might
+    # Make sure that the CPT_ROOT doesn't end with a '/'. This might
     # break some operations.
-    [ -z "$KISS_ROOT" ] || [ "${KISS_ROOT##*/}" ] || {
-        warn "Your KISS_ROOT variable shouldn't end with '/'"
-        KISS_ROOT=${KISS_ROOT%/}
+    [ -z "$CPT_ROOT" ] || [ "${CPT_ROOT##*/}" ] || {
+        warn "Your CPT_ROOT variable shouldn't end with '/'"
+        CPT_ROOT=${CPT_ROOT%/}
     }
 
     # Define an optional sys_arch variable in order to provide
@@ -1656,43 +1680,42 @@ main() {
 
     # Define this variable but don't create its directory structure from
     # the get go. It will be created as needed by package installation.
-    sys_db=$KISS_ROOT/$pkg_db
+    sys_db=$CPT_ROOT/$pkg_db
 
-    # This allows for automatic setup of a KISS chroot and will
+    # This allows for automatic setup of a CPT chroot and will
     # do nothing on a normal system.
-    mkdir -p "$KISS_ROOT/" 2>/dev/null ||:
+    mkdir -p "$CPT_ROOT/" 2>/dev/null ||:
 
-    # Set a value for KISS_COMPRESS if it isn't set.
-    : "${KISS_COMPRESS:=gz}"
+    # Set a value for CPT_COMPRESS if it isn't set.
+    : "${CPT_COMPRESS:=gz}"
 
     # A temporary directory can be specified apart from the cache
     # directory in order to build in a user specified directory.
     # /tmp could be used in order to build on ram, useful on SSDs.
-    # The user can specify KISS_TMPDIR for this.
+    # The user can specify CPT_TMPDIR for this.
     #
     # Create the required temporary directories and set the variables
     # which point to them.
-    mkdir -p "${cac_dir:=${XDG_CACHE_HOME:-$HOME/.cache}/kiss}" \
-             "${KISS_TMPDIR:=$cac_dir}" \
-             "${mak_dir:=$KISS_TMPDIR/build-$pid}" \
-             "${pkg_dir:=$KISS_TMPDIR/pkg-$pid}" \
-             "${tar_dir:=$KISS_TMPDIR/extract-$pid}" \
+    mkdir -p "${cac_dir:=${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}" \
+             "${CPT_TMPDIR:=$cac_dir}" \
+             "${mak_dir:=$CPT_TMPDIR/build-$pid}" \
+             "${pkg_dir:=$CPT_TMPDIR/pkg-$pid}" \
+             "${tar_dir:=$CPT_TMPDIR/extract-$pid}" \
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
 
     # Disable color escape sequences if running in a subshell.
-    # This behaviour can be changed by adding a KISS_COLOR
+    # This behaviour can be changed by adding a CPT_COLOR
     # variable to the environment. If it is set to 1 it will
     # always enable color escapes, and if set to 0 it will
     # always disable color escapes.
-    if [ "$KISS_COLOR" = 1 ]; then color=1
-    elif [ "$KISS_COLOR" = 0 ] || ! [ -t 1 ]; then
+    if [ "$CPT_COLOR" = 1 ]; then color=1
+    elif [ "$CPT_COLOR" = 0 ] || ! [ -t 1 ]; then
         log() { printf '%s %s %s\n' "${3:-->}" "$1" "$2" >&2 ;}
     else color=1
     fi
 
-    args "$@"
 }
 
 main "$@"
