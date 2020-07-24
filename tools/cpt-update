@@ -1,4 +1,5 @@
 #!/bin/sh -ef
+# Check for updates
 
 # shellcheck disable=1091
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ../lib.sh; fi
