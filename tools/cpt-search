@@ -12,7 +12,7 @@ case "$1" in
     --help|-h|'')
         out "usage: ${0##*/} [--single] [pkg...]" "" \
             "  Options:" \
-            "    --single  Only show the first instance of a package"
+            "    --single  Only show the first instance of a package" ""
         exit 0
         ;;
     --version|-v) version ;;

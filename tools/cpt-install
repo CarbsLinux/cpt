@@ -10,7 +10,7 @@ while [ "$1" ]; do
             out "usage: ${0##*/} [options] [pkg...]" "" \
                 "  Options:" \
                 "    --force           Force installation" \
-                "    --root [rootdir]  Use an alternate root directory"
+                "    --root [rootdir]  Use an alternate root directory" ""
             exit 1
             ;;
         --version|-v) version                ;;
