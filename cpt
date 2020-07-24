@@ -3,7 +3,8 @@
 
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./lib.sh; fi
 
-case "$1" in
+[ "$1" ] && { arg=$1; shift; }
+case "$arg" in
     --help|-h|'')
         log "Carbs Packaging Tool"
         set --
@@ -12,7 +13,7 @@ case "$1" in
             max=$((${#1} > max ? ${#1} : max))
         done
 
-        for path in "$@"; do
+        for path; do
             # These are binary files so they should be ignored
             contains "readlink stat" "$path" && continue
 
@@ -27,7 +28,7 @@ case "$1" in
         util=$(SEARCH_PATH=$PATH pkg_find "cpt-$1"* "" -x 2>/dev/null) ||
             die "'cpt $action' is not a valid command"
 
-        shift; "$util" "$@"
+        "$util" "$@"
         ;;
 
 esac
