@@ -100,4 +100,4 @@ It is considerably easy to switch to the Carbs Linux rsync repository.
   +--------------------------------------------------------------------------+
 
 This will fetch the repository to the given location, you can then add it to your
-$KISS_PATH.
+$CPT_PATH.
