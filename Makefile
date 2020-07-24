@@ -17,12 +17,12 @@ clean:
 	rm -f ${BIN} ${OBJ}
 
 install: all
-	install -Dm755 ${DESTDIR}${BINDIR}/cpt-lib lib.sh
-	install -Dm755 ${DESTDIR}${BINDIR}/cpt     cpt
+	install -Dm755 lib.sh ${DESTDIR}${BINDIR}/cpt-lib
+	install -Dm755 cpt    ${DESTDIR}${BINDIR}/cpt
 	for bin in tools/* ${BIN} contrib/*; do \
-		install -Dm755 ${DESTDIR}${BINDIR}/$${bin##*/} $${bin}; done
-	for man in man/*.1; do install -Dm644 ${DESTDIR}${MAN1}/$${man##*/} $${man}; done
-	for doc in doc/*; do install -Dm644 ${DESTDIR}${CPTDOC}/$${doc##*/} $${doc}; done
+		install -Dm755 $${bin} ${DESTDIR}${BINDIR}/$${bin##*/}; done
+	for man in man/*.1; do install -Dm644 $${man} ${DESTDIR}${MAN1}/$${man##*/}; done
+	for doc in doc/*; do install -Dm644 $${doc} ${DESTDIR}${CPTDOC}/$${doc##*/}; done
 
 uninstall:
 	rm -f ${DESTDIR}${BINDIR}/cpt \
