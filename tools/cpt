@@ -1,7 +1,7 @@
 #!/bin/sh -ef
 # shellcheck disable=1091
 
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./lib.sh; fi
+if command -v cpt-lib >/dev/null; then . cpt-lib; else ./cpt-lib; fi
 
 [ "$1" ] && { arg=$1; shift; }
 case "$arg" in
