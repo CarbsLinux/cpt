@@ -10,7 +10,7 @@ die() {
     rm -f carbs-rootfs.tar.xz carbs-rootfs.tar.xz.sum
 
     log "$@"
-    log "Re-run 'kiss-chbuild' to try again."
+    log "Re-run 'cpt-chbuild' to try again."
 
     exit 1
 }
@@ -37,7 +37,7 @@ case "$(uname -m)" in i*86) arch=i686; esac
 url="https://dl.carbslinux.org/releases/${arch:-$(uname -m)}/carbs-rootfs.tar.xz"
 pid=$$
 
-cd "${cac_dir:=$KISS_ROOT${XDG_CACHE_HOME:-$HOME/.cache}/kiss}"
+cd "${cac_dir:=$CPT_ROOT${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}"
 
 [ -f carbs-rootfs.tar.xz ] || {
     log "Downloading chroot tarball"
@@ -66,8 +66,8 @@ cp -a carbs-chroot "chroot-$pid"
 
 [ "$1" ] && {
     log "Installing extra packages"
-    KISS_ROOT=$PWD/chroot-$pid kiss i "$@"
+    CPT_ROOT=$PWD/chroot-$pid cpt-install "$@"
 }
 
 log "Entering chroot"
-su -c "kiss-chroot chroot-$pid; rm -rf chroot-$pid"
+su -c "cpt-chroot chroot-$pid; rm -rf chroot-$pid"

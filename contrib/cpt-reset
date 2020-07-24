@@ -9,16 +9,16 @@ set --
 while read -r pkg _; do
     case $pkg in
         baselayout|binutils|bison|busybox|bzip2|curl|flex|gcc|rsync|\
-        gzip|kiss|libressl|linux-headers|m4|make|musl|pkgconf|xz|zlib) ;;
+        gzip|cpt|libressl|linux-headers|m4|make|musl|pkgconf|xz|zlib) ;;
 
         *) set -- "$@" "$pkg" ;;
     esac
 done <<EOF
-$(kiss l)
+$(cpt-list)
 EOF
 
 [ "$1" ] && {
     printf 'WARNING: This will remove \033[1m%s\033[m package(s).\n' "$#"
     printf 'Continue? [Enter/Ctrl+C]\n'
-    read -r _ && KISS_FORCE=1 kiss r "$@"
+    read -r _ && CPT_FORCE=1 cpt-remove "$@"
 }

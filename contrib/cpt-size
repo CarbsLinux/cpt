@@ -1,12 +1,12 @@
 #!/bin/sh -ef
 # Show the size on disk for a package
 
-case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-size [pkg]" ; exit 0 ; esac
-kiss s "$1" >/dev/null
+case "$1" in ''|--help|-h) printf '%s\n' "usage: ${0##*/} [pkg]" ; exit 0 ; esac
+cpt-search "$1" >/dev/null
 
 # Filter directories from manifest and leave only files.
 # Directories in the manifest end in a trailing '/'.
-files=$(sed 's|.*/$||' "$KISS_ROOT/var/db/kiss/installed/$1/manifest")
+files=$(sed 's|.*/$||' "$CPT_ROOT/var/db/cpt/installed/$1/manifest")
 
 # Send the file list to 'du'.
 # This unquoted variable is safe as word splitting is intended

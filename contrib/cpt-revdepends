@@ -1,12 +1,12 @@
 #!/bin/sh -e
 # Display packages which depend on package
 
-case "$1" in ''|--help|-h) printf '%s\n' "usage: kiss-revdepends [pkg]" ; exit 0 ; esac
-kiss s "$1" >/dev/null
+case "$1" in ''|--help|-h) printf '%s\n' "usage: ${0##*/} [pkg]" ; exit 0 ; esac
+cpt-search "$1" >/dev/null
 
 # 'cd' to the database directory as a simple way of
 # stripping the path and performing a 'basename'.
-cd "$KISS_ROOT/var/db/kiss/installed"
+cd "$CPT_ROOT/var/db/cpt/installed"
 
 # Use a simple 'grep' to display packages depending on '$1'.
 grep "^$1" -- */depends
