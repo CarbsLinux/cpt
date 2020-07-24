@@ -20,15 +20,25 @@ case "$arg" in
             printf "%b->%b %-${max}s  " "${color:+\033[1;31m}" "${color:+\033[m}" "${path#*/cpt-}"
             sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
         done | sort -uk1 >&2
+        exit
         ;;
 
-    --version|-v) version ;;
+    --version|-v|version) version ;;
 
-    *)
-        util=$(SEARCH_PATH=$PATH pkg_find "cpt-$arg"* "" -x 2>/dev/null) ||
-            die "'cpt $arg' is not a valid command"
-
-        "$util" "$@"
-        ;;
-
+    # Reserve these arguments for the following tools.
+    a) arg=alternatives ;;
+    b) arg=build ;;
+    c) arg=checksum ;;
+    d) arg=download ;;
+    f) arg=fetch ;;
+    i) arg=install ;;
+    l) arg=list ;;
+    r) arg=remove ;;
+    s) arg=search ;;
+    u) arg=update ;;
 esac
+
+util=$(SEARCH_PATH=$PATH pkg_find "cpt-$arg"* "" -x 2>/dev/null) ||
+    die "'cpt $arg' is not a valid command"
+
+"$util" "$@"
