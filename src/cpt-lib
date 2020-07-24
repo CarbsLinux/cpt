@@ -1,17 +1,11 @@
 #!/bin/sh -ef
 # shellcheck source=/dev/null
 #
-# This is a simple package manager written in POSIX 'sh' for use
-# in KISS Linux (https://k1ss.org).
-#
-# This script runs with '-ef' meaning:
-# '-e': Abort on any non-zero exit code.
-# '-f': Disable globbing globally.
-#
-# [1] Warnings related to word splitting and globbing are disabled.
-# All word splitting in this script is *safe* and intentional.
-#
+# This is the Carbs Packaging Toolchain written for Carbs Linux.
+# It was originally forked from the kiss package manager by
 # Dylan Araps.
+#
+# Currently maintained by Cem Keylan.
 
 version() {
     log "Carbs Packaging Tools" 3.0.0
