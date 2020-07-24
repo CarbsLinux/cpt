@@ -28,7 +28,7 @@ uninstall:
 	rm -f ${DESTDIR}${BINDIR}/cpt \
 		${DESTDIR}${BINDIR}/cpt-lib
 	for bin in ${BIN} tools/* contrib/*; do \
-		rm -f ${DESTDIR}${BINDIR}/$${bin}; done
+		rm -f ${DESTDIR}${BINDIR}/$${bin##*/}; done
 	rm -f ${DESTDIR}${MAN1}/kiss.1 ${DESTDIR}${MAN1}/kiss.1
 	rm -f ${DESTDIR}${MAN1}/kiss-contrib.1 ${DESTDIR}${MAN1}/kiss-contrib.1
 	rm -rf ${DESTDIR}${CPTDOC}
