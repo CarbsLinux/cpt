@@ -1,18 +1,18 @@
 CHANGELOG
 ================================================================================
 
-This is the CHANGELOG for the Carbs Linux fork of the `kiss` package manager.
-The format is based on [Keep a Changelog], and this project _somewhat_ adheres
-to [Semantic Versioning].
+This is the CHANGELOG for the Carbs Packaging Tools, initially a customized fork
+of the `kiss` package manager. The format is based on [Keep a Changelog], and
+this project _somewhat_ adheres to [Semantic Versioning].
 
 [Keep a Changelog]:    https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
+3.0.0 - 2020-07-24
 --------------------------------------------------------------------------------
 
-This is the 3.0 release. This will make `kiss` (now renamed as `cpt`) a
+This is the 3.0.0 release. This will make `kiss` (now renamed as `cpt`) a
 toolchain for package management rather than a single script program. The main
 functionality is moved into a `lib.sh` file which the tools will source. This
 comes with nice benefits such as:
@@ -44,6 +44,7 @@ comes with nice benefits such as:
 
 ### Removed
 - Removed `kiss-which` because it became unnecessary after this release.
+- Removed the ability to control color output (for now).
 
 
 2.3.0 - 2020-07-16
