@@ -1,0 +1,33 @@
+#!/bin/sh -ef
+# shellcheck disable=1091
+
+if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./lib.sh; fi
+
+case "$1" in
+    --help|-h|'')
+        log "Carbs Packaging Tool"
+        set --
+        for path in $(SEARCH_PATH=$PATH pkg_find cpt-* all -x); do
+            set -- "${path#*/cpt-}" "$@"
+            max=$((${#1} > max ? ${#1} : max))
+        done
+
+        for path in "$@"; do
+            # These are binary files so they should be ignored
+            contains "readlink stat" "$path" && continue
+
+            printf "%b->%b %-${max}s  " "${color:+\033[1;31m}" "${color:+\033[m}" "${path#*/cpt-}"
+            sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
+        done | sort -uk1 >&2
+        ;;
+
+    --version|-v) version ;;
+
+    *)
+        util=$(SEARCH_PATH=$PATH pkg_find "cpt-$1"* "" -x 2>/dev/null) ||
+            die "'cpt $action' is not a valid command"
+
+        shift; "$util" "$@"
+        ;;
+
+esac
