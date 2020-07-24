@@ -1,4 +1,4 @@
-/* kiss-readlink --- a utility replacement for readlink
+/* cpt-readlink --- a utility replacement for readlink
  * See LICENSE for copyright information.
  *
  * This is basically a 'readlink -f' command.
