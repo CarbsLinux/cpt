@@ -730,9 +730,14 @@ pkg_build() {
         cp -LRf "$repo_dir" "$pkg_dir/$pkg/$pkg_db/"
 
         # We never ever want this. Let's end the endless conflicts
-        # and remove it. This will be the only exception for a
-        # specific removal of this kind.
+        # and remove it.
         find "$pkg_dir/$pkg" -name charset.alias -exec rm -f {} +
+
+        # Remove libtool's '*.la' library files. This removes cross-build
+        # system conflicts that may arise. Build-systems change, libtool
+        # is getting deprecated, we don't want a package that depends on
+        # some package's '.la' files.
+        find "$pkg_dir/$pkg" -name '*.la' -exec rm -f {} +
 
         log "$pkg" "Successfully built package"
 
