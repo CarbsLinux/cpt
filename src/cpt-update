@@ -22,4 +22,6 @@ while [ "$1" ]; do
     esac
 done
 
+create_cache
+
 pkg_updates

@@ -31,6 +31,8 @@ done
 
 pkg_order "$@"
 
+create_cache
+
 # shellcheck disable=2154
 for pkg in $order; do pkg_install "$pkg"; done
 

@@ -13,4 +13,5 @@ case "$1" in
     '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH
 esac
 
+create_cache
 for pkg; do pkg_sources "$pkg"; done
