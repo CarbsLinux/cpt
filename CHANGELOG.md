@@ -9,6 +9,16 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+3.1.0 - 2020-08-07
+--------------------------------------------------------------------------------
+
+### Changed
+- `cpt-lib` no longer creates temporary directories. This will need manual
+  adjustments for scripts that make use of the cache directories. Those
+  directories can now be created by calling the `create_cache()` function.
+- Dropping libtool's `*.la` library files from packages.
+
+
 3.0.0 - 2020-07-24
 --------------------------------------------------------------------------------
 
