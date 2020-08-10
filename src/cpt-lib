@@ -75,10 +75,24 @@ as_root() {
     # 'doas' or 'su'. Hurrah for choice.
     [ "$uid" = 0 ] || log "Using '${su:-su}' (to become ${user:=root})"
 
+    # We are exporting package manager variables, so that we still have the same
+    # repository paths / access to the same cache directories etc.
+    set -- HOME="$HOME" \
+           XDG_CACHE_HOME="$XDG_CACHE_HOME" \
+           CPT_PATH="$CPT_PATH" \
+           CPT_FORCE="$CPT_FORCE" \
+           CPT_HOOK="$CPT_HOOK" \
+           CPT_ROOT="$CPT_ROOT" \
+           CPT_CHOICE="$CPT_CHOICE" \
+           CPT_CACHE="$CPT_CACHE" \
+           CPT_TMPDIR="$CPT_TMPDIR" \
+           CPT_HOOK="$CPT_HOOK" \
+           CPT_PID="$CPT_PID" \
+           "$@"
+
     case ${su##*/} in
-        sudo) sudo -E -u "$user" -- "$@" ;;
-        doas) doas    -u "$user" -- "$@" ;;
-        su)   su -pc "env USER=$user $* <&3" "$user" 3<&0 </dev/tty ;;
+        sudo|doas) "$su" -u "$user" -- env "$@" ;;
+        su)   su -c "env $* <&3" "$user" 3<&0 </dev/tty ;;
         *)    die "Invalid CPT_SU value: $su" ;;
     esac
 }
