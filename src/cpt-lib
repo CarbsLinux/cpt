@@ -752,8 +752,8 @@ pkg_build() {
         cp -LRf "$repo_dir" "$pkg_dir/$pkg/$pkg_db/"
 
         # Copy the modified build file to the package directory.
-        diff "$pkg_dir/$pkg/$pkg_db/build" .build.cpt > "$pkg_dir/$pkg/$pkg_db/build.diff"
-        [ -s "$pkg_dir/$pkg/$pkg_db/build.diff" ] || rm -f "$pkg_dir/$pkg/$pkg_db/build.diff"
+        diff "$pkg_dir/$pkg/$pkg_db/build" .build.cpt > "$pkg_dir/$pkg/$pkg_db/build.diff" &&
+            rm -f "$pkg_dir/$pkg/$pkg_db/build.diff"
 
         # We never ever want this. Let's end the endless conflicts
         # and remove it.
