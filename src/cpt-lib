@@ -79,15 +79,19 @@ as_root() {
     # repository paths / access to the same cache directories etc.
     set -- HOME="$HOME" \
            XDG_CACHE_HOME="$XDG_CACHE_HOME" \
-           CPT_PATH="$CPT_PATH" \
+           CPT_CACHE="$CPT_CACHE" \
+           CPT_CHOICE="$CPT_CHOICE" \
+           CPT_COMPRESS="$CPT_COMPRESS" \
+           CPT_DEBUG="$CPT_DEBUG" \
+           CPT_FETCH="$CPT_FETCH" \
            CPT_FORCE="$CPT_FORCE" \
            CPT_HOOK="$CPT_HOOK" \
-           CPT_ROOT="$CPT_ROOT" \
-           CPT_CHOICE="$CPT_CHOICE" \
-           CPT_CACHE="$CPT_CACHE" \
-           CPT_TMPDIR="$CPT_TMPDIR" \
-           CPT_HOOK="$CPT_HOOK" \
+           CPT_KEEPLOG="$CPT_KEEPLOG" \
+           CPT_PATH="$CPT_PATH" \
            CPT_PID="$CPT_PID" \
+           CPT_PROMPT="$CPT_PROMPT" \
+           CPT_ROOT="$CPT_ROOT" \
+           CPT_TMPDIR="$CPT_TMPDIR" \
            "$@"
 
     case ${su##*/} in
