@@ -116,8 +116,6 @@ run_hook() {
     # escalation through user scripts.
     [ "$4" ] && CPT_HOOK=$CPT_ROOT/etc/cpt-hook
 
-    # This is not a misspelling, can be ignored safely.
-    # shellcheck disable=2153
     [ -f "$CPT_HOOK" ] || return 0
 
     log "$2" "Running $1 hook"
