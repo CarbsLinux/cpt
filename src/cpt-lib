@@ -1477,10 +1477,6 @@ main() {
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
 
-    # Die here if the user has no set CPT_PATH. This is a rare occurance
-    # as the environment variable should always be defined.
-    [ "$CPT_PATH" ] || die "\$CPT_PATH needs to be set"
-
     # Set the location to the repository and package database.
     pkg_db=var/db/cpt/installed
 
