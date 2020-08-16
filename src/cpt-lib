@@ -198,7 +198,7 @@ pkg_find() {
         done
     done
 
-    unset IFS
+    IFS=$old_ifs
 
     # A package may also not be found due to a repository not being
     # readable by the current user. Either way, we need to die here.
@@ -1267,7 +1267,7 @@ pkg_fetch() {
     # Create a list of all repositories.
     # See [1] at top of script.
     # shellcheck disable=2046,2086
-    { IFS=:; set -- $CPT_PATH; unset IFS; }
+    { IFS=:; set -- $CPT_PATH; IFS=$old_ifs ;}
 
     # Update each repository in '$CPT_PATH'. It is assumed that
     # each repository is 'git' tracked.
@@ -1516,6 +1516,9 @@ main() {
     # Make note of the user's current ID to do root checks later on.
     # This is used enough to warrant a place here.
     uid=$(id -u)
+
+    # Save IFS, so we can restore it back to what it was before.
+    old_ifs=$IFS
 
     # Make sure that the CPT_ROOT doesn't end with a '/'. This might
     # break some operations.
