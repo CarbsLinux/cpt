@@ -8,15 +8,19 @@ if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 # in order to only find the first instance of a package.
 all=1
 
-case "$1" in
-    --help|-h|'')
-        out "usage: ${0##*/} [--single] [pkg...]" "" \
-            "  Options:" \
-            "    --single  Only show the first instance of a package" ""
-        exit 0
-        ;;
-    --version|-v) version ;;
-    --single) unset all; shift ;;
-esac
+eval set -- "$(getopt -l single,version,help -- shv "$@")"
+while :; do
+    case "$1" in
+        --help|-h|'')
+            out "usage: ${0##*/} [--single] [pkg...]" "" \
+                "  Options:" \
+                "    -s --single  Only show the first instance of a package" ""
+            exit 0
+            ;;
+        --version|-v) version ;;
+        --single|-s) unset all; shift ;;
+        --) shift; break ;;
+    esac
+done
 
 for pkg; do pkg_find "$pkg" "${all:+all}"; done
