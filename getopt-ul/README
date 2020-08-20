@@ -1,0 +1,6 @@
+getopt from util-linux
+----------------------
+
+This is the standalone getopt build from util-linux. This is used in cpt seperately
+so that the program doesn't depend on any outside source. See COPYING for copyright
+information.
