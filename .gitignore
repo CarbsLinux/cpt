@@ -1,6 +1,7 @@
 ### Binaries/Objects ###
 cpt-stat
 cpt-readlink
+getopt
 *.o
 
 ### Emacs ###
