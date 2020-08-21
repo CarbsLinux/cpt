@@ -118,7 +118,7 @@ run_hook() {
 
     [ -f "$CPT_HOOK" ] || return 0
 
-    log "$2" "Running $1 hook"
+    [ "$2" ] && log "$2" "Running $1 hook"
 
     TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$CPT_HOOK"
 }
