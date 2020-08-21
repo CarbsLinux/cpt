@@ -9,6 +9,22 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+3.2.0 - 2020-08-22
+--------------------------------------------------------------------------------
+
+### Added
+- A `.build.cpt` file can be edited during the pre-build hook, so that a build
+  script can be modified. If the build is modified, a diff file will be
+  generated to the package database.
+- Some of the tools now use getopt. Since getopt isn't a POSIX utility,
+  util-linux implementation has been added to the `getopt-ul` directory. It
+  consists only of files required for the tool to be built.
+- Added `pre-chroot` hook for the `cpt-chbuild` utility.
+
+### Changed
+- `cpt-chbuild` now uses library functions such `sh256()`, and `as_root()`.
+
+
 3.1.1 - 2020-08-11
 --------------------------------------------------------------------------------
 
