@@ -52,5 +52,7 @@ cp -a carbs-chroot "chroot-$pid"
     CPT_ROOT=$PWD/chroot-$pid cpt-install "$@"
 }
 
+run_hook pre-chroot "" "$PWD/chroot-$pid"
+
 log "Entering chroot"
 as_root sh -c "cpt-chroot chroot-$pid; rm -rf chroot-$pid"
