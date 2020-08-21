@@ -1,10 +1,11 @@
-+------------------------------------------------------------------------------+
-|   ___          _       ___         _             _          _____         _  |
-|  / __|__ _ _ _| |__ __| _ \__ _ __| |____ _ __ _(_)_ _  __ |_   _|__  ___| | |
-| | (__/ _` | '_| '_ (_-<  _/ _` / _| / / _` / _` | | ' \/ _` || |/ _ \/ _ \ | |
-|  \___\__,_|_| |_.__/__/_| \__,_\__|_\_\__,_\__, |_|_||_\__, ||_|\___/\___/_| |
-|                                            |___/       |___/                 |
-+------------------------------------------------------------------------------+
+  ____ ____ _____
+ / ___|  _ \_   _|
+| |   | |_) || |
+| |___|  __/ | |
+ \____|_|    |_|
+
+Carbs Packaging Tools
+--------------------------------------------------------------------------------
 
 Package management toolset for Carbs Linux. Forked from [KISS]. All usage
 information can be obtained from the manual page. For changes please refer to
@@ -13,12 +14,28 @@ the `CHANGELOG.md` file.
 [KISS]: https://github.com/kisslinux/kiss
 
 
+Dependencies
+--------------------------------------------------------------------------------
+
+To build and use cpt, you need the following software.
+
+- C compiler [make]
+- rsync
+- getopt [provided by cpt if not available]
+- POSIX base utilities [coreutils, busybox, sbase, etc.]
+- tar [GNU tar, busybox, toybox, libarchive, etc.]
+
+Build configuration can be done from the 'config.mk' file. If you have getopt
+on your system, add SYSTEM_GETOPT=1 option to your 'config.mk'.
+
+
 Directory Structure
 --------------------------------------------------------------------------------
 
-    /        -- kiss, README, Makefile, LICENSE, CHANGELOG
-    bin/     -- for C programs.
-    contrib/ -- for Shell scripts that wrap around kiss.
-    doc/     -- for documentation.
-    man/     -- for manual pages.
-    src/   -- for the tools that make up the package manager.
+    /         -- cpt, README, Makefile, LICENSE, CHANGELOG
+    bin/      -- for C programs.
+    contrib/  -- for Shell scripts that wrap around cpt.
+    doc/      -- for documentation.
+    getopt-ul -- for cpt provided util-linux standalone getopt(1).
+    man/      -- for manual pages.
+    src/      -- for the tools that make up the package manager.
