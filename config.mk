@@ -18,3 +18,6 @@ LIBS    = -lc
 # C compiler and linker
 CC = cc
 LD = ${CC}
+
+# Uncomment this if you have getopt on your system
+# SYSTEM_GETOPT = 1
