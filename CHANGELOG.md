@@ -23,6 +23,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 
 ### Changed
 - `cpt-chbuild` now uses library functions such `sh256()`, and `as_root()`.
+- `cpt` programs no longer exit if `$CPT_PATH` is unset.
 
 
 3.1.1 - 2020-08-11
