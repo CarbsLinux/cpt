@@ -4,23 +4,20 @@
 # shellcheck disable=1091
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 
-eval set -- "$(getopt -l help,version,force,root: -- fhv "$@")"
+parser_definition() {
+    setup REST -- "usage: ${0##*/} [pkg...]"
+    msg -- '' 'Options:'
+    flag  CPT_FORCE -f --force   -- "Force installation"
+    param CPT_ROOT     --root    -- "Use an alternate root directory"
+    disp  :usage    -h --help    -- "Show this help message"
+    disp  :version  -v --version -- "Print version information"
+}
 
-while :; do
-    case "$1" in
-        --help|-h)
-            out "usage: ${0##*/} [options] [pkg...]" "" \
-                "  Options:" \
-                "    -f --force        Force installation" \
-                "    --root [rootdir]  Use an alternate root directory" ""
-            exit 1
-            ;;
-        --version|-v) version                   ;;
-        -f|--force) export CPT_FORCE=1; shift   ;;
-        --root) export CPT_ROOT=$2; shift 2     ;;
-        --) shift; break                        ;;
-    esac
-done
+eval "$(getoptions      parser_definition parse "$0")"
+eval "$(getoptions_help parser_definition usage "$0")"
+
+parse "$@"
+eval set -- "$REST"
 
 [ "$1" ] || set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH
 

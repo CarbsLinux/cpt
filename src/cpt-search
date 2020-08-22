@@ -4,23 +4,18 @@
 # shellcheck disable=1091
 if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 
-# By default we are showing all instances of a package. This value can be unset
-# in order to only find the first instance of a package.
-all=1
+parser_definition() {
+    setup REST -- "usage: ${0##*/} [pkg...]"
+    msg -- '' 'Options:'
+    flag all      -s --single init:=1 on:'' -- "Only show the first instance of a package"
+    disp :usage   -h --help                     -- "Show this help message"
+    disp :version -v --version                  -- "Print version information"
+}
 
-eval set -- "$(getopt -l single,version,help -- shv "$@")"
-while :; do
-    case "$1" in
-        --help|-h|'')
-            out "usage: ${0##*/} [--single] [pkg...]" "" \
-                "  Options:" \
-                "    -s --single  Only show the first instance of a package" ""
-            exit 0
-            ;;
-        --version|-v) version ;;
-        --single|-s) unset all; shift ;;
-        --) shift; break ;;
-    esac
-done
+eval "$(getoptions      parser_definition parse "$0")"
+eval "$(getoptions_help parser_definition usage "$0")"
+
+parse "$@"
+eval set -- "$REST"
 
 for pkg; do pkg_find "$pkg" "${all:+all}"; done
