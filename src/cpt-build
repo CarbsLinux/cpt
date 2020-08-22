@@ -10,7 +10,7 @@ while :; do
         --help|-h)
             out "usage: ${0##*/} [pkg...]" "" \
                 "  Options:" \
-                "  -y --no-prompt  Do not prompt for confirmation"
+                "  -y --no-prompt  Do not prompt for confirmation" ""
             exit 1 ;;
         --version|-v) version ;;
         --no-prompt|-y) export CPT_PROMPT=0; shift ;;
