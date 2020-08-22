@@ -21,6 +21,7 @@ To build and use cpt, you need the following software.
 
 - C compiler [make]
 - rsync
+- curl
 - getopt [provided by cpt if not available]
 - POSIX base utilities [coreutils, busybox, sbase, etc.]
 - tar [GNU tar, busybox, toybox, libarchive, etc.]
