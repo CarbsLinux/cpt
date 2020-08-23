@@ -7,10 +7,10 @@ if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
 parser_definition() {
     setup REST -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
-    flag  CPT_FORCE -f --force   -- "Force removal"
-    param CPT_ROOT     --root    -- "Use an alternate root directory"
-    disp  :usage    -h --help    -- "Show this help message"
-    disp  :version  -v --version -- "Print version information"
+    flag  CPT_FORCE -f --force init:"$CPT_FORCE"  -- "Force removal"
+    param CPT_ROOT     --root  init:"$CPT_ROOT"   -- "Use an alternate root directory"
+    disp  :usage    -h --help                     -- "Show this help message"
+    disp  :version  -v --version                  -- "Print version information"
 }
 
 eval "$(getoptions      parser_definition parse "$0")"
