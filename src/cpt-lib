@@ -475,8 +475,14 @@ pkg_list() {
 pkg_cache() {
     read -r version release 2>/dev/null < "$(pkg_find "$1")/version"
 
-    set +f; set -f -- "$bin_dir/$1#$version-$release.tar."*
-    tar_file=$1
+    # Initially assume that the package tarball is built with the CPT_COMPRESS
+    # value.
+    if [ -f "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS" ]; then
+        tar_file="$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
+    else
+        set +f; set -f -- "$bin_dir/$1#$version-$release.tar."*
+        tar_file=$1
+    fi
 
     [ -f "$tar_file" ]
 }
