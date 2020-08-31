@@ -1497,7 +1497,8 @@ pkg_fetch() {
     for repo; do
         # Go to the root of the repository (if it exists).
         cd "$repo"
-        cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null ||:
+        cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null ||
+            cd "$(hg root 2>/dev/null)" 2>/dev/null ||:
 
         if [ -d .git ]; then
 
@@ -1549,10 +1550,17 @@ pkg_fetch() {
                     )
                 fi
             }
-        elif hg root >/dev/null 2>&1; then
-            cd "$(hg root)"
+        elif [ -d .hg ]; then
+
+            [ "$(hg showconfig paths 2>/dev/null)" ] || {
+                log "$repo" " "
+                printf '%s\n' "No remote, skipping."
+                continue
+            }
+
             contains "$repos $PWD" || {
                 repos="$repos $PWD"
+
                 if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
                     hg pull
                     hg update
