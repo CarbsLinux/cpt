@@ -281,7 +281,7 @@ getoptions_help() {
 
 warn() {
     # Print a warning message
-    log "WARN" "$1" "${2:-!>}"
+    log "$1" "$2" "${3:-WARNING}"
 }
 
 contains() {
@@ -1316,7 +1316,7 @@ pkg_etc() {
 
             # All other cases.
             *)
-                warn "($pkg_name) saving /$file as /$file.new" "->"
+                warn "$pkg_name" "saving /$file as /$file.new" "->"
                 new=.new
             ;;
         esac
@@ -1771,7 +1771,7 @@ main() {
     # Make sure that the CPT_ROOT doesn't end with a '/'. This might
     # break some operations.
     [ -z "$CPT_ROOT" ] || [ "${CPT_ROOT##*/}" ] || {
-        warn "Your CPT_ROOT variable shouldn't end with '/'"
+        warn "" "Your CPT_ROOT variable shouldn't end with '/'"
         CPT_ROOT=${CPT_ROOT%/}
     }
 
