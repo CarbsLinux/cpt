@@ -1582,6 +1582,10 @@ pkg_fetch() {
                 fi
             }
         elif [ -f .rsync ]; then
+            # If an .rsync_root file exists, we check that the repository root
+            # exists. If it does, we change to that directory to do the fetch.
+            # This way, we allow for partial repositories while making sure that
+            # we can fetch the repository in a single operation.
             [ -f .rsync_root ] && {
                 read -r rsync_root < .rsync_root
                 [ -f "$rsync_root/.rsync" ] && cd "$rsync_root"
