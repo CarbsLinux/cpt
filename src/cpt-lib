@@ -37,6 +37,15 @@ die() {
     exit 1
 }
 
+trap_set() {
+    # Function to set the trap value.
+    case ${1:-cleanup} in
+        cleanup) trap pkg_clean EXIT INT ;;
+        block)   trap '' INT ;;
+        unset)   trap - EXIT INT ;;
+    esac
+}
+
 # This is the public domain getoptions shell library. It also forms a usage
 # function.
 # License: CC0 (Public Domain)
@@ -1333,7 +1342,7 @@ pkg_remove() {
     # Block being able to abort the script with 'Ctrl+C' during removal.
     # Removes all risk of the user aborting a package removal leaving
     # an incomplete package installed.
-    trap '' INT
+    trap_set block
 
     if [ -x "$sys_db/$1/pre-remove" ]; then
         log "$1" "Running pre-remove script"
@@ -1364,7 +1373,7 @@ pkg_remove() {
 
     # Reset 'trap' to its original value. Removal is done so
     # we no longer need to block 'Ctrl+C'.
-    trap pkg_clean EXIT INT
+    trap_set cleanup
 
     run_hook post-remove "$1" "$CPT_ROOT/" root
 
@@ -1436,7 +1445,7 @@ pkg_install() {
     # Block being able to abort the script with Ctrl+C during installation.
     # Removes all risk of the user aborting a package installation leaving
     # an incomplete package installed.
-    trap '' INT
+    trap_set block
 
     # If the package is already installed (and this is an upgrade) make a
     # backup of the manifest and etcsums files.
@@ -1486,7 +1495,7 @@ pkg_install() {
 
     # Reset 'trap' to its original value. Installation is done so
     # we no longer need to block 'Ctrl+C'.
-    trap pkg_clean EXIT INT
+    trap_set cleanup
 
     if [ -x "$sys_db/$pkg_name/post-install" ]; then
         log "$pkg_name" "Running post-install script"
@@ -1682,7 +1691,7 @@ pkg_clean() {
     [ "$CPT_DEBUG" != 1 ] || return
 
     # Block 'Ctrl+C' while cache is being cleaned.
-    trap '' INT
+    trap_set block
 
     # Remove temporary items.
     rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
@@ -1732,7 +1741,7 @@ main() {
 
     # Catch errors and ensure that build files and directories are cleaned
     # up before we die. This occurs on 'Ctrl+C' as well as success and error.
-    trap pkg_clean EXIT INT
+    trap_set cleanup
 
     # Prefer GNU grep if installed as it is much much faster than busybox's
     # implementation. Very much worth it if you value performance over
