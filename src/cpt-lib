@@ -387,7 +387,7 @@ sh256() {
       openssl dgst -r -sha256 "$1" ||
       die "No sha256 program could be run." ;} |
 
-        while read -r hash _; do printf '%s  %s\n' "$hash" "$1"; done
+        while read -r hash _; do printf '%s\n' "$hash"; done
 }
 
 pkg_isbuilt() (
@@ -409,7 +409,7 @@ pkg_lint() {
     repo_dir=$(pkg_find "$1")
 
     cd "$repo_dir" || die "'$repo_dir' not accessible"
-    [ -f sources ] || die "$1" "Sources file not found"
+    [ -f sources ] || warn "$1" "Sources file not found"
     [ -x build ]   || die "$1" "Build file not found or not executable"
     [ -s version ] || die "$1" "Version file not found or empty"
 
@@ -1063,6 +1063,8 @@ pkg_checksums() {
     # Generate checksums for packages.
     repo_dir=$(pkg_find "$1")
 
+    [ -f "$repo_dir/sources" ] || return 0
+
     while read -r src _ || [ "$src" ]; do
         # Comment.
         if [ -z "${src##\#*}" ]; then
@@ -1077,9 +1079,7 @@ pkg_checksums() {
             src_path=$src_dir/$1
 
         # File is a git repository.
-        elif [ -z "${src##git+*}" ]; then
-            printf 'git  %s\n' "$src"
-            continue
+        elif [ -z "${src##git+*}" ]; then continue
 
         # Die here if source for some reason, doesn't exist.
         else
@@ -1094,10 +1094,15 @@ pkg_checksums() {
 }
 
 pkg_verify() {
-    # Verify all package checksums. This is achieved by generating
-    # a new set of checksums and then comparing those with the old
-    # set.
-    for pkg do pkg_checksums "$pkg" | diff - "$(pkg_find "$pkg")/checksums" || {
+    # Verify all package checksums. This is achieved by generating a new set of
+    # checksums and then comparing those with the old set.
+    verify_cmd="NR==FNR{a[\$1];next}/^git  .*/{next}!((\$1)in a){exit 1}"
+
+    for pkg; do
+        repo_dir=$(pkg_find "$pkg")
+        [ -f "$repo_dir/sources" ] || continue
+
+        pkg_checksums "$pkg" | awk "$verify_cmd" - "$repo_dir/checksums" || {
         log "$pkg" "Checksum mismatch"
 
         # Instead of dying above, log it to the terminal. Also define a
