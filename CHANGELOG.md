@@ -9,7 +9,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-3.3.0 - 2020-08-22
+3.3.1 - 2020-08-31
+--------------------------------------------------------------------------------
+
+### Changed
+- Reverted `sh256()` to the previous way.
+
+
+3.3.0 - 2020-08-31
 --------------------------------------------------------------------------------
 
 ### Added

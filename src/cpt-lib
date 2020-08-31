@@ -8,7 +8,7 @@
 # Currently maintained by Cem Keylan.
 
 version() {
-    log "Carbs Packaging Tools" 3.3.0
+    log "Carbs Packaging Tools" 3.3.1
     exit 0
 }
 
@@ -387,7 +387,7 @@ sh256() {
       openssl dgst -r -sha256 "$1" ||
       die "No sha256 program could be run." ;} |
 
-        while read -r hash _; do printf '%s\n' "$hash"; done
+        while read -r hash _; do printf '%s  %s\n' "$hash" "$1"; done
 }
 
 pkg_isbuilt() (
