@@ -9,6 +9,21 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+3.3.0 - 2020-08-22
+--------------------------------------------------------------------------------
+
+### Added
+- Added `trap_set()` in order to manage traps.
+
+### Changed
+- Moved from `getopt` to a shell implementation of option parsing. This ensures
+  portability, and doesn't depend on a C program with GNU extensions. That was
+  a mistake. The new implementation is taken from the public domain library,
+  `getoptions`.
+- `warn()` function was modified to use `log "$1" "$2" "${3:-WARNING}"` instead.
+- Made `cpt` checksum method compatible with the KISS Community repository.
+
+
 3.2.0 - 2020-08-22
 --------------------------------------------------------------------------------
 
