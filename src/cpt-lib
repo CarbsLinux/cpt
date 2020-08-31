@@ -1501,12 +1501,6 @@ pkg_fetch() {
 
         if [ -d .git ]; then
 
-            command -v git >/dev/null || {
-                log "$repo" " "
-                printf '%s\n' "Git is not installed, skipping."
-                continue
-            }
-
             [ "$(git remote 2>/dev/null)" ] || {
                 log "$repo" " "
                 printf '%s\n' "No remote, skipping."
