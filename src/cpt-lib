@@ -499,6 +499,11 @@ pkg_cache() {
 pkg_sources() {
     # Download any remote package sources. The existence of local
     # files is also checked.
+    repo_dir=$(pkg_find "$1")
+
+    # Support packages without sources. Simply do nothing.
+    [ -f "$repo_dir/sources" ] || return 0
+
     log "$1" "Downloading sources"
 
     # Store each downloaded source in a directory named after the
