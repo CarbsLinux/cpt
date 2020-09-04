@@ -7,11 +7,8 @@ BIN = ${SRC:.c=}
 
 all: ${BIN}
 
-.c.o:
-	${CC} ${CFLAGS} -c -o $@ $<
-
-${BIN}: ${OBJ}
-	${CC} ${LDFLAGS} -o $@ $< ${LIBS}
+.c:
+	${CC} ${CFLAGS} ${LDFLAGS} -o $@ $< ${LIBS}
 
 clean:
 	rm -f ${BIN} ${OBJ}
