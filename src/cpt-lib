@@ -677,8 +677,11 @@ pkg_depends() {
         [ "$pkg_build" ] && [ -z "$2" ] &&
             (pkg_list "$1" >/dev/null) && return
 
-        # Recurse through the dependencies of the child packages.
-        while read -r dep _ || [ "$dep" ]; do
+        while read -r dep type || [ "$dep" ]; do
+            # Skip test dependencies unless $CPT_TEST is set to 1.
+            case $type in test) [ "$CPT_TEST" = 1 ] || continue; esac
+
+            # Recurse through the dependencies of the child packages.
             [ "${dep##\#*}" ] && pkg_depends "$dep"
         done 2>/dev/null < "$(pkg_find "$1")/depends" ||:
 
@@ -963,6 +966,19 @@ pkg_build() {
             pkg_clean
             kill 0
         } } | tee "$log_dir/$pkg-$time-$pid"
+
+        # Run the test script if it exists and the user wants to run tests. This
+        # is turned off by default.
+        [ -x "$repo_dir/test" ] && [ "$CPT_TEST" = 1 ] && {
+            run_hook pre-test "$pkg" "$pkg_dir/$pkg"
+            log "$pkg" "Running tests"
+            "$repo_dir/test" "$pkg_dir/$pkg" "$build_version" "$sys_arch" 2>&1 || {
+                log "$pkg" "Test failed"
+                log "$pkg" "Log stored to $log_dir/$pkg-$time-$pid"
+                run_hook test-fail "$pkg" "$pkg_dir/$pkg"
+                pkg_clean
+                kill 0
+        } } | tee -a "$log_dir/$pkg-$time-$pid"
 
         # Delete the log file if the build succeeded to prevent
         # the directory from filling very quickly with useless logs.
