@@ -1,7 +1,6 @@
 #!/bin/sh
 # Install a package
 
-# shellcheck disable=1091
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 parser_definition() {

@@ -1,8 +1,7 @@
 #!/bin/sh -ef
 # Generate checksums
 
-# shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 case "$1" in
     --help|-h) out "usage: ${0##*/} [pkg...]"; exit 1 ;;

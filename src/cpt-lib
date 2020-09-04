@@ -582,7 +582,7 @@ pkg_extract() {
             # Comment or blank line.
             \#*|'') continue ;;
 
-            # Only 'tar' an 'zip' archives are currently supported for
+            # Only 'tar', 'cpio', and 'zip' archives are currently supported for
             # extraction. Other filetypes are simply copied to '$mak_dir'
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|*://*.txz)
@@ -637,6 +637,11 @@ pkg_extract() {
 
                 # Clean up the temporary tarball.
                 rm -f .ktar
+            ;;
+
+            *://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
+                decompress "$src_dir/$1/${src##*/}" | cpio -i
+
             ;;
 
             *://*.zip)

@@ -1,8 +1,7 @@
 #!/bin/sh -ef
 # List and swap to alternatives
 
-# shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 case "$1" in --version|--help|-v|-h|'') ;; *)
     [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {

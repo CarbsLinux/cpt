@@ -1,8 +1,7 @@
 #!/bin/sh -ef
 # Check for updates
 
-# shellcheck disable=1091
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 parser_definition() {
     setup REST -- "usage: ${0##*/} [options]"
