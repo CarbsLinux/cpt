@@ -1,7 +1,14 @@
 #!/bin/sh -ef
 # Show the size on disk for a package
 
-case "$1" in ''|--help|-h) printf '%s\n' "usage: ${0##*/} [pkg]" ; exit 0 ; esac
+case "$1" in
+    --help|-h)
+        printf '%s\n' "usage: ${0##*/} [pkg]"
+        exit 0
+        ;;
+    '') set -- "${PWD##*/}"
+esac
+
 cpt-search "$1" >/dev/null
 
 # Filter directories from manifest and leave only files.
