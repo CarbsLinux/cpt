@@ -17,4 +17,6 @@ eval "$(getoptions_help parser_definition usage "$0")"
 parse "$@"
 eval set -- "$REST"
 
+# The 'all' variable is set by the option parser.
+# shellcheck disable=2154
 for pkg; do pkg_find "$pkg" "${all:+all}"; done
