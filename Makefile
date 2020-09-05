@@ -13,6 +13,12 @@ all: ${BIN}
 clean:
 	rm -f ${BIN} ${OBJ}
 
+test:   ${BIN}
+	bin/cpt-stat     bin
+	bin/cpt-stat     Makefile
+	bin/cpt-readlink /bin/sh
+	shellcheck -P src -x -f gcc src/* contrib/*
+
 install-bin: ${BIN}
 	for bin in ${BIN}; do \
 		install -Dm755 $${bin} ${DESTDIR}${BINDIR}/$${bin##*/}; done
