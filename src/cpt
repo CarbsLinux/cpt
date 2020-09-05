@@ -1,7 +1,6 @@
 #!/bin/sh -ef
-# shellcheck disable=1091
 
-if command -v cpt-lib >/dev/null; then . cpt-lib; else . ./cpt-lib; fi
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 # If none of the tools below are specified, we will reenable glob
 unset glob
@@ -20,7 +19,7 @@ case "$arg" in
             # These are the files to be ignored.
             contains "lib readlink stat" "$path" && continue
 
-            printf "%b->%b %-${max}s  " "${color:+\033[1;31m}" "${color:+\033[m}" "${path#*/cpt-}"
+            printf "%b->%b %-${max}s  " "$colorb" "$colre" "${path#*/cpt-}"
             sed -n 's/^# *//;2p' "$(command -v "cpt-$path")"
         done | sort -uk1 >&2
         exit
