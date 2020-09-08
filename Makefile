@@ -17,7 +17,7 @@ test:   ${BIN}
 	bin/cpt-stat     bin
 	bin/cpt-stat     Makefile
 	bin/cpt-readlink /bin/sh
-	shellcheck -P src -x -f gcc src/* contrib/*
+	${MAKE} -C src test
 
 install-bin: ${BIN}
 	for bin in ${BIN}; do \
