@@ -6,8 +6,8 @@ if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 parser_definition() {
     setup REST -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
-    flag  CPT_FORCE -f --force init:"$CPT_FORCE"  -- "Force removal"
-    param CPT_ROOT     --root  init:"$CPT_ROOT"   -- "Use an alternate root directory"
+    flag  CPT_FORCE -f --force init:="$CPT_FORCE"  -- "Force removal"
+    param CPT_ROOT     --root  init:="$CPT_ROOT"   -- "Use an alternate root directory"
     disp  :usage    -h --help                     -- "Show this help message"
     disp  :version  -v --version                  -- "Print version information"
 }

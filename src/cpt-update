@@ -6,12 +6,12 @@ if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 parser_definition() {
     setup REST -- "usage: ${0##*/} [options]"
     msg -- '' 'Options:'
-    flag  download_only -d --download                           -- "Only download updatable packages"
-    flag  CPT_FETCH     -n --no-fetch  on:0  init:"$CPT_FETCH"  -- "Do not refresh the repositories"
-    flag  CPT_PROMPT    -y --no-prompt on:0  init:"$CPT_PROMPT" -- "Do not prompt for confirmation"
-    param CPT_ROOT         --root            init:"$CPT_ROOT"   -- "Use an alternate root directory"
-    disp  :usage        -h --help                               -- "Show this help message"
-    disp  :version      -v --version                            -- "Print version information"
+    flag  download_only -d --download                            -- "Only download updatable packages"
+    flag  CPT_FETCH     -n --no-fetch  on:0  init:="$CPT_FETCH"  -- "Do not refresh the repositories"
+    flag  CPT_PROMPT    -y --no-prompt on:0  init:="$CPT_PROMPT" -- "Do not prompt for confirmation"
+    param CPT_ROOT         --root            init:="$CPT_ROOT"   -- "Use an alternate root directory"
+    disp  :usage        -h --help                                -- "Show this help message"
+    disp  :version      -v --version                             -- "Print version information"
 }
 
 eval "$(getoptions      parser_definition parse "$0")"
