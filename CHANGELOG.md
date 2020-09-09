@@ -9,6 +9,34 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+4.0.0 - 2020-09-09
+--------------------------------------------------------------------------------
+
+With this update, all the documentation was moved to the `docs` repository,
+which can be accessed from the following sources:
+
+- [Docs Repository](https://github.com/carbslinux/docs)
+- [Online User Manual](https://carbslinux.org/docs)
+- `carbs-docs` package
+
+### Added
+- Added the ability to test packages using a new executable file `test`.
+- Added `$CPT_TEST` variable for testing packages.
+- Added `--test|-t` option to build.
+- Added support for `mercurial` repositories.
+- Added options to install the tools "static" so they don't depend on cpt-lib.
+- Added basic unit tests. See `make test`.
+
+### Changed
+- Most contrib scripts now use the current directory as the package name.
+
+### Removed
+- Removed the `docs/` folder.
+
+### Fixed
+- Fixed `getoptions` parsers while declaring initial variables.
+- Fixed build `cpt-stat` on the Makefile.
+
 3.3.1 - 2020-08-31
 --------------------------------------------------------------------------------
 
