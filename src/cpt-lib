@@ -390,8 +390,7 @@ sh256() {
 
 pkg_isbuilt() (
     # Check if a package is built or not.
-    repo_dir=$(pkg_find "$1")
-    read -r ver rel < "$repo_dir/version"
+    read -r ver rel < "$(pkg_find "$1")/version"
 
     set +f
     for tarball in "$bin_dir/$1#$ver-$rel.tar."*; do
