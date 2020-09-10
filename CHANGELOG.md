@@ -9,6 +9,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+4.0.1 - 2020-09-10
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed flags starting with `--no-`
+
+
 4.0.0 - 2020-09-09
 --------------------------------------------------------------------------------
 
