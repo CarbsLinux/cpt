@@ -9,6 +9,16 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+4.1.0 - 2020-09-11
+--------------------------------------------------------------------------------
+
+### Added
+- Added `bi` action to cpt for building and installing packages at the same time
+
+### Fixed
+- Fixed `as_root()` call on `cpt-chbuild`.
+
+
 4.0.1 - 2020-09-10
 --------------------------------------------------------------------------------
 
