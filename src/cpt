@@ -38,6 +38,15 @@ case "$arg" in
     r|remove)       arg=remove ;;
     s|search)       arg=search ;;
     u|update)       arg=update ;;
+    bi)
+        # Build and install function for cpt.
+        cpt-build "$@"
+
+        # When building multiple packages, cpt will already ask to install
+        # the packages, so no need for this here.
+        [ "$2" ] || cpt-install "$@"
+        exit
+        ;;
     *) glob=1 ;;
 esac
 
