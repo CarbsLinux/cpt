@@ -798,7 +798,7 @@ pkg_fixdeps() {
 
             case $own in "$pkg_name"|"$pkg_name-bin"|"") continue ; esac
             printf 'Found %s (%s) in (%s)\n' "$own" "$dep" \
-                   "${file##$pkg_dir/$pkg_name}" >/dev/tty
+                   "${file##$pkg_dir/$pkg_name}" >&2
 
             printf '%s\n' "$own"
         done ||:
