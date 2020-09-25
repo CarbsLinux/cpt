@@ -9,6 +9,20 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+4.1.1 - 2020-09-25
+--------------------------------------------------------------------------------
+
+### Changed
+- Git clones now fetch tags if commits are specified. This makes the operation
+  longer, but not as long as cloning the whole repository while building a
+  package.
+- `pkg_fixdeps()` now outputs to `stderr` instead of `/dev/tty`. You can now
+  have fully silent builds.
+
+### Fixed
+- Fixed the `as_root()` function when using `su`.
+
+
 4.1.0 - 2020-09-11
 --------------------------------------------------------------------------------
 
