@@ -954,6 +954,11 @@ pkg_build() {
 
         run_hook pre-build "$pkg" "$pkg_dir/$pkg"
 
+        # Notify the user if the build script is changed during the pre-build
+        # hook.
+        diff -q "$repo_dir/build" .build.cpt ||
+            log "$pkg" "Executing the modified build file"
+
         # Call the build script, log the output to the terminal
         # and to a file. There's no PIPEFAIL in POSIX shelll so
         # we must resort to tricks like killing the script ourselves.
