@@ -318,6 +318,7 @@ as_root() {
     # We are exporting package manager variables, so that we still have the same
     # repository paths / access to the same cache directories etc.
     set -- HOME="$HOME" \
+           USER="$user" \
            XDG_CACHE_HOME="$XDG_CACHE_HOME" \
            CPT_CACHE="$CPT_CACHE" \
            CPT_CHOICE="$CPT_CHOICE" \
