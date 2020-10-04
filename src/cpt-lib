@@ -290,7 +290,8 @@ contains() {
 regesc() {
     # Escape special regular expression characters as
     # defined in POSIX BRE. '$.*[\^'
-    printf '%s\n' "$1" | sed 's|\\|\\\\|g;s|\[|\\[|g;s|\$|\\$|g;s|\.|\\.|g;s|\*|\\*|g;s|\^|\\^|g'
+    printf '%s\n' "$1" |
+    sed 's|\\|\\\\|g;s|\[|\\[|g;s|\$|\\$|g;s|\.|\\.|g;s|\*|\\*|g;s|\^|\\^|g'
 }
 
 
@@ -315,8 +316,8 @@ as_root() {
     # 'doas' or 'su'. Hurrah for choice.
     [ "$uid" = 0 ] || log "Using '${su:-su}' (to become ${user:=root})"
 
-    # We are exporting package manager variables, so that we still have the same
-    # repository paths / access to the same cache directories etc.
+    # We are exporting package manager variables, so that we still have the
+    # same repository paths / access to the same cache directories etc.
     set -- HOME="$HOME" \
            USER="$user" \
            XDG_CACHE_HOME="$XDG_CACHE_HOME" \
@@ -513,7 +514,10 @@ pkg_sources() {
 
     while read -r src dest || [ "$src" ]; do
         # Remote git/hg repository or comment.
-        if [ -z "${src##\#*}" ] || [ -z "${src##git+*}" ] || [ -z "${src##hg+*}" ]
+        if [ -z "${src##\#*}" ]   ||
+           [ -z "${src##git+*}" ] ||
+           [ -z "${src##hg+*}" ]
+
         then :
 
         # Remote source (cached).
