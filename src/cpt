@@ -32,7 +32,6 @@ case "$arg" in
     b|build)        arg=build ;;
     c|checksum)     arg=checksum ;;
     d|download)     arg=download ;;
-    f|fetch)        arg=fetch ;;
     i|install)      arg=install ;;
     l|list)         arg=list ;;
     r|remove)       arg=remove ;;
