@@ -9,6 +9,32 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+--------------------------------------------------------------------------------
+
+### IMPORTANT
+- `cpt-fetch` has been removed. `cpt-update -o` can be used instead.
+
+### Added
+- Added an `/etc/cpt-base` file to define a base. It can be used in order to
+  ship a default base, but to make it redefinable by the user. This file isn't
+  installed by default, it serves as a template.
+- Added `cpt-orphans` to view orphaned packages. This tool uses `/etc/cpt-base`
+  and doesn't output any packages in the defined base.
+- Added a `global_options()` function in order to add into the option parser.
+- Added `cpt-update -o` flag to replace the functionality of `cpt-fetch`.
+- Added `cpt-list -c` to use the current directory as the argument string.
+
+### Changed
+- `pkg_build()` now notifies the user if the build file was modified inside a
+  hook (the `pre-build` hook to be precise).
+- In git repository sources, `@` can now be used to specify tags.
+  E.g. `git+git://git.carbslinux.org/cpt@4.2.0`
+- `cpt-fork` now removes `manifest` and `etcsums` files.
+- `cpt-fork` can now be used to fork multiple packages.
+- `cpt-reset` now uses `/etc/cpt-base` when removing packages.
+
+
 4.1.1 - 2020-09-25
 --------------------------------------------------------------------------------
 
