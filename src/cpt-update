@@ -8,7 +8,7 @@ parser_definition() {
     msg -- '' 'Options:'
     flag  download_only -d --download                                 -- "Only download updatable packages"
     flag  CPT_FETCH     -n --no-fetch  on:0 off:0 init:="$CPT_FETCH"  -- "Do not refresh the repositories"
-    disp :pkg_fetch     -f --only-fetch                               -- "Only fetch repositories"
+    disp :pkg_fetch     -o --only-fetch                               -- "Only fetch repositories"
     global_options
 }
 
