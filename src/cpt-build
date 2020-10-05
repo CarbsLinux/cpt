@@ -6,10 +6,8 @@ if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 parser_definition() {
     setup REST -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
-    flag CPT_PROMPT -y --no-prompt on:0 off:0 init:="$CPT_PROMPT" -- "Do not prompt for confirmation"
     flag CPT_TEST   -t --test                init:="$CPT_TEST"    -- "Run tests (if it exists)"
-    disp :usage     -h --help                                     -- "Show this help message"
-    disp :version   -v --version                                  -- "Print version information"
+    global_options
 }
 
 eval "$(getoptions      parser_definition parse "$0")"

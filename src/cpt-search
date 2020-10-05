@@ -7,8 +7,7 @@ parser_definition() {
     setup REST -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
     flag all      -s --single init:=1 on:'' -- "Only show the first instance of a package"
-    disp :usage   -h --help                     -- "Show this help message"
-    disp :version -v --version                  -- "Print version information"
+    global_flags
 }
 
 eval "$(getoptions      parser_definition parse "$0")"
