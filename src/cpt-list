@@ -3,9 +3,19 @@
 
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
-case "$1" in
-    --help|-h) out "usage: ${0##*/} [pkg...]"; exit 1 ;;
-    --version|-v) version ;;
-esac
+parser_definition() {
+    setup REST -- "usage: ${0##*/} [-c] [pkg...]"
+    msg -- '' 'Options:'
+    flag CURRENT -c --current -- "Use the current directory as a package"
+    global_options
+}
+
+eval "$(getoptions parser_definition parse "$0")"
+eval "$(getoptions_help parser_definition usage)"
+
+parse "$@"
+eval set -- "$REST"
+
+[ "$CURRENT" ] && set -- "${PWD##*/}"
 
 pkg_list "$@"
