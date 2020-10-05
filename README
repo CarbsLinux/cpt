@@ -40,3 +40,19 @@ Directory Structure
     getopt-ul -- for cpt provided util-linux standalone getopt(1).
     man/      -- for manual pages.
     src/      -- for the tools that make up the package manager.
+
+
+Defining Base
+--------------------------------------------------------------------------------
+
+Tools such as cpt-orphans and cpt-reset define the base from the file
+'/etc/cpt-base'. An example cpt-base file can be found from the root directory
+of the repository, which is the default base for Carbs Linux. A user can modify
+this file to fit their needs and redefine their base for the system. For
+example, a user can decide that they want 'sbase' instead of 'busybox' for their
+base, so if they reset their system, busybox will be removed instead of sbase.
+
+This file is used to ship a predefined base, while leaving the base to a user's
+choice. However, it isn't installed by the Makefile so that the packagers may
+define their own base, or so that a user can install cpt without using it as
+their main package manager.
