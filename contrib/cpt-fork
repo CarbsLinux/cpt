@@ -16,7 +16,7 @@ for pkg; do
 
     # Sometimes forked packages are from the database and not from a repository.
     # We should remove the manifest in such a case.
-    rm -f "$pkg/manifest"
+    rm -f "$pkg/manifest" "$pkg/etcsums"
 
     printf 'forked package to %s\n' "$PWD/$pkg"
 done
