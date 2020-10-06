@@ -6,7 +6,8 @@ if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 parser_definition() {
     setup REST -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
-    flag CPT_TEST   -t --test                init:="$CPT_TEST"    -- "Run tests (if it exists)"
+    flag CPT_TEST   -t --test export:1 init:="$CPT_TEST" -- \
+                                    "Run tests (if they exist)"
     global_options
 }
 
