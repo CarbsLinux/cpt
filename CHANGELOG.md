@@ -9,7 +9,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-UNRELEASED
+5.0.0 - 2020-10-06
 --------------------------------------------------------------------------------
 
 ### IMPORTANT
@@ -33,6 +33,8 @@ UNRELEASED
 - `cpt-fork` now removes `manifest` and `etcsums` files.
 - `cpt-fork` can now be used to fork multiple packages.
 - `cpt-reset` now uses `/etc/cpt-base` when removing packages.
+- `cpt-build` now exports the `CPT_TEST` variable, so some tests that can't be
+  done in a `test` script can be done from the build itself.
 
 
 4.1.1 - 2020-09-25
