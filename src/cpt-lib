@@ -393,6 +393,19 @@ sh256() {
         while read -r hash _; do printf '%s  %s\n' "$hash" "$1"; done
 }
 
+pkg_owner() {
+    set +f
+
+    [ "$3" ] || set -- "$1" "$2" "$sys_db"/*/manifest
+
+    pkg_owner=$(grep "$@")
+    pkg_owner=${pkg_owner%/*}
+    pkg_owner=${pkg_owner##*/}
+
+    set -f -- "$pkg_owner"; unset pkg_owner
+    [ "$1" ] && printf '%s\n' "$1"
+}
+
 pkg_isbuilt() (
     # Check if a package is built or not.
     read -r ver rel < "$(pkg_find "$1")/version"
