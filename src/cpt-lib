@@ -763,11 +763,10 @@ pkg_strip() {
     done 2>/dev/null ||:
 }
 
-pkg_fixdeps() {
-    # Dynamically look for missing runtime dependencies by checking
-    # each binary and library with 'ldd'. This catches any extra
-    # libraries and or dependencies pulled in by the package's
-    # build suite.
+pkg_fix_deps() {
+    # Dynamically look for missing runtime dependencies by checking each binary
+    # and library with either 'ldd' or 'readelf'. This catches any extra
+    # libraries and or dependencies pulled in by the package's build suite.
     log "$1" "Checking for missing dependencies"
 
     # Go to the directory containing the built package to
@@ -793,38 +792,32 @@ pkg_fixdeps() {
     find "$pkg_dir/$pkg_name/" -type f 2>/dev/null |
 
     while read -r file; do
-        # Run 'ldd' on the file and parse each line. The code
-        # then checks to see which packages own the linked
-        # libraries and it prints the result.
-        ldd "$file" 2>/dev/null | while read -r dep; do
+        case ${elf_prog:-ldd} in
+            *readelf) "$elf_prog" -d "$file" 2>/dev/null  ;;
+            *)        ldd "$file" 2>/dev/null  ;;
+        esac |
+        while read -r dep; do
             # Skip lines containing 'ldd'.
             [ "${dep##*ldd*}" ] || continue
+            case $dep in *NEEDED*\[*\] | *'=>'*) ;; *) continue; esac
 
-            # Extract the file path from 'ldd' output, and
-            # canonicalize the path.
+            # readelf output:
+            # 0x0000 (NEEDED) Shared library: [libc.so]
+            dep=${dep##*\[}
+            dep=${dep%%\]*}
+
+            # ldd output:
+            # libc.so => /lib/ld-musl-x86_64.so.1
             dep=${dep#* => }
             dep=${dep% *}
-            dep=$(cpt-readlink "$dep")
 
-            # Figure out which package owns the file.
-            own=$("$grep" -lFx "${dep#$CPT_ROOT}" "$@")
-
-            # If the package wasn't found, retry by removing
-            # the '/usr' prefix.
-            if [ -z "$own" ] && [ -z "${dep##$CPT_ROOT/usr*}" ]; then
-                own=$("$grep" -lFx "${dep#$CPT_ROOT/usr}" "$@")
-                dep=${dep#/usr}
-            fi
-
-            # Extract package name from 'grep' match.
-            own=${own%/*}
-            own=${own##*/}
-
-            case $own in "$pkg_name"|"$pkg_name-bin"|"") continue ; esac
-            printf 'Found %s (%s) in (%s)\n' "$own" "$dep" \
-                   "${file##$pkg_dir/$pkg_name}" >&2
-
-            printf '%s\n' "$own"
+            # Figure out which package owns the file. Skip file if it is owned
+            # by the current package. This also handles cases where a '*-bin'
+            # package exists on the system, so the package manager doesn't think
+            # that the package we are building depends on the *-bin version of
+            # itself, or any other renamed versions of the same software.
+            pkg_owner -l "/${dep#/}\$" "$PWD/manifest" >/dev/null && continue
+            pkg_owner -l "/${dep#/}\$" "$@" ||:
         done ||:
     done >> depends
 
@@ -1044,7 +1037,7 @@ pkg_build() {
             : > "$pkg_dir/$pkg/$pkg_db/$pkg/etcsums"
 
         pkg_strip    "$pkg"
-        pkg_fixdeps  "$pkg"
+        pkg_fix_deps  "$pkg"
         pkg_manifest "$pkg"
         pkg_etcsums  "$pkg"
         pkg_tar      "$pkg"
@@ -1822,6 +1815,14 @@ main() {
     # Store the date and time of script invocation to be used as the name
     # of the log files the package manager creates uring builds.
     time=$(date '+%Y-%m-%d-%H:%M')
+
+    # Use readelf for fixing dependencies if it is available, fallback to
+    # ldd. readelf shows only the actual dependencies and doesn't include
+    # the libraries required by the dependencies.
+    elf_prog=${CPT_ELF:="$(
+               command -v readelf       ||
+               command -v llvm-readelf  ||
+               command -v eu-readelf)"} || elf_prog=ldd
 
     # Make note of the user's current ID to do root checks later on.
     # This is used enough to warrant a place here.
