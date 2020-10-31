@@ -4,14 +4,13 @@
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 parser_definition() {
-    setup REST -- "usage: ${0##*/} [-c] [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-c] [pkg...]"
     msg -- '' 'Options:'
     flag CURRENT -c --current -- "Use the current directory as a package"
     global_options
 }
 
 eval "$(getoptions parser_definition parse "$0")"
-eval "$(getoptions_help parser_definition usage)"
 
 parse "$@"
 eval set -- "$REST"

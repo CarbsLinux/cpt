@@ -4,16 +4,15 @@
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 parser_definition() {
-    setup REST -- "usage: ${0##*/} [options]"
+    setup REST help:usage -- "usage: ${0##*/} [options]"
     msg -- '' 'Options:'
-    flag  download_only -d --download                                 -- "Only download updatable packages"
-    flag  CPT_FETCH     -n --no-fetch  on:0 off:0 init:="$CPT_FETCH"  -- "Do not refresh the repositories"
-    disp :pkg_fetch     -o --only-fetch                               -- "Only fetch repositories"
+    flag  download_only -d --download                          -- "Only download updatable packages"
+    flag  CPT_FETCH     -n --no-fetch  on:0 off:0 init:@export -- "Do not refresh the repositories"
+    disp :pkg_fetch     -o --only-fetch                        -- "Only fetch repositories"
     global_options
 }
 
-eval "$(getoptions      parser_definition parse "$0")"
-eval "$(getoptions_help parser_definition usage "$0")"
+eval "$(getoptions parser_definition parse "$0")"
 
 parse "$@"
 eval set -- "$REST"

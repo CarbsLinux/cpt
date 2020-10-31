@@ -4,14 +4,13 @@
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 parser_definition() {
-    setup REST -- "usage: ${0##*/} [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [pkg...]"
     msg -- '' 'Options:'
-    flag  CPT_FORCE -f --force init:="$CPT_FORCE"  -- "Force removal"
+    flag  CPT_FORCE -f --force init:@export  -- "Force removal"
     global_options
 }
 
-eval "$(getoptions      parser_definition parse "$0")"
-eval "$(getoptions_help parser_definition usage "$0")"
+eval "$(getoptions parser_definition parse "$0")"
 
 parse "$@"
 eval set -- "$REST"

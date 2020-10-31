@@ -277,11 +277,11 @@ getoptions_help() {
 
 global_options() {
     msg -- '' 'Global Options:'
-    flag  CPT_FORCE  -f --force                init:="$CPT_FORCE"  -- "Force operation"
-    flag  CPT_PROMPT -y --no-prompt on:0 off:0 init:="$CPT_PROMPT" -- "Do not prompt for confirmation"
-    param CPT_ROOT      --root                 init:="$CPT_ROOT"   -- "Use an alternate root directory"
-    disp :usage      -h --help                                     -- "Show this help message"
-    disp :version    -v --version                                  -- "Print version information"
+    flag  CPT_FORCE  -f --force                init:@export -- "Force operation"
+    flag  CPT_PROMPT -y --no-prompt on:0 off:0 init:@export -- "Do not prompt for confirmation"
+    param CPT_ROOT      --root                 init:@export -- "Use an alternate root directory"
+    disp :usage      -h --help                              -- "Show this help message"
+    disp :version    -v --version                           -- "Print version information"
 }
 
 warn() {
