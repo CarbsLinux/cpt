@@ -423,19 +423,20 @@ pkg_isbuilt() (
 
 pkg_lint() {
     # Check that each mandatory file in the package entry exists.
-    log "$1" "Checking repository files"
+    pkg_name=${1##*/}
+    log "$pkg_name" "Checking repository files"
 
     repo_dir=$(pkg_find "$1")
 
     cd "$repo_dir" || die "'$repo_dir' not accessible"
-    [ -f sources ] || warn "$1" "Sources file not found"
-    [ -x build ]   || die "$1" "Build file not found or not executable"
-    [ -s version ] || die "$1" "Version file not found or empty"
+    [ -f sources ] || warn "$pkg_name" "Sources file not found"
+    [ -x build ]   || die "$pkg_name" "Build file not found or not executable"
+    [ -s version ] || die "$pkg_name" "Version file not found or empty"
 
     read -r _ release 2>/dev/null < version || die "Version file not found"
     [ "$release" ] || die "Release field not found in version file"
 
-    [ "$2" ] || [ -f checksums ] || die "$pkg" "Checksums are missing"
+    [ "$2" ] || [ -f checksums ] || die "$pkg_name" "Checksums are missing"
 }
 
 pkg_find() {
@@ -447,27 +448,34 @@ pkg_find() {
     # Figure out which repository a package belongs to by
     # searching for directories matching the package name
     # in $CPT_PATH/*.
-    query=$1 match=$2 type=$3 IFS=:; set --
+    query=$1 match=$2 type=$3; set --
 
-    # Word splitting is intentional here.
-    # shellcheck disable=2086
-    for path in $SEARCH_PATH ; do
-        set +f
+    case $query in
+        */*)
+            [ -d "$query" ] || { log "$query" "No such directory" "ERROR"; return 1;}
+            (cd -P "$query" && printf '%s\n' "$PWD") ;;
+        *)
+            IFS=:
+            # Word splitting is intentional here.
+            # shellcheck disable=2086
+            for path in $SEARCH_PATH ; do
+                set +f
 
-        for path2 in "$path/"$query; do
-            test "${type:--d}" "$path2" && set -f -- "$@" "$path2"
-        done
-    done
+                for path2 in "$path/"$query; do
+                    test "${type:--d}" "$path2" && set -f -- "$@" "$path2"
+                done
+            done
 
-    IFS=$old_ifs
+            IFS=$old_ifs
 
-    # A package may also not be found due to a repository not being
-    # readable by the current user. Either way, we need to die here.
-    [ "$1" ] || die "Package '$query' not in any repository"
+            # A package may also not be found due to a repository not being
+            # readable by the current user. Either way, we need to die here.
+            [ "$1" ] || die "Package '$query' not in any repository"
 
-    # Show all search results if called from 'cpt search', else
-    # print only the first match.
-    [ "$match" ] && printf '%s\n' "$@" || printf '%s\n' "$1"
+            # Show all search results if called from 'cpt search', else
+            # print only the first match.
+            [ "$match" ] && printf '%s\n' "$@" || printf '%s\n' "$1"
+    esac
 }
 
 pkg_list() {
@@ -502,6 +510,7 @@ pkg_list() {
 
 pkg_cache() {
     read -r version release 2>/dev/null < "$(pkg_find "$1")/version"
+    set -- "${1##*/}"
 
     # Initially assume that the package tarball is built with the CPT_COMPRESS
     # value.
@@ -523,12 +532,12 @@ pkg_sources() {
     # Support packages without sources. Simply do nothing.
     [ -f "$repo_dir/sources" ] || return 0
 
-    log "$1" "Downloading sources"
+    log "${1##*/}" "Downloading sources"
 
     # Store each downloaded source in a directory named after the
     # package it belongs to. This avoid conflicts between two packages
     # having a source of the same name.
-    mkdir -p "$src_dir/$1" && cd "$src_dir/$1"
+    mkdir -p "$src_dir/${1##*/}" && cd "$src_dir/${1##*/}"
 
     repo_dir=$(pkg_find "$1")
 
@@ -542,23 +551,23 @@ pkg_sources() {
 
         # Remote source (cached).
         elif [ -f "${src##*/}" ]; then
-            log "$1" "Found cached source '${src##*/}'"
+            log "${1##*/}" "Found cached source '${src##*/}'"
 
         # Remote source.
         elif [ -z "${src##*://*}" ]; then
-            log "$1" "Downloading $src"
+            log "${1##*/}" "Downloading $src"
 
             curl "$src" -fLo "${src##*/}" || {
                 rm -f "${src##*/}"
-                die "$1" "Failed to download $src"
+                die "${1##*/}" "Failed to download $src"
             }
 
         # Local source.
         elif [ -f "$repo_dir/$src" ]; then
-            log "$1" "Found local file '$src'"
+            log "${1##*/}" "Found local file '$src'"
 
         else
-            die "$1" "No local file '$src'"
+            die "${1##*/}" "No local file '$src'"
         fi
     done < "$repo_dir/sources"
 }
@@ -567,14 +576,15 @@ pkg_extract() {
     # Extract all source archives to the build directory and copy over
     # any local repository files.
     repo_dir=$(pkg_find "$1")
+    pkg_name=${1##*/}
 
     # Support packages without sources. Simply do nothing.
     [ -f "$repo_dir/sources" ] || return 0
 
-    log "$1" "Extracting sources"
+    log "$pkg_name" "Extracting sources"
 
     while read -r src dest || [ "$src" ]; do
-        mkdir -p "$mak_dir/$1/$dest" && cd "$mak_dir/$1/$dest"
+        mkdir -p "$mak_dir/$pkg_name/$dest" && cd "$mak_dir/$pkg_name/$dest"
 
         case $src in
             # Git repository.
@@ -582,7 +592,7 @@ pkg_extract() {
                 # Split the source into URL + OBJECT (branch or commit).
                 url=${src##git+} com=${url##*[@#]} com=${com#${url%[@#]*}}
 
-                log "$1" "Cloning ${url%[@#]*}"; {
+                log "$pkg_name" "Cloning ${url%[@#]*}"; {
                     git init
                     git remote add origin "${url%[@#]*}"
                     case "$url" in
@@ -591,7 +601,7 @@ pkg_extract() {
                         *)   git fetch --depth=1 origin "$com" || git fetch
                     esac
                     git checkout "${com:-FETCH_HEAD}"
-                } || die "$1" "Failed to clone $src"
+                } || die "$pkg_name" "Failed to clone $src"
             ;;
 
             # Mercurial repository.
@@ -600,7 +610,7 @@ pkg_extract() {
                 url=${src##hg+} com=${url##*[@#]} com=${com#${url%[@#]*}}
 
                 # Unfortunately, there is no shallow cloning with Mercurial.
-                log "$1" "Cloning ${url%[@#]*}"
+                log "$pkg_name" "Cloning ${url%[@#]*}"
                 hg clone -u "${com:-tip}"
 
             ;;
@@ -613,9 +623,9 @@ pkg_extract() {
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|*://*.txz)
 
-                decompress "$src_dir/$1/${src##*/}" > .ktar
+                decompress "$src_dir/$pkg_name/${src##*/}" > .ktar
 
-                "$tar" xf .ktar || die "$1" "Couldn't extract ${src##*/}"
+                "$tar" xf .ktar || die "$pkg_name" "Couldn't extract ${src##*/}"
 
                 # We now list the contents of the tarball so we can do our
                 # version of 'strip-components'.
@@ -666,13 +676,13 @@ pkg_extract() {
             ;;
 
             *://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
-                decompress "$src_dir/$1/${src##*/}" | cpio -i
+                decompress "$src_dir/$pkg_name/${src##*/}" | cpio -i
 
             ;;
 
             *://*.zip)
-                unzip "$src_dir/$1/${src##*/}" ||
-                    die "$1" "Couldn't extract ${src##*/}"
+                unzip "$src_dir/$pkg_name/${src##*/}" ||
+                    die "$pkg_name" "Couldn't extract ${src##*/}"
 
             ;;
 
@@ -682,11 +692,11 @@ pkg_extract() {
                     cp -f "$repo_dir/$src" .
 
                 # Remote file.
-                elif [ -f "$src_dir/$1/${src##*/}" ]; then
-                    cp -f "$src_dir/$1/${src##*/}" .
+                elif [ -f "$src_dir/$pkg_name/${src##*/}" ]; then
+                    cp -f "$src_dir/$pkg_name/${src##*/}" .
 
                 else
-                    die "$1" "Local file $src not found"
+                    die "$pkg_name" "Local file $src not found"
                 fi
             ;;
         esac
@@ -697,11 +707,11 @@ pkg_depends() {
     # Resolve all dependencies and generate an ordered list.
     # This does a depth-first search. The deepest dependencies are
     # listed first and then the parents in reverse order.
-    contains "$deps" "$1" || {
+    contains "$deps" "${1##*/}" || {
         # Filter out non-explicit, aleady installed dependencies.
         # Only filter installed if called from 'pkg_build()'.
         [ "$pkg_build" ] && [ -z "$2" ] &&
-            (pkg_list "$1" >/dev/null) && return
+            (pkg_list "${1##*/}" >/dev/null) && return
 
         while read -r dep type || [ "$dep" ]; do
             # Skip test dependencies unless $CPT_TEST is set to 1.
@@ -713,7 +723,7 @@ pkg_depends() {
 
         # After child dependencies are added to the list,
         # add the package which depends on them.
-        [ "$2" = explicit ] || deps="$deps $1 "
+        [ "$2" = explicit ] || deps="$deps ${1##*/} "
     }
 }
 
@@ -723,18 +733,20 @@ pkg_order() {
     # to be called from 'cpt i'.
     order=; redro=; deps=
 
-    for pkg do case $pkg in
-        *.tar.*) deps="$deps $pkg "  ;;
+    for pkg do case ${pkg##*/} in
+        *.tar.*) deps="$deps ${pkg##*/} "  ;;
         *)       pkg_depends "$pkg" raw
     esac done
 
     # Filter the list, only keeping explicit packages.
     # The purpose of these two loops is to order the
     # argument list based on dependence.
-    for pkg in $deps; do ! contains "$*" "$pkg" || {
-        order="$order $pkg "
-        redro=" $pkg $redro"
-    } done
+    for pkg in $deps; do for explicit_pkg; do
+            [ "$pkg" = "${explicit_pkg##*/}" ] && {
+                order="$order $explicit_pkg "
+                redro=" $explicit_pkg $redro"
+            }
+    done; done
 
     deps=
 }
@@ -903,7 +915,7 @@ pkg_build() {
 
     log "Resolving dependencies"
 
-    for pkg do contains "$explicit" "$pkg" || {
+    for pkg do contains "$explicit" "${pkg##*/}" || {
         pkg_depends "$pkg" explicit
 
         # Mark packages passed on the command-line
@@ -918,14 +930,15 @@ pkg_build() {
     # installed as a dependency.
     # shellcheck disable=2086
     for pkg do
-        contains "$deps" "$pkg" && explicit=$(pop "$pkg" from $explicit)
+        contains "$deps" "${pkg##*/}" && explicit=$(pop "$pkg" from $explicit)
     done
 
     # See [1] at top of script.
     # shellcheck disable=2046,2086
     set -- $deps $explicit
 
-    log "Building: $*"
+    pkg_list=''; for pkg; do pkg_list="$pkg_list ${pkg##*/}"; done
+    log "Building: $pkg_list"
 
     # Only ask for confirmation if more than one package needs to be built.
     [ $# -gt 1 ] || [ "$pkg_update" ] && { prompt || exit 0 ;}
@@ -953,6 +966,7 @@ pkg_build() {
     # Finally build and create tarballs for all passed packages and
     # dependencies.
     for pkg do
+        pkg_name=${pkg##*/}
         log "$pkg" "Building package ($((in = in + 1))/$#)"
 
         pkg_extract "$pkg"
@@ -962,18 +976,18 @@ pkg_build() {
 
         # Copy the build file to the build directory to users to modify it
         # temporarily at runtime.
-        cp -f "$repo_dir/build" "$mak_dir/$pkg/.build.cpt"
+        cp -f "$repo_dir/build" "$mak_dir/$pkg_name/.build.cpt"
 
         # Install built packages to a directory under the package name
         # to avoid collisions with other packages.
-        mkdir -p "$pkg_dir/$pkg/$pkg_db"
+        mkdir -p "$pkg_dir/$pkg_name/$pkg_db"
 
         # Move to the build directory.
-        cd "$mak_dir/$pkg"
+        cd "$mak_dir/$pkg_name"
 
-        log "$pkg" "Starting build"
+        log "$pkg_name" "Starting build"
 
-        run_hook pre-build "$pkg" "$pkg_dir/$pkg"
+        run_hook pre-build "$pkg_name" "$pkg_dir/$pkg_name"
 
         # Notify the user if the build script is changed during the pre-build
         # hook.
@@ -983,76 +997,76 @@ pkg_build() {
         # Call the build script, log the output to the terminal
         # and to a file. There's no PIPEFAIL in POSIX shelll so
         # we must resort to tricks like killing the script ourselves.
-        { ./.build.cpt "$pkg_dir/$pkg" "$build_version" "$sys_arch" 2>&1 || {
-            log "$pkg" "Build failed"
-            log "$pkg" "Log stored to $log_dir/$pkg-$time-$pid"
-            run_hook build-fail "$pkg" "$pkg_dir/$pkg"
+        { ./.build.cpt "$pkg_dir/$pkg_name" "$build_version" "$sys_arch" 2>&1 || {
+            log "$pkg_name" "Build failed"
+            log "$pkg_name" "Log stored to $log_dir/$pkg_name-$time-$pid"
+            run_hook build-fail "$pkg_name" "$pkg_dir/$pkg_name"
             pkg_clean
             kill 0
-        } } | tee "$log_dir/$pkg-$time-$pid"
+        } } | tee "$log_dir/$pkg_name-$time-$pid"
 
         # Run the test script if it exists and the user wants to run tests. This
         # is turned off by default.
         [ -x "$repo_dir/test" ] && [ "$CPT_TEST" = 1 ] && {
-            run_hook pre-test "$pkg" "$pkg_dir/$pkg"
-            log "$pkg" "Running tests"
-            "$repo_dir/test" "$pkg_dir/$pkg" "$build_version" "$sys_arch" 2>&1 || {
-                log "$pkg" "Test failed"
-                log "$pkg" "Log stored to $log_dir/$pkg-$time-$pid"
+            run_hook pre-test "$pkg_name" "$pkg_dir/$pkg_name"
+            log "$pkg_name" "Running tests"
+            "$repo_dir/test" "$pkg_dir/$pkg_name" "$build_version" "$sys_arch" 2>&1 || {
+                log "$pkg_name" "Test failed"
+                log "$pkg_name" "Log stored to $log_dir/$pkg_name-$time-$pid"
                 run_hook test-fail "$pkg" "$pkg_dir/$pkg"
                 pkg_clean
                 kill 0
-        } } | tee -a "$log_dir/$pkg-$time-$pid"
+        } } | tee -a "$log_dir/$pkg_name-$time-$pid"
 
         # Delete the log file if the build succeeded to prevent
         # the directory from filling very quickly with useless logs.
-        [ "$CPT_KEEPLOG" = 1 ] || rm -f "$log_dir/$pkg-$time-$pid"
+        [ "$CPT_KEEPLOG" = 1 ] || rm -f "$log_dir/$pkg_name-$time-$pid"
 
         # Copy the repository files to the package directory.
         # This acts as the database entry.
-        cp -LRf "$repo_dir" "$pkg_dir/$pkg/$pkg_db/"
+        cp -LRf "$repo_dir" "$pkg_dir/$pkg_name/$pkg_db/"
 
         # Copy the modified build file to the package directory.
-        pkg_build="$pkg_dir/$pkg/$pkg_db/$pkg/build"
+        pkg_build="$pkg_dir/$pkg/$pkg_db/$pkg_name/build"
         diff -U 3 "$pkg_build" .build.cpt > "$pkg_build.diff" &&
             rm -f "$pkg_build.diff"
 
         # We never ever want this. Let's end the endless conflicts
         # and remove it.
-        find "$pkg_dir/$pkg" -name charset.alias -exec rm -f {} +
+        find "$pkg_dir/$pkg_name" -name charset.alias -exec rm -f {} +
 
         # Remove libtool's '*.la' library files. This removes cross-build
         # system conflicts that may arise. Build-systems change, libtool
         # is getting deprecated, we don't want a package that depends on
         # some package's '.la' files.
-        find "$pkg_dir/$pkg" -name '*.la' -exec rm -f {} +
+        find "$pkg_dir/$pkg_name" -name '*.la' -exec rm -f {} +
 
-        log "$pkg" "Successfully built package"
+        log "$pkg_name" "Successfully built package"
 
-        run_hook post-build "$pkg" "$pkg_dir/$pkg"
+        run_hook post-build "$pkg_name" "$pkg_dir/$pkg_name"
 
         # Create the manifest file early and make it empty.
         # This ensures that the manifest is added to the manifest.
-        : > "$pkg_dir/$pkg/$pkg_db/$pkg/manifest"
+        : > "$pkg_dir/$pkg_name/$pkg_db/$pkg_name/manifest"
 
         # If the package contains '/etc', add a file called
         # 'etcsums' to the manifest. See comment directly above.
-        [ -d "$pkg_dir/$pkg/etc" ] &&
-            : > "$pkg_dir/$pkg/$pkg_db/$pkg/etcsums"
+        [ -d "$pkg_dir/$pkg_name/etc" ] &&
+            : > "$pkg_dir/$pkg_name/$pkg_db/$pkg_name/etcsums"
 
-        pkg_strip    "$pkg"
-        pkg_fix_deps  "$pkg"
-        pkg_manifest "$pkg"
-        pkg_etcsums  "$pkg"
-        pkg_tar      "$pkg"
+        pkg_strip    "$pkg_name"
+        pkg_fix_deps "$pkg_name"
+        pkg_manifest "$pkg_name"
+        pkg_etcsums  "$pkg_name"
+        pkg_tar      "$pkg_name"
 
         # Install only dependencies of passed packages.
         # Skip this check if this is a package update.
-        contains "$explicit" "$pkg" && [ -z "$pkg_update" ] && continue
+        contains "$explicit" "$pkg_name" && [ -z "$pkg_update" ] && continue
 
-        log "$pkg" "Needed as a dependency or has an update, installing"
+        log "$pkg_name" "Needed as a dependency or has an update, installing"
 
-        (CPT_FORCE=1 cpt-install "$pkg")
+        (CPT_FORCE=1 cpt-install "$pkg_name")
     done
 
     # End here as this was a system update and all packages have been installed.
@@ -1090,7 +1104,7 @@ pkg_checksums() {
             src_path=$repo_dir/${src%/*}
 
         # File is remote and was downloaded.
-        elif [ -f "$src_dir/$1/${src##*/}" ]; then
+        elif [ -f "$src_dir/$pkg_name/${src##*/}" ]; then
             src_path=$src_dir/$1
 
         # File is a git repository.
@@ -1098,13 +1112,13 @@ pkg_checksums() {
 
         # Die here if source for some reason, doesn't exist.
         else
-            die "$1" "Couldn't find source '$src'"
+            die "$pkg_name" "Couldn't find source '$src'"
         fi
 
         # An easy way to get 'sha256sum' to print with the 'basename'
         # of files is to 'cd' to the file's directory beforehand.
         (cd "$src_path" && sh256 "${src##*/}") ||
-            die "$1" "Failed to generate checksums"
+            die "$pkg_name" "Failed to generate checksums"
     done < "$repo_dir/sources"
 }
 
@@ -1414,7 +1428,7 @@ pkg_install() {
         pkg_cache "$1" ||
             die "package has not been built, run 'cpt b pkg'"
 
-        pkg_name=$1
+        pkg_name=${1##*/}
     fi
 
     mkdir -p "$tar_dir/$pkg_name"
