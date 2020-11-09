@@ -1774,7 +1774,8 @@ create_cache() {
 
 }
 
-main() {
+# main()
+{
     set -ef
 
     # If a parser definition exists, let's run it ourselves. This makes sure we
@@ -1875,5 +1876,3 @@ main() {
     fi
 
 }
-
-main "$@"
