@@ -1,8 +1,6 @@
 #!/bin/sh -ef
 # List installed packages
 
-if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
-
 parser_definition() {
     setup REST help:usage -- "usage: ${0##*/} [-c] [pkg...]"
     msg -- '' 'Options:'
@@ -10,10 +8,7 @@ parser_definition() {
     global_options
 }
 
-eval "$(getoptions parser_definition parse "$0")"
-
-parse "$@"
-eval set -- "$REST"
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 [ "$CURRENT" ] && set -- "${PWD##*/}"
 

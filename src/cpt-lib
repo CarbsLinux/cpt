@@ -1788,8 +1788,17 @@ create_cache() {
 
 }
 
-main() {
+# main()
+{
     set -ef
+
+    # If a parser definition exists, let's run it ourselves. This makes sure we
+    # get the variables as soon as possible.
+    command -v parser_definition >/dev/null && {
+        eval "$(getoptions parser_definition parse "$0")"
+        parse "$@"
+        eval set -- "$REST"
+    }
 
     # Create the cache directories for CPT and set the variables which point
     # to them. This is seperate from temporary directories created in
@@ -1881,5 +1890,3 @@ main() {
     fi
 
 }
-
-main "$@"
