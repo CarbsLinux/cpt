@@ -1767,10 +1767,10 @@ create_cache() {
     #
     # Create the required temporary directories and set the variables
     # which point to them.
-    mkdir -p "${CPT_TMPDIR:=$cac_dir}" \
-             "${mak_dir:=$CPT_TMPDIR/build-$pid}" \
-             "${pkg_dir:=$CPT_TMPDIR/pkg-$pid}" \
-             "${tar_dir:=$CPT_TMPDIR/extract-$pid}" \
+    mkdir -p "${CPT_TMPDIR:=$cac_dir/proc}" \
+             "${mak_dir:=$CPT_TMPDIR/$pid/build}" \
+             "${pkg_dir:=$CPT_TMPDIR/$pid/pkg}" \
+             "${tar_dir:=$CPT_TMPDIR/$pid/export}"
 
 }
 
