@@ -1043,7 +1043,8 @@ pkg_build() {
             : > "$pkg_dir/$pkg/$pkg_db/$pkg/etcsums"
 
         pkg_strip    "$pkg"
-        pkg_fix_deps  "$pkg"
+        pkg_manifest "$pkg"
+        pkg_fix_deps "$pkg"
         pkg_manifest "$pkg"
         pkg_etcsums  "$pkg"
         pkg_tar      "$pkg"
