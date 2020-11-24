@@ -1160,7 +1160,7 @@ pkg_conflicts() {
         # temporary manifest to be parsed.
         printf '%s/%s\n' "${dirname#$CPT_ROOT}" "${file##*/}"
 
-    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$CPT_TMPDIR/$pid-m"
+    done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$CPT_TMPDIR/$pid/manifest"
 
     p_name=$1
 
@@ -1169,7 +1169,7 @@ pkg_conflicts() {
     # shellcheck disable=2046,2086
     set -- $(set +f; pop "$sys_db/$p_name/manifest" from "$sys_db"/*/manifest)
 
-    [ -s "$CPT_TMPDIR/$pid-m" ] || return 0
+    [ -s "$CPT_TMPDIR/$pid/manifest" ] || return 0
 
     # In rare cases where the system only has one package installed
     # and you are reinstalling that package, grep will try to read from
@@ -1185,13 +1185,14 @@ pkg_conflicts() {
     # Store the list of found conflicts in a file as we will be using the
     # information multiple times. Storing it in the cache dir allows us
     # to be lazy as they'll be automatically removed on script end.
-    "$grep" -Fxf "$CPT_TMPDIR/$pid-m" -- "$@" > "$CPT_TMPDIR/$pid-c" ||:
+    "$grep" -Fxf "$CPT_TMPDIR/$pid/manifest" -- "$@" > "$CPT_TMPDIR/$pid/conflict" ||:
 
 
     # Enable alternatives automatically if it is safe to do so.
     # This checks to see that the package that is about to be installed
     # doesn't overwrite anything it shouldn't in '/var/db/cpt/installed'.
-    "$grep" -q ":/var/db/cpt/installed/" "$CPT_TMPDIR/$pid-c" || choice_auto=1
+    "$grep" -q ":/var/db/cpt/installed/" "$CPT_TMPDIR/$pid/conflict" ||
+        choice_auto=1
 
     # Use 'grep' to list matching lines between the to
     # be installed package's manifest and the above filtered
@@ -1241,13 +1242,13 @@ pkg_conflicts() {
                 log "this must be fixed in $p_name. Contact the maintainer"
                 die "by checking 'git log' or by running 'cpt-maintainer'"
             }
-        done < "$CPT_TMPDIR/$pid-c"
+        done < "$CPT_TMPDIR/$pid/conflict"
 
         # Rewrite the package's manifest to update its location
         # to its new spot (and name) in the choices directory.
         pkg_manifest "$p_name" "$tar_dir" 2>/dev/null
 
-    elif [ -s "$CPT_TMPDIR/$pid-c" ]; then
+    elif [ -s "$CPT_TMPDIR/$pid/conflict" ]; then
         log "Package '$p_name' conflicts with another package" "" "!>"
         log "Run 'CPT_CHOICE=1 cpt i $p_name' to add conflicts" "" "!>"
         die "as alternatives."
@@ -1751,8 +1752,7 @@ pkg_clean() {
     trap_set block
 
     # Remove temporary items.
-    rm -rf -- "$mak_dir" "$pkg_dir" "$tar_dir" \
-       "$CPT_TMPDIR/$pid-c" "$CPT_TMPDIR/$pid-m"
+    rm -rf -- "${CPT_TMPDIR:=$cac_dir/proc}/$pid"
 }
 
 create_cache() {
