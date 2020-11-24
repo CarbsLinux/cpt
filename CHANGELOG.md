@@ -9,6 +9,26 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+5.1.0 - 2020-11-25
+--------------------------------------------------------------------------------
+
+### IMPORTANT
+- The `pkg_fixdeps()` function has been renmaed to `pkg_fix_deps()`.
+- `cpt-lib` now parses options for you if `parser_definition()` is defined
+  before being called.
+
+### Changed
+- `cpt-fork` can now take full path for packages.
+- `cpt-size` can now display the total size of multiple packages.
+- Updated `getoptions()` parser to version `2.0.1`
+- Added `git` to the default `cpt-base`.
+- Temporary cache creation scheme is changed from `build-$pid/` to
+  `proc/$pid/build/`
+
+### Fixed
+- Moved option parsing to cpt-lib if `parser_definition` exists. This shouldn't
+  affect existing scripts where `cpt-lib` is called before the `p
+
 5.0.0 - 2020-10-06
 --------------------------------------------------------------------------------
 
