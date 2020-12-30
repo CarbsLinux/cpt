@@ -1835,7 +1835,7 @@ create_cache() {
     mkdir -p "${cac_dir:=${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}" \
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
-             "${bin_dir:=$cac_dir/bin}"
+             "${bin_dir:=$cac_dir/$CPT_CROSS_TRIPLET${CPT_CROSS_TRIPLET:+-}bin}"
 
     # Set the location to the repository and package database.
     pkg_db=var/db/cpt/installed
