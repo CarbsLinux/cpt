@@ -4,6 +4,7 @@
 
 set -- \
     "--prefix=$CPT_PKG_PREFIX" \
+    "--libdir=$CPT_PKG_LIBDIR" \
     "--sysconfdir=$CPT_PKG_ETCDIR" \
     "--bindir=$CPT_PKG_BINDIR" \
     "--sbindir=$CPT_PKG_SBINDIR" \

@@ -1922,6 +1922,7 @@ create_cache() {
     # TODO Document
     : "${CPT_PKG_PREFIX:=/usr}" \
       "${CPT_PKG_ETCDIR:=/etc}" \
+      "${CPT_PKG_LIBDIR:=$CPT_PKG_PREFIX/lib}" \
       "${CPT_PKG_BINDIR:=$CPT_PKG_PREFIX/bin}" \
       "${CPT_PKG_SBINDIR:=$CPT_PKG_PREFIX/bin}" \
       "${CPT_PKG_MANDIR:=/usr/share/man}" \
