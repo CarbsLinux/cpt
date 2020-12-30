@@ -385,6 +385,7 @@ as_root() {
            CPT_PID="$CPT_PID" \
            CPT_PROMPT="$CPT_PROMPT" \
            CPT_ROOT="$CPT_ROOT" \
+           CPT_CROSS_TRIPLET="$CPT_CROSS_TRIPLET" \
            CPT_TMPDIR="$CPT_TMPDIR" \
            "$@"
 
