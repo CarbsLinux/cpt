@@ -18,4 +18,4 @@ set -- \
         "--host=$CPT_CROSS_TRIPLET" \
         "--with-sysroot=$CPT_ROOT$CPT_PKG_PREFIX"
 
-"${configure_args:-./configure}" "$@"
+"${configure_file:-./configure}" "$@"
