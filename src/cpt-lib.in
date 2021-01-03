@@ -45,6 +45,30 @@ trap_set() {
     esac
 }
 
+sepchar() (
+    # Seperate every character on the given string without resorting to external
+    # processes.
+    [ "$1" ] || return 0; str=$1; set --
+    while [ "$str" ]; do
+        str_tmp=$str
+        for i in $(_seq $(( ${#str} - 1 ))); do
+            str_tmp=${str_tmp%?}
+        done
+        set -- "$@" "$str_tmp"
+        str=${str#$str_tmp}
+    done
+    printf '%s\n' "$@"
+)
+
+_seq() (
+    # Pure shell counter meant to be used in 'for' loops.
+    i=0 buf=''
+    while [ "$(( i += 1 ))" -le "$1" ]; do
+        buf="$buf $i "
+    done
+    printf '%s' "$buf"
+)
+
 _stat() (
     _user=; eval set -- "$(ls -ld "$1")"
     id -u "${_user:=$3}" >/dev/null 2>&1 || _user=root
@@ -390,7 +414,7 @@ as_root() {
            "$@"
 
     case ${su##*/} in
-        sudo|doas) "$su" -u "$user" -- env "$@" ;;
+        sls|sudo|doas) "$su" -u "$user" -- env "$@" ;;
         su)   su -c "env $* <&3" "$user" 3<&0 </dev/tty ;;
         *)    die "Invalid CPT_SU value: $su" ;;
     esac
@@ -750,16 +774,29 @@ pkg_depends() {
             (pkg_list "$1" >/dev/null) && return
 
         while read -r dep type || [ "$dep" ]; do
+            # Skip comments and empty lines.
+            [ "${dep##\#*}" ] || continue
             # Skip test dependencies unless $CPT_TEST is set to 1.
-            case $type in test) [ "$CPT_TEST" = 1 ] || continue; esac
+            #
+            # Skip make dependencies on the 'tree' operation for child packages
+            # or when the 'first-nomake' argument is given.
+            case $type in
+                test) [ "$CPT_TEST" = 1 ] || continue ;;
+                make) [ "$2" = tree ] && [ -z "${3#first-nomake}" ] && continue
+            esac
 
-            # Recurse through the dependencies of the child packages.
-            [ "${dep##\#*}" ] && pkg_depends "$dep"
+            # Recurse through the dependencies of the child packages. Forward
+            # the 'tree' operation.
+            if [ "$2" = tree ]; then
+                pkg_depends "$dep" tree
+            else
+                pkg_depends "$dep"
+            fi
         done 2>/dev/null < "$(pkg_find "$1")/depends" ||:
 
         # After child dependencies are added to the list,
         # add the package which depends on them.
-        [ "$2" = explicit ] || deps="$deps $1 "
+        [ "$2" = explicit ] || [ "$3" ] || deps="$deps $1 "
     }
 }
 
@@ -1786,6 +1823,42 @@ pkg_updates(){
     log "Updated all packages"
 }
 
+pkg_get_base() (
+    # Print the packages defined in the /etc/cpt-base file.
+    # If an argument is given, it prints a space seperated list instead
+    # of a list seperated by newlines.
+    [ -f "$CPT_ROOT/etc/cpt-base" ] || return 1
+    nonl=$1; set --
+    while read -r pkg _; do
+        [ "${pkg##\#*}" ] || continue
+        set -- "$@" "$pkg"
+    done < "$CPT_ROOT/etc/cpt-base"
+    if [ "$nonl" ]; then printf '%s ' "$@"; else printf '%s\n' "$@"; fi
+)
+
+pkg_gentree() (
+    # Generate an ordered dependency tree of a package. Useful for testing
+    # whether the generated dependency tree is enough to actually building a
+    # given package. A second argument can be given as a combination of
+    # characters (similar to 'tar(1)' keys) which will be used as an option
+    # parser. See the documentation for more information on the keys.
+    deps='' reverse='' nonl='' make_deps=first
+    for op in $(sepchar "$2"); do
+        case "$op" in
+            b) deps="$(pkg_get_base nonl)" ;;
+            x) make_deps=first-nomake ;;
+            r) reverse=1 ;;
+            n) nonl=1 ;;
+            *) return 1
+        esac
+    done
+    pkg_depends "$1" tree "${make_deps:+first}"
+    eval set -- "$deps"
+    pkg_order "$@"
+    if [ "$reverse" ]; then eval set -- "$redro"; else eval set -- "$order"; fi
+    if [ "$nonl" ];    then printf '%s ' "$@"; else printf '%s\n' "$@"; fi
+)
+
 pkg_clean() {
     # Clean up on exit or error. This removes everything related
     # to the build.
@@ -1868,7 +1941,9 @@ create_cache() {
 
     # Figure out which 'sudo' command to use based on the user's choice or
     # what is available on the system.
-    su=${CPT_SU:-$(command -v sudo || command -v doas)} || su=su
+    su=${CPT_SU:-$(command -v sls    ||
+                   command -v sudo   ||
+                   command -v doas)} || su=su
 
     # Store the date and time of script invocation to be used as the name
     # of the log files the package manager creates uring builds.
