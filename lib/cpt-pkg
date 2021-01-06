@@ -1,5 +1,4 @@
 # Package functions
-# shellcheck source=lib-cpt
 
 run_hook() {
     # Store the CPT_HOOK variable so that we can revert it if it is changed.

@@ -77,7 +77,7 @@ _readlinkf() {
 
     # Set the library directory if unset, assuming that it shares the same
     # prefix with the tool.
-    [ "$CPT_LIBDIR" ] || CPT_LIBDIR=$(_readlinkf "${0%/*}/../lib/cpt/")
+    [ "$CPT_LIBDIR" ] || CPT_LIBDIR=$(_readlinkf "$(command -v cpt-lib)") CPT_LIBDIR=${CPT_LIBDIR%/*}
 
     # If a parser definition exists, let's run it ourselves. This makes sure we
     # get the variables as soon as possible.
