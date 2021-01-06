@@ -1,3 +1,17 @@
+BRANCH: experiment/lazyload
+This branch was an experiment for lazy loading the package library. It generated
+function autoloads from the cpt-* files on the lib/ directory and loaded the
+libraries of the functions when they were called. I tested this out, because I
+assumed that the result would be an increase of speed, but it turned out that
+the answer was quite the contrary.
+
+Using the master branch (757d256), running `cpt l` takes 33 seconds.
+Using this branch, it takes 37 seconds.
+
+Even though, this currently slows the operation, I would love to revisit this
+branch someday if I come up with a better idea for lazyloading functions. At the
+current stage, this branch doesn't improve speed at all.
+
   ____ ____ _____
  / ___|  _ \_   _|
 | |   | |_) || |
