@@ -1,0 +1,320 @@
+# Functions related to obtaining sources
+
+pkg_sources() {
+    # Download any remote package sources. The existence of local
+    # files is also checked.
+    repo_dir=$(pkg_find "$1")
+
+    # Support packages without sources. Simply do nothing.
+    [ -f "$repo_dir/sources" ] || return 0
+
+    log "$1" "Downloading sources"
+
+    # Store each downloaded source in a directory named after the
+    # package it belongs to. This avoid conflicts between two packages
+    # having a source of the same name.
+    mkdir -p "$src_dir/$1" && cd "$src_dir/$1"
+
+    repo_dir=$(pkg_find "$1")
+
+    while read -r src dest || [ "$src" ]; do
+        # Remote git/hg repository or comment.
+        if [ -z "${src##\#*}" ]   ||
+           [ -z "${src##git+*}" ] ||
+           [ -z "${src##hg+*}" ]
+
+        then :
+
+        # Remote source (cached).
+        elif [ -f "${src##*/}" ]; then
+            log "$1" "Found cached source '${src##*/}'"
+
+        # Remote source.
+        elif [ -z "${src##*://*}" ]; then
+            log "$1" "Downloading $src"
+
+            curl "$src" -fLo "${src##*/}" || {
+                rm -f "${src##*/}"
+                die "$1" "Failed to download $src"
+            }
+
+        # Local source.
+        elif [ -f "$repo_dir/$src" ]; then
+            log "$1" "Found local file '$src'"
+
+        else
+            die "$1" "No local file '$src'"
+        fi
+    done < "$repo_dir/sources"
+}
+
+pkg_extract() {
+    # Extract all source archives to the build directory and copy over
+    # any local repository files.
+    repo_dir=$(pkg_find "$1")
+
+    # Support packages without sources. Simply do nothing.
+    [ -f "$repo_dir/sources" ] || return 0
+
+    log "$1" "Extracting sources"
+
+    while read -r src dest || [ "$src" ]; do
+        mkdir -p "$mak_dir/$1/$dest" && cd "$mak_dir/$1/$dest"
+
+        case $src in
+            # Git repository.
+            git+*)
+                # Split the source into URL + OBJECT (branch or commit).
+                url=${src##git+} com=${url##*[@#]} com=${com#${url%[@#]*}}
+
+                log "$1" "Cloning ${url%[@#]*}"; {
+                    git init
+                    git remote add origin "${url%[@#]*}"
+                    case "$url" in
+                        # Tags are specified via '@'
+                        *@*) git fetch -t --depth=1 origin "$com" || git fetch ;;
+                        *)   git fetch --depth=1 origin "$com" || git fetch
+                    esac
+                    git checkout "${com:-FETCH_HEAD}"
+                } || die "$1" "Failed to clone $src"
+            ;;
+
+            # Mercurial repository.
+            hg+*)
+                # Split the source into URL + OBJECT (branch or commit).
+                url=${src##hg+} com=${url##*[@#]} com=${com#${url%[@#]*}}
+
+                # Unfortunately, there is no shallow cloning with Mercurial.
+                log "$1" "Cloning ${url%[@#]*}"
+                hg clone -u "${com:-tip}"
+
+            ;;
+
+            # Comment or blank line.
+            \#*|'') continue ;;
+
+            # Only 'tar', 'cpio', and 'zip' archives are currently supported for
+            # extraction. Other filetypes are simply copied to '$mak_dir'
+            # which allows for manual extraction.
+            *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|*://*.txz)
+
+                decompress "$src_dir/$1/${src##*/}" > .ktar
+
+                "$tar" xf .ktar || die "$1" "Couldn't extract ${src##*/}"
+
+                # We now list the contents of the tarball so we can do our
+                # version of 'strip-components'.
+                "$tar" tf .ktar |
+                    while read -r file; do printf '%s\n' "${file%%/*}"; done |
+
+                    # Do not repeat files.
+                    uniq |
+
+                    # For every directory in the base we move each file
+                    # inside it to the upper directory.
+                    while read -r dir ; do
+
+                        # Skip if we are not dealing with a directory here.
+                        # This way we don't remove files on the upper directory
+                        # if a tar archive doesn't need directory stripping.
+                        [ -d "${dir#.}" ] || continue
+
+                        # Change into the directory in a subshell so we don't
+                        # need to cd back to the upper directory.
+                        (
+                            cd "$dir"
+
+                            # We use find because we want to move hidden files
+                            # as well.
+                            #
+                            # Skip the file if it has the same name as the directory.
+                            # We will deal with it later.
+                            #
+                            # Word splitting is intentional here.
+                            # shellcheck disable=2046
+                            find . \( ! -name . -prune \) ! -name "$dir" \
+                                 -exec mv -f {} .. \;
+
+                            # If a file/directory with the same name as the directory
+                            # exists, append a '.cptbak' to it and move it to the
+                            # upper directory.
+                            ! [ -e "$dir" ] || mv "$dir" "../${dir}.cptbak"
+                        )
+                        rmdir "$dir"
+
+                        # If a backup file exists, move it into the original location.
+                        ! [ -e "${dir}.cptbak" ] || mv "${dir}.cptbak" "$dir"
+                done
+
+                # Clean up the temporary tarball.
+                rm -f .ktar
+            ;;
+
+            *://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
+                decompress "$src_dir/$1/${src##*/}" | cpio -i
+
+            ;;
+
+            *://*.zip)
+                unzip "$src_dir/$1/${src##*/}" ||
+                    die "$1" "Couldn't extract ${src##*/}"
+
+            ;;
+
+            *)
+                # Local file.
+                if [ -f "$repo_dir/$src" ]; then
+                    cp -f "$repo_dir/$src" .
+
+                # Remote file.
+                elif [ -f "$src_dir/$1/${src##*/}" ]; then
+                    cp -f "$src_dir/$1/${src##*/}" .
+
+                else
+                    die "$1" "Local file $src not found"
+                fi
+            ;;
+        esac
+    done < "$repo_dir/sources"
+}
+
+pkg_fetch() {
+    log "Updating repositories"
+
+    run_hook pre-fetch
+
+    # Create a list of all repositories.
+    # See [1] at top of script.
+    # shellcheck disable=2046,2086
+    { IFS=:; set -- $CPT_PATH; IFS=$old_ifs ;}
+
+    # Update each repository in '$CPT_PATH'. It is assumed that
+    # each repository is 'git' tracked.
+    for repo; do
+        # Go to the root of the repository (if it exists).
+        cd "$repo"
+        cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null ||
+            cd "$(hg root 2>/dev/null)" 2>/dev/null ||:
+
+        if [ -d .git ]; then
+
+            [ "$(git remote 2>/dev/null)" ] || {
+                log "$repo" " "
+                printf '%s\n' "No remote, skipping."
+                continue
+            }
+
+            contains "$repos" "$PWD" || {
+                repos="$repos $PWD "
+
+                # Display a tick if signing is enabled for this
+                # repository.
+                case $(git config merge.verifySignatures) in
+                    true) log "$PWD" "[signed] " ;;
+                    *)    log "$PWD" " " ;;
+                esac
+
+                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+                    git fetch
+                    git merge
+                    git submodule update --remote --init -f
+
+                else
+                    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
+
+                    # Find out the owner of the repository and spawn
+                    # git as this user below.
+                    #
+                    # This prevents 'git' from changing the original
+                    # ownership of files and directories in the rare
+                    # case that the repository is owned by a 3rd user.
+                    (
+                        user=$(_stat "$PWD")
+
+                        [ "$user" = root ] ||
+                            log "Dropping permissions to $user for pull"
+
+                        git_cmd="git fetch && git merge && git submodule update --remote --init -f"
+                        case $su in *su) git_cmd="'$git_cmd'"; esac
+
+                        # Spawn a subshell to run multiple commands as
+                        # root at once. This makes things easier on users
+                        # who aren't using persist/timestamps for auth
+                        # caching.
+                        user=$user as_root sh -c "$git_cmd"
+                    )
+                fi
+            }
+        elif [ -d .hg ]; then
+
+            [ "$(hg showconfig paths 2>/dev/null)" ] || {
+                log "$repo" " "
+                printf '%s\n' "No remote, skipping."
+                continue
+            }
+
+            contains "$repos $PWD" || {
+                repos="$repos $PWD"
+
+                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+                    hg pull
+                    hg update
+                else
+                    [ "$uid" ] || log "$PWD" "Need root to update"
+
+                    # We are going to do the same operation as above, to
+                    # find the owner of the repository.
+                    (
+                        user=$(_stat "$PWD")
+
+                        [ "$user" = root ] ||
+                            log "Dropping permissions to $user for pull"
+
+                        hg_cmd="hg pull && hg update"
+
+                        case $su in *su) hg_cmd="'$hg_cmd'"; esac
+                        user=$user as_root sh -c "$hg_cmd"
+                    )
+                fi
+            }
+        elif [ -f .rsync ]; then
+            # If an .rsync_root file exists, we check that the repository root
+            # exists. If it does, we change to that directory to do the fetch.
+            # This way, we allow for partial repositories while making sure that
+            # we can fetch the repository in a single operation.
+            [ -f .rsync_root ] && {
+                read -r rsync_root < .rsync_root
+                [ -f "$rsync_root/.rsync" ] && cd "$rsync_root"
+            }
+            contains "$repos" "$PWD" || {
+                repos="$repos $PWD"
+                read -r remote < .rsync
+                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+                    rsync -acvzzC --include=core --delete "$remote/" "$PWD"
+                else
+                    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
+
+                    # Similar to the git update, we find the owner of
+                    # the repository and spawn rsync as that user.
+                    (
+                        user=$(_stat "$PWD")
+
+                        [ "$user" = root ] ||
+                            log "Dropping permissions to $user for pull"
+
+                        user=$user as_root rsync -acvzzC --include=core --delete "$remote/" "$PWD"
+                    )
+                fi
+            }
+        else
+            log "$repo" " "
+            printf '%s\n' "Not a remote repository, skipping."
+        fi
+    done
+
+    run_hook post-fetch
+}
+
+# Local Variables:
+# mode: sh
+# End:

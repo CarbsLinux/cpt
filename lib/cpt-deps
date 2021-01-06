@@ -1,0 +1,177 @@
+# Dependeny and ordering functions
+
+pkg_depends() {
+    # Resolve all dependencies and generate an ordered list.
+    # This does a depth-first search. The deepest dependencies are
+    # listed first and then the parents in reverse order.
+    contains "$deps" "$1" || {
+        # Filter out non-explicit, aleady installed dependencies.
+        # Only filter installed if called from 'pkg_build()'.
+        [ "$pkg_build" ] && [ -z "$2" ] &&
+            (pkg_list "$1" >/dev/null) && return
+
+        while read -r dep type || [ "$dep" ]; do
+            # Skip comments and empty lines.
+            [ "${dep##\#*}" ] || continue
+            # Skip test dependencies unless $CPT_TEST is set to 1.
+            #
+            # Skip make dependencies on the 'tree' operation for child packages
+            # or when the 'first-nomake' argument is given.
+            case $type in
+                test) [ "$CPT_TEST" = 1 ] || continue ;;
+                make) [ "$2" = tree ] && [ -z "${3#first-nomake}" ] && continue
+            esac
+
+            # Recurse through the dependencies of the child packages. Forward
+            # the 'tree' operation.
+            if [ "$2" = tree ]; then
+                pkg_depends "$dep" tree
+            else
+                pkg_depends "$dep"
+            fi
+        done 2>/dev/null < "$(pkg_find "$1")/depends" ||:
+
+        # After child dependencies are added to the list,
+        # add the package which depends on them.
+        [ "$2" = explicit ] || [ "$3" ] || deps="$deps $1 "
+    }
+}
+
+pkg_order() {
+    # Order a list of packages based on dependence and
+    # take into account pre-built tarballs if this is
+    # to be called from 'cpt i'.
+    order=; redro=; deps=
+
+    for pkg do case $pkg in
+        *.tar.*) deps="$deps $pkg "  ;;
+        *)       pkg_depends "$pkg" raw
+    esac done
+
+    # Filter the list, only keeping explicit packages.
+    # The purpose of these two loops is to order the
+    # argument list based on dependence.
+    for pkg in $deps; do ! contains "$*" "$pkg" || {
+        order="$order $pkg "
+        redro=" $pkg $redro"
+    } done
+
+    deps=
+}
+
+pkg_fix_deps() {
+    # Dynamically look for missing runtime dependencies by checking each binary
+    # and library with either 'ldd' or 'readelf'. This catches any extra
+    # libraries and or dependencies pulled in by the package's build suite.
+    log "$1" "Checking for missing dependencies"
+
+    # Go to the directory containing the built package to
+    # simplify path building.
+    cd "$pkg_dir/$1/$pkg_db/$1"
+
+    # Make a copy of the depends file if it exists to have a
+    # reference to 'diff' against.
+    if [ -f depends ]; then
+        cp -f depends "$mak_dir/d"
+        dep_file=$mak_dir/d
+    else
+        dep_file=/dev/null
+    fi
+
+    # Generate a list of all installed manifests.
+    pkg_name=$1
+    set +f; set -f -- "$sys_db/"*/manifest
+
+    # Get a list of binaries and libraries, false files
+    # will be found, however it's faster to get 'ldd' to check
+    # them anyway than to filter them out.
+    find "$pkg_dir/$pkg_name/" -type f 2>/dev/null |
+
+    while read -r file; do
+        case ${elf_prog:-ldd} in
+            *readelf) "$elf_prog" -d "$file" 2>/dev/null  ;;
+            *)        ldd "$file" 2>/dev/null  ;;
+        esac |
+        while read -r dep; do
+            # Skip lines containing 'ldd'.
+            [ "${dep##*ldd*}" ] || continue
+            case $dep in *NEEDED*\[*\] | *'=>'*) ;; *) continue; esac
+
+            # readelf output:
+            # 0x0000 (NEEDED) Shared library: [libc.so]
+            dep=${dep##*\[}
+            dep=${dep%%\]*}
+
+            # ldd output:
+            # libc.so => /lib/ld-musl-x86_64.so.1
+            dep=${dep#* => }
+            dep=${dep% *}
+
+            # Figure out which package owns the file. Skip file if it is owned
+            # by the current package. This also handles cases where a '*-bin'
+            # package exists on the system, so the package manager doesn't think
+            # that the package we are building depends on the *-bin version of
+            # itself, or any other renamed versions of the same software.
+            pkg_owner -l "/${dep#/}\$" "$PWD/manifest" >/dev/null && continue
+            pkg_owner -l "/${dep#/}\$" "$@" ||:
+        done ||:
+    done >> depends
+
+    # Remove duplicate entries from the new depends file.
+    # This removes duplicate lines looking *only* at the
+    # first column.
+    sort -uk1,1 -o depends depends 2>/dev/null ||:
+
+    # Display a diff of the new dependencies against the old ones.
+    diff -U 3 "$dep_file" depends 2>/dev/null ||:
+
+    # Remove the depends file if it is empty.
+    [ -s depends ] || rm -f depends
+}
+
+pkg_get_base() (
+    # Print the packages defined in the /etc/cpt-base file.
+    # If an argument is given, it prints a space seperated list instead
+    # of a list seperated by newlines.
+
+    # cpt-base is an optional file, return with success if it doesn't exist.
+    [ -f "$CPT_ROOT/etc/cpt-base" ] || return 0
+    nonl=$1; set --
+
+    # Older versions of shellcheck warns us that the variable is changing on the
+    # subshell. That is our purpose here, thank you very much.
+    # shellcheck disable=SC2030
+    while read -r pkgname _; do
+        [ "${pkgname##\#*}" ] || continue
+        set -- "$@" "$pkgname"
+    done < "$CPT_ROOT/etc/cpt-base"
+    if [ "$nonl" ]; then printf '%s ' "$@"; else printf '%s\n' "$@"; fi
+)
+
+pkg_gentree() (
+    # Generate an ordered dependency tree of a package. Useful for testing
+    # whether the generated dependency tree is enough to actually building a
+    # given package. A second argument can be given as a combination of
+    # characters (similar to 'tar(1)' keys) which will be used as an option
+    # parser. See the documentation for more information on the keys.
+    # shellcheck disable=2030
+    deps='' reverse='' nonl='' make_deps=first
+    for op in $(sepchar "$2"); do
+        case "$op" in
+            b) deps="$(pkg_get_base nonl)" ;;
+            x) make_deps=first-nomake ;;
+            r) reverse=1 ;;
+            n) nonl=1 ;;
+            *) return 1
+        esac
+    done
+    pkg_depends "$1" tree "${make_deps:+first}"
+    eval set -- "$deps"
+    pkg_order "$@"
+    if [ "$reverse" ]; then eval set -- "$redro"; else eval set -- "$order"; fi
+    if [ "$nonl" ];    then printf '%s ' "$@"; else printf '%s\n' "$@"; fi
+)
+
+# Local Variables:
+# mode: sh
+# End:

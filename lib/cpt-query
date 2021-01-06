@@ -1,0 +1,88 @@
+# -*- mode: sh -*-
+# Query functions
+
+pkg_find() {
+    # Use a SEARCH_PATH variable so that we can get the sys_db into
+    # the same variable as CPT_PATH. This makes it easier when we are
+    # searching for executables instead of CPT_PATH.
+    : "${SEARCH_PATH:=$CPT_PATH:$sys_db}"
+
+    # Figure out which repository a package belongs to by
+    # searching for directories matching the package name
+    # in $CPT_PATH/*.
+    query=$1 match=$2 type=$3 IFS=:; set --
+
+    # Word splitting is intentional here.
+    # shellcheck disable=2086
+    for path in $SEARCH_PATH ; do
+        set +f
+
+        for path2 in "$path/"$query; do
+            test "${type:--d}" "$path2" && set -f -- "$@" "$path2"
+        done
+    done
+
+    IFS=$old_ifs
+
+    # A package may also not be found due to a repository not being
+    # readable by the current user. Either way, we need to die here.
+    [ "$1" ] || die "Package '$query' not in any repository"
+
+    # Show all search results if called from 'cpt search', else
+    # print only the first match.
+    [ "$match" ] && printf '%s\n' "$@" || printf '%s\n' "$1"
+}
+
+pkg_list() {
+    # List installed packages. As the format is files and
+    # directories, this just involves a simple for loop and
+    # file read.
+
+    # Change directories to the database. This allows us to
+    # avoid having to 'basename' each path. If this fails,
+    # set '$1' to mimic a failed glob which indicates that
+    # nothing is installed.
+    cd "$sys_db" 2>/dev/null || set -- "$sys_db/"\*
+
+    # Optional arguments can be passed to check for specific
+    # packages. If no arguments are passed, list all. As we
+    # loop over '$@', if there aren't any arguments we can
+    # just set the directory contents to the argument list.
+    [ "$1" ] || { set +f; set -f -- *; }
+
+    # If the 'glob' above failed, exit early as there are no
+    # packages installed.
+    [ "$1" = "$sys_db/"\* ] && return 1
+
+    # Loop over each package and print its name and version.
+    for pkg do
+        [ -d "$pkg" ] || { log "$pkg" "not installed"; return 1; }
+
+        read -r version 2>/dev/null < "$pkg/version" || version=null
+        printf '%s\n' "$pkg $version"
+    done
+}
+
+pkg_isbuilt() (
+    # Check if a package is built or not.
+    read -r ver rel < "$(pkg_find "$1")/version"
+
+    set +f
+    for tarball in "$bin_dir/$1#$ver-$rel.tar."*; do
+        [ -f "$tarball" ] && return 0
+    done
+    return 1
+)
+
+pkg_owner() {
+    set +f
+
+    [ "$3" ] || set -- "$1" "$2" "$sys_db"/*/manifest
+
+    pkg_owner=$(grep "$@")
+    pkg_owner=${pkg_owner%/*}
+    pkg_owner=${pkg_owner##*/}
+
+    set -f -- "$pkg_owner"; unset pkg_owner
+    [ "$1" ] && printf '%s\n' "$1"
+}

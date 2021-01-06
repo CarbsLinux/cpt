@@ -1,0 +1,72 @@
+# Text and output related functions
+
+out() {
+    # Print a message as is.
+    printf '%s\n' "$@"
+}
+
+die() {
+    # Print a message and exit with '1' (error).
+    log "$1" "$2" "!>"
+    exit 1
+}
+
+warn() {
+    # Print a warning message
+    log "$1" "$2" "${3:-WARNING}"
+}
+
+sepchar() (
+    # Seperate every character on the given string without resorting to external
+    # processes.
+    [ "$1" ] || return 0; str=$1; set --
+    while [ "$str" ]; do
+        str_tmp=$str
+        for i in $(_seq $(( ${#str} - 1 ))); do
+            str_tmp=${str_tmp%?}
+        done
+        set -- "$@" "$str_tmp"
+        str=${str#$str_tmp}
+    done
+    printf '%s\n' "$@"
+)
+
+contains() {
+    # Check if a "string list" contains a word.
+    case " $1 " in *" $2 "*) return 0; esac; return 1
+}
+
+regesc() {
+    # Escape special regular expression characters as
+    # defined in POSIX BRE. '$.*[\^'
+    printf '%s\n' "$1" |
+    sed 's|\\|\\\\|g;s|\[|\\[|g;s|\$|\\$|g;s|\.|\\.|g;s|\*|\\*|g;s|\^|\\^|g'
+}
+
+prompt() {
+    # If CPT_PROMPT is set to 0, continue This can be useful for installation
+    # scripts and bootstrapping.
+    [ "$CPT_PROMPT" = 0 ] && return 0
+
+    # Ask the user for some input.
+    [ "$1" ] && log "$1"
+    log "Continue?: Press Enter to continue or Ctrl+C to abort here"
+
+    # POSIX 'read' has none of the "nice" options like '-n', '-p'
+    # etc etc. This is the most basic usage of 'read'.
+    # '_' is used as 'dash' errors when no variable is given to 'read'.
+    read -r _ || return 1
+}
+
+pop() {
+    # Remove an item from a "string list". This allows us
+    # to remove a 'sed' call and reuse this code throughout.
+    del=$1
+    shift 2
+
+    for i do [ "$i" = "$del" ] || printf %s " $i "; done
+}
+
+# Local Variables:
+# mode: sh
+# End:
