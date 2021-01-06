@@ -5,8 +5,11 @@ libraries of the functions when they were called. I tested this out, because I
 assumed that the result would be an increase of speed, but it turned out that
 the answer was quite the contrary.
 
-Using the master branch (757d256), running `cpt l` takes 33 seconds.
-Using this branch, it takes 37 seconds.
+I have compared the speed by running `cpt l` 2000 times on my system which has
+429 packages:
+
+- Using the master branch (757d256), it takes 33 seconds.
+- Using this branch, it takes 37 seconds.
 
 Even though, this currently slows the operation, I would love to revisit this
 branch someday if I come up with a better idea for lazyloading functions. At the
