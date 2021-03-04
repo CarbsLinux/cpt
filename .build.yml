@@ -1,13 +1,15 @@
 image: alpine/edge
 packages:
   - curl
+  - rsync
   - shellcheck
   - texinfo
+  - gzip
 tasks:
   - build: |
       cd cpt
       make
   - test: |
       cd cpt
-      curl -fsSL https://git.io/shellspec | sudo sh -s -- 0.27.2 -y -p /usr
+      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
       make test
