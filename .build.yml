@@ -5,7 +5,9 @@ packages:
   - texinfo
 tasks:
   - build: |
+      cd cpt
       make
   - test: |
+      cd cpt
       curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr/local
       make test
