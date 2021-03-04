@@ -1,9 +1,11 @@
 image: alpine/edge
 packages:
   - curl
+  - shellcheck
+  - texinfo
 tasks:
   - build: |
       make
   - test: |
-      curl -fsSL https://git.io/shellspec | sh -s -- -y
+      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr/local
       make test
