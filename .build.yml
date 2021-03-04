@@ -1,0 +1,9 @@
+image: alpine/edge
+packages:
+  - curl
+tasks:
+  - build: |
+      make
+  - test: |
+      curl -fsSL https://git.io/shellspec | sh -s -- -y
+      make test
