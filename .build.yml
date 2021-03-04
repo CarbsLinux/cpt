@@ -9,5 +9,5 @@ tasks:
       make
   - test: |
       cd cpt
-      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr/local
+      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
       make test
