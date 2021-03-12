@@ -6,10 +6,7 @@ trap 'rm -f $CPT_TMPDIR/packages-$$' EXIT
 cd "$CPT_ROOT/var/db/cpt/installed"
 
 # Get base packages.
-[ -f "$CPT_ROOT/etc/cpt-base" ] && while read -r pkg _; do
-    case "$pkg" in ''|\#*) continue; esac
-    base=" $pkg $base"
-done < "$CPT_ROOT/etc/cpt-base"
+base=" $(cpt-lib pkg_get_base nonl)"
 
 # Make a list of packages, but remove the base.
 for pkg in *; do
