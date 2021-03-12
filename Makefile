@@ -2,7 +2,9 @@
 include config.mk
 
 INSTALL_SH = ./tools/install.sh
-BIN    = `find contrib src -name 'cpt*' ! -name '*.*'`
+CONTRIB = `find contrib src -name 'cpt*' ! -name '*.*'`
+SRC     = `find contrib src -name 'cpt*' ! -name '*.*'`
+BIN     = ${SRC} ${CONTRIB}
 LIB        = src/cpt-lib
 LIB_IN     = ${LIB:=.in}
 
@@ -29,12 +31,17 @@ install: all
 	test "${DOCS}" != yes || ${MAKE} -C docs install
 	${INSTALL_SH} -Dm755 -t ${DESTDIR}${BINDIR} ${BIN}
 	${INSTALL_SH} -Dm644 -t ${DESTDIR}${MAN1} man/*.1
+	for man in ${CONTRIB}; do \
+		./tools/tool2man.sh $$man > "${DESTDIR}${MAN1}/$${man##*/}.1"; \
+		chmod 644 "${DESTDIR}${MAN1}/$${man##*/}.1"; \
+	done
 
 uninstall:
 	test "${DOCS}" != yes || ${MAKE} -C docs uninstall
 	for bin in ${BIN}; do \
 		rm -f ${DESTDIR}${BINDIR}/$${bin##*/}; done
 	for man in man/*.1; do rm -f ${DESTDIR}${MAN1}/$${man##*/}; done
+	for man in ${CONTRIB}; do rm -f ${DESTDIR}${MAN1}/$${man##*/}.1; done
 
 clean:
 	test "${DOCS}" != yes || ${MAKE} -C docs clean
