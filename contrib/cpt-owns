@@ -1,6 +1,26 @@
 #!/bin/sh -e
 # Check which package owns a file
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar file
+## DESCRIPTION:
+## .Nm
+## searches package manifests to determine which package owns
+## .Ar file .
+## If the
+## .Ar file
+## is not a realpath,
+## .Nm
+## will first check if the file exists as a relative path, and then it will
+## check if it exists as an executable
+## in
+## .Ev PATH .
+##
+## .Nm
+## does not check directories, as they can be used by multiple packages at the
+## same time.
+
 # Source the package manager library.
 # shellcheck disable=1091
 . cpt-lib

@@ -1,5 +1,25 @@
 #!/bin/sh -e
-# Display packages which depend on package
+# Display packages which depend on the given package
+
+## SYNOPSIS:
+## .Nm
+## .Op Fl tm
+## .Op Ar package
+## DESCRIPTION:
+## .Nm
+## generates reverse dependencies for
+## .Ar package .
+## If no package name is given,
+## .Nm
+## uses the name of the current directory for the package.
+##
+## Following options are available for use::
+## .Bl -tag
+## .It Fl t , -tree
+## Also print indirect reverse dependencies
+## .It Fl m , -make
+## Include make dependencies
+## .El
 
 parser_definition() {
     setup REST help:usage -- "usage: ${0##*/} [options...] [pkg...]"
@@ -8,22 +28,30 @@ parser_definition() {
     global_options
 }
 
+# shellcheck disable=1091
 . cpt-lib; set +f
 
 [ "$1" ] || set -- "${PWD##*/}"
 
 # 'cd' to the database directory as a simple way of
 # stripping the path and performing a 'basename'.
+#
+# $sys_db is defined on cpt-lib
+# shellcheck disable=2154
 cd "$sys_db"
 
 get_revdep() {
     query="^$1\$"
+    # Defined by parser.
+    # shellcheck disable=2154
     [ "$make" ] && query="$query\\|^$1 *make\$"
     grep "$query" -- */depends | while read -r pkg _; do
         printf '%s\n' "${pkg%%/*}"
     done
 }
 
+# Defined by parser.
+# shellcheck disable=2154
 if [ "$tree" ]; then
     create_cache nobuild
     :> "$tmp_dir/processed"

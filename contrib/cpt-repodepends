@@ -1,6 +1,25 @@
 #!/bin/sh -e
 # Display a package's dependencies in the repository
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg
+
+## DESCRIPTION:
+## .Nm
+## displays the dependencies of the given
+## .Em repository package .
+## If no package name is given,
+## .Nm
+## will use the name of the current directory as the package.
+##
+## Unlike
+## .Xr cpt-depends 1 ,
+## .Nm
+## checks the package repository in order to print the dependencies, and the
+## package does not have to be installed on the system.
+## see: cpt-depends.1
+
 case "$1" in
     --help|-h)
         printf '%s\n' "usage: ${0##*/} [pkg]"

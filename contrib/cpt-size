@@ -1,6 +1,30 @@
 #!/bin/sh -ef
 # Show the size on disk for a package
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg...
+
+## DESCRIPTION:
+## .Nm
+## calculates the sizes of given
+## .Ar packages
+## using the files from the package manifest and outputs a total size of the
+## packages along with all the files associated with them.
+
+## CAVEATS:
+## .Nm
+## uses the non-POSIX
+## .Fl h
+## and
+## .Fl c
+## flags for
+## .Xr du 1 ,
+## which will not work with
+## .Em sbase ,
+## but it is a major performance improvement compared to calculating
+## total and human-readable sizes by hand.
+
 case "$1" in
     --help|-h)
         printf '%s\n' "usage: ${0##*/} [pkg...]"

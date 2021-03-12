@@ -12,6 +12,7 @@
 ## If no package name is given,
 ## .Nm
 ## will use the name of the current directory as the package.
+## see: cpt-repodepends.1
 
 case "$1" in
     --help|-h)

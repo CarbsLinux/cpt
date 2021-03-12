@@ -4,6 +4,13 @@
 # Disable word-splittng warnings as they're safe here.
 # shellcheck disable=SC2046
 
+## SYNOPSIS:
+## .Nm
+## DESCRIPTION:
+## .Nm
+## removes all packages from the system that is not defined as a base package in
+## .Pa /etc/cpt-base .
+
 [ "$1" ] && {
     printf 'usage: %s\n\nRemove all packages not defined in the base.\n' \
            "${0##*/}"

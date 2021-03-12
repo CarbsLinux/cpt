@@ -1,6 +1,18 @@
 #!/bin/sh -e
 # Create a boilerplate CPT package
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar package-name
+## .Op Ar version
+## .Op Ar source
+## DESCRIPTION:
+## .Nm
+## creates an empty CPT package with the given arguments.
+## .Ar package-name
+## is the only mandatory argument.
+## see: cpt-checksum.1
+
 out() { printf '%s\n' "$@" ;}
 die() { printf '\033[1;31m!> \033[m%s\n' "$@" >&2 ; exit 1 ;}
 

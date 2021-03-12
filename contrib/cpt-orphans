@@ -1,5 +1,15 @@
 #!/bin/sh -e
-# Print orphaned packages.
+# Print orphaned packages
+
+## SYNOPSIS:
+## .Nm
+## DESCRIPTION:
+## .Nm
+## prints a list of all packages that are not required by other packages. It
+## also reads the file
+## .Pa /etc/cpt-base
+## to determine base packages, and will keep those packages out of this printed
+## list.
 
 trap 'rm -f $CPT_TMPDIR/packages-$$' EXIT
 

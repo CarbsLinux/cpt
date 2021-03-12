@@ -8,7 +8,10 @@
 # Syntax:
 # Every line starts with two hashes and a space ('## '). If the line ends with a
 # colon (':'), it is assumed to be a section header. Subsections follow the same
-# convention, but uses three hashes instead of two. An empty '## ' line will
+# convention, but uses three hashes instead of two. If the line ends with two
+# colons ('::'), the last colon will be removed.
+#
+# An empty '## ' line will
 # start a new paragraph (.Pp).  Otherwise, mdoc(7) syntax is used as is.
 # Headers are generated using the script's name, and the docstring is used from
 # the line following the shebang.
@@ -40,6 +43,10 @@ out \
 
 while read -r line; do
     case $line in
+        '##'*::)
+            line=${line%:} line=${line#'##'} line=${line#'#'} line=${line#' '}
+            out "$line"
+            ;;
         '###'*:)
             line=${line%:}
             out ".Ss ${line#'### '}"
@@ -56,9 +63,7 @@ while read -r line; do
             out ".Pp"
             ;;
         '##'*)
-            line=${line#'##'}
-            line=${line#'#'}
-            line=${line# }
+            line=${line#'##'} line=${line#'#'} line=${line# }
             out "$line"
             ;;
     esac
