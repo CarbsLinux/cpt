@@ -1,5 +1,5 @@
 # Carbs Packaging Tools
-VERSION = 6.0.0
+VERSION = 6.0.0-rc1
 
 # Installation paths
 PREFIX    = /usr/local
@@ -19,5 +19,4 @@ DOCS = yes
 
 # Files to be added into the distribution tarball
 DISTFILES = contrib docs man spec src tests tools \
-            .dir-locals.el CHANGELOG.md LICENSE \
-            Makefile README config.mk cpt-base
+            CHANGELOG.md LICENSE Makefile README.md config.mk cpt-base
