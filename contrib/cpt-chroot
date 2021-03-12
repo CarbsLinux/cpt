@@ -1,6 +1,16 @@
 #!/bin/sh -e
 # Enter a chroot
 
+## SYNOPSIS:
+## .Nm cpt-chroot
+## .Op Ar dir
+
+## DESCRIPTION:
+## .Nm
+## is a wrapper script to chroot inside other root filesystems. It automatically
+## mounts important filesystems in to the chroot directory, and unmounts them
+## when the user exits the chroot and cleans up leftover host files.
+
 log() {
     printf '\033[32m->\033[m %s.\n' "$*"
 }
