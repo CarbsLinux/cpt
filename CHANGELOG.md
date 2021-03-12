@@ -15,6 +15,7 @@ UNRELEASED
 ### Added
 - Added unit tests using `shellspec`.
 - Added support for `pax` for tarball extraction.
+- Added `-p` flag for specifying package when using `cpt-link`
 
 ### Changed
 - Moved `cpt-lib` to `cpt-lib.in`.
