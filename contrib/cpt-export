@@ -32,7 +32,7 @@ read -r ver rel 2>/dev/null < \
 ### environment variable.
 
 # Fallback to gzip if there is a typo
-case "$CPT_COMPRESS" in bz2|gz|xz|zst) ;; *) CPT_COMPRESS=gz; esac
+case "$CPT_COMPRESS" in bz2|gz|xz|zst|lz) ;; *) CPT_COMPRESS=gz; esac
 
 # Reset the argument list.
 pkg=$1
@@ -52,6 +52,7 @@ case "$CPT_COMPRESS" in
     gz)  gzip -6  ;;
     xz)  xz -zT 0 ;;
     zst) zstd -3  ;;
+    lz)  lzip -6  ;;
 esac > "$tarball"
 
 printf 'tarball created in %s\n' "$tarball"
