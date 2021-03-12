@@ -1,6 +1,17 @@
 #!/bin/sh -ef
 # Turn an installed package into a CPT tarball
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg
+
+## DESCRIPTION:
+## .Nm
+## creates a package tarball of an installed package using the system files
+## declared on the package's manifest. If no package name is given,
+## .Nm
+## will use the name of the current directory as the package.
+
 case "$1" in
     --help|-h)
         printf 'usage: %s [pkg]\n' "${0##*/}"
@@ -14,6 +25,11 @@ cpt-list "${1:-null}" >/dev/null
 # Grab the package's version..
 read -r ver rel 2>/dev/null < \
     "$CPT_ROOT/var/db/cpt/installed/$1/version"
+
+### Environment variables:
+### The compression method can be changed while creating a tarball, using the
+### .Ev CPT_COMPRESS
+### environment variable.
 
 # Fallback to gzip if there is a typo
 case "$CPT_COMPRESS" in bz2|gz|xz|zst) ;; *) CPT_COMPRESS=gz; esac

@@ -1,6 +1,33 @@
 #!/bin/sh -e
 # Concatanate package files in the installed package database
 # File names are printed to stderr.
+
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg
+## .Op Ar file...
+
+## DESCRIPTION:
+## .Nm
+## outputs the contents of the given package's database files to the standard
+## output. The names of the files being printed will also be printed, but to
+## stderr. Thus, you can pipe the contents of a file without worrying about
+## mixing filenames into that file.
+##
+## If no package is specified,
+## .Nm
+## will assume that the package in the current directory is going to be printed.
+##
+## If no file is specified,
+## .Nm
+## will print the contents
+## .Em build ,
+## .Em depends ,
+## .Em sources
+## and
+## .Em version
+## files.
+
 case "$1" in
     --help|-h)
         printf 'usage: %s [pkg] [file...]\n' "${0##*/}"

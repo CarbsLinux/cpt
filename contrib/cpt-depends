@@ -1,6 +1,18 @@
 #!/bin/sh -ef
 # Display a package's dependencies
 
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg
+
+## DESCRIPTION:
+## .Nm
+## displays the dependencies of the given
+## .Em installed package .
+## If no package name is given,
+## .Nm
+## will use the name of the current directory as the package.
+
 case "$1" in
     --help|-h)
         printf 'usage: %s [pkg]\n' "${0##*/}"
