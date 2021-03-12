@@ -1,12 +1,17 @@
 #!/bin/sh -e
 # Check which package owns a file
 
-case "$1" in ''|--help|-h) printf '%s\n' "usage: ${0##*/} [file]" ; exit 0 ; esac
+# Source the package manager library.
+# shellcheck disable=1091
+. cpt-lib
 
-# If full path is not specified, use either the current directory, or look for
-# a command.
-case "$1" in /*) ;;
-    *)
+case "$1" in ''|--help|-h) out "usage: ${0##*/} [file]"; exit 0; esac
+
+# If full path is not specified, use either the current directory, or look for a
+# command.
+case "$1" in
+    /*) ;;
+     *)
         if [ -f "$1" ]; then
             set -- "$PWD/$1"
         else
@@ -14,28 +19,15 @@ case "$1" in /*) ;;
         fi
 esac
 
-# Strip 'CPT_ROOT' from the file path if passed and
-# follow symlinks.
+# Strip 'CPT_ROOT' from the file path if passed and follow symlinks.
 file="${1#$CPT_ROOT}"
 dirname=$(_readlinkf "$CPT_ROOT/${file%/*}")
 file="$dirname/${file##*/}"
 
 # Check if the file exists and exit if it is not.
 [ -f "$file" ] || {
-    [ -d "$file" ] && printf '%s\n' \
-        "error: please specify a file instead of a directory" >&2 ||
-        printf '%s\n' "error: file '$1' doesn't exist." >&2
-    exit 1
+    [ -d "$file" ] && die "please specify a file instead of a directory"
+    die "file '$1' doesn't exist."
 }
 
-# Print the full path to the manifest file which contains
-# the match to our search.
-pkg_owns=$(grep -lFx "${file#$CPT_ROOT}" \
-                     "$CPT_ROOT/var/db/cpt/installed/"*/manifest)
-
-
-# Extract the package name from the path above.
-pkg_owns=${pkg_owns%/*}
-pkg_owns=${pkg_owns##*/}
-
-printf '%s\n' "$pkg_owns"
+pkg_owner -lFx "$file" || die "Cannot determine which package owns '$file'"
