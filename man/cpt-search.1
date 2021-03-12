@@ -25,6 +25,64 @@ Show help message
 .It Fl v , -version
 Print version information
 .El
+.Sh EXAMPLES
+Below are usage examples for
+.Nm ,
+which is a simple yet powerful utility for querying packages.
+.Ss Using wildcards
+.Nm
+expands POSIX shell wildcards when searching for packages.
+.Bd -offset indent -literal
+$ cpt-search 'emacs*'
+/home/cem/repos/main/community/emacs
+/home/cem/repos/main/community/emacs-nox
+/home/cem/repos/kiss-community/community/emacs
+/var/db/cpt/installed/emacs
+.Ed
+.Ss Limiting search to a single package
+When the
+.Fl s
+flag is given,
+.Nm
+will only output the first instance of the package.
+.Bd -offset indent -literal
+$ cpt-search -s emacs
+/home/cem/repos/main/community/emacs
+.Ed
+.Pp
+Here is what happens when I don't use the
+.Fl s
+flag:
+.Bd -offset indent -literal
+$ cpt-search emacs
+/home/cem/repos/main/community/emacs
+/home/cem/repos/kiss-community/community/emacs
+/var/db/cpt/installed/emacs
+.Ed
+.Ss Removing installed database from the search results.
+When you use the
+.Fl d
+flag,
+.Nm
+will omit the installed package database from the result. Using the above
+.Em emacs
+query with this flag will result in:
+.Bd -offset indent -literal
+$ cpt-search -d emacs
+/home/cem/repos/main/community/emacs
+/home/cem/repos/kiss-community/community/emacs
+.Ed
+.Ss Searching other instances of the current package
+Sometimes you want to check whether there are other instances of your package,
+especially if you are using multiple repositories from different sources. Let's
+say that you are in the
+.Pa ~/repos/main/community/emacs
+directory and you want to know whether this same package exists in a different
+repository. You then run the following command:
+.Bd -offset indent -literal
+$ cpt-search -od
+/home/cem/repos/kiss-community/community/emacs
+.Ed
 .Sh AUTHOR
 .An Cem Keylan Aq Mt cem@ckyln.com
 .Sh LICENSE
