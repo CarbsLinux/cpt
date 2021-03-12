@@ -10,25 +10,14 @@
     exit 0
 }
 
-sys_db="$CPT_ROOT/var/db/cpt/installed"
-
-# Get base packages and their dependencies.
-[ -f "$CPT_ROOT/etc/cpt-base" ] && while read -r basepkg _; do
-    case "$basepkg" in \#*) continue; esac
-    base=" $basepkg $base"
-    [ -f "$sys_db/$basepkg/depends" ] || continue
-    while read -r dep make; do
-        [ "$make" ] && continue
-        base=" $dep $base"
-    done < "$sys_db/$basepkg/depends"
-done < "$CPT_ROOT/etc/cpt-base"
+. cpt-lib
+base=$(pkg_get_base nonl)
 
 set --
 cd "$sys_db"
 
-for pkg in *; do
-    case "$base" in *" $pkg "*) continue; esac
-    set -- "$pkg" "$@"
+set +f; for pkg in *; do
+    contains "$base" "$pkg" || set -- "$pkg" "$@"
 done
 
 [ "$1" ] && {
