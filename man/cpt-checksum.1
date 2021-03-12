@@ -7,8 +7,13 @@
 .Nm
 .Op Ar package...
 .Sh DESCRIPTION
-cpt-checksum lints a package, downloads the sources, and creates a checksum file
-including the SHA256 digests of the sources.
+.Nm
+lints a package, downloads the sources, and creates a checksum file
+including the SHA256 digests of the sources. If no
+.Ar package
+is specified,
+.Nm
+will generate checksums assuming the working directory as the package.
 .Sh AUTHOR
 .An Cem Keylan Aq Mt cem@ckyln.com
 .Sh LICENSE
