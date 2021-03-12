@@ -1,17 +1,44 @@
 #!/bin/sh -e
 # Display packages which depend on package
 
-case "$1" in
-    --help|-h)
-        printf '%s\n' "usage: ${0##*/} [pkg]"
-        exit 0
-        ;;
-    '') set -- "${PWD##*/}"
-esac
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/} [options...] [pkg...]"
+    flag tree -t --tree   -- "Also print indirect reverse dependencies"
+    flag make -m --make   -- "Include make dependencies"
+    global_options
+}
+
+. cpt-lib; set +f
+
+[ "$1" ] || set -- "${PWD##*/}"
 
 # 'cd' to the database directory as a simple way of
 # stripping the path and performing a 'basename'.
-cd "$CPT_ROOT/var/db/cpt/installed"
+cd "$sys_db"
 
-# Use a simple 'grep' to display packages depending on '$1'.
-grep "^$1\$" -- */depends
+get_revdep() {
+    query="^$1\$"
+    [ "$make" ] && query="$query\\|^$1 *make\$"
+    grep "$query" -- */depends | while read -r pkg _; do
+        printf '%s\n' "${pkg%%/*}"
+    done
+}
+
+if [ "$tree" ]; then
+    create_cache nobuild
+    :> "$tmp_dir/processed"
+    get_revdep "$1" > "$tmp_dir/dep"
+    while ! diff -q "$tmp_dir/dep" "$tmp_dir/processed" >/dev/null 2>&1; do
+        cp "$tmp_dir/dep" "$tmp_dir/dep.new"
+        while read -r line; do
+            grep -q "^$line\$" "$tmp_dir/processed" && continue
+            get_revdep "$line" >> "$tmp_dir/dep.new"
+            printf '%s\n' "$line" >> "$tmp_dir/processed"
+        done < "$tmp_dir/dep"
+        sort -u -o "$tmp_dir/dep" "$tmp_dir/dep.new"
+        sort -u -o "$tmp_dir/processed" "$tmp_dir/processed"
+    done
+    cat "$tmp_dir/dep"
+else
+    get_revdep "$1"
+fi
