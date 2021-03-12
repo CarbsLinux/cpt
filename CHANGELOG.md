@@ -15,22 +15,29 @@ UNRELEASED
 ### Added
 - Added unit tests using `shellspec`.
 - Added support for `pax` for tarball extraction.
-- Added `-p` flag for specifying package when using `cpt-link`
+- [ssu] support has been added for privilege escalation.
+- Added `-p` flag for specifying package when using `cpt-link`.
+- Added manual pages for all `cpt-contrib` scripts.
+- Added `lz` compression/decompression support to `$CPT_COMPRESS`.
 
 ### Changed
 - Moved `cpt-lib` to `cpt-lib.in`.
 - All `src` scripts now exit with success after being called with `--help`.
-- Minor optimizations on `contrib` scripts.
+- Minor optimisations on `contrib` scripts.
 - Huge speed improvement on `cpt-export`.
-- Updated the `getoptions` library to version `2.5.0`
+- Updated the `getoptions` library to version `2.5.0`.
 
 ### Fixed
 - Fixed `cpt-cat` not using the `CPT_ROOT` value.
+- Fixed an error with the usage of `sbase grep` that resulted in exit when
+  removing packages.
 
 ### Removed
 - Removed C binaries `cpt-readlink` and `cpt-stat` and instead replaced them
   with `_readlink()` and `_stat()` library functions.
 
+
+[ssu]: https://github.com/illiliti/ssu
 
 5.1.2 - 2021-01-04
 --------------------------------------------------------------------------------
