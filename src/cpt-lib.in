@@ -492,7 +492,7 @@ tar_extract() {
     # sacrifice speed. Fortunately, we don't have to make such a choice when
     # using pax.
     case "${extract##*/}" in
-        pax)         decompress "$1" | pax -r -s '/[^\/]*\///' ;;
+        pax)         decompress "$1" | pax -r -s '/[^\/]*/./' ;;
         gtar|bsdtar) decompress "$1" | "$tar" xf - --strip-components 1 ;;
         tar) decompress "$1" > .ktar
 
