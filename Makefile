@@ -2,8 +2,8 @@
 include config.mk
 
 INSTALL_SH = ./tools/install.sh
-CONTRIB = `find contrib src -name 'cpt*' ! -name '*.*'`
-SRC     = `find contrib src -name 'cpt*' ! -name '*.*'`
+CONTRIB = `find contrib -name 'cpt*' ! -name '*.*'`
+SRC     = `find src -name 'cpt*' ! -name '*.*'`
 BIN     = ${SRC} ${CONTRIB}
 LIB        = src/cpt-lib
 LIB_IN     = ${LIB:=.in}
