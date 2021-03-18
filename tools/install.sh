@@ -15,68 +15,22 @@ mkdirp=''
 target=''
 mode=''
 REST=''
-parse() {
-    OPTIND=$(($#+1))
-    while OPTARG= && [ $# -gt 0 ]; do
-        case $1 in
-            -[stm]?*) OPTARG=$1; shift
-                     eval 'set -- "${OPTARG%"${OPTARG#??}"}" "${OPTARG#??}"' ${1+'"$@"'}
-                     ;;
-            -[!-]?*) OPTARG=$1; shift
-                     eval 'set -- "${OPTARG%"${OPTARG#??}"}" -"${OPTARG#??}"' ${1+'"$@"'}
-                     OPTARG= ;;
-        esac
-        case $1 in
-            '-D')
-                [ "${OPTARG:-}" ] && OPTARG=${OPTARG#*\=} && set "noarg" "$1" && break
-                eval '[ ${OPTARG+x} ] &&:' && OPTARG='1' || OPTARG=''
-                mkdirp="$OPTARG"
-                ;;
-            '-s')
-                [ $# -le 1 ] && set "required" "$1" && break
-                OPTARG=$2
-                sed="$OPTARG"
-                shift ;;
-            '-t')
-                [ $# -le 1 ] && set "required" "$1" && break
-                OPTARG=$2
-                target="$OPTARG"
-                shift ;;
-            '-m')
-                [ $# -le 1 ] && set "required" "$1" && break
-                OPTARG=$2
-                mode="$OPTARG"
-                shift ;;
-            '-h'|'--help')
-                usage
-                exit 0 ;;
-            --)
-                shift
-                while [ $# -gt 0 ]; do
-                    REST="${REST} \"\${$((OPTIND-$#))}\""
-                    shift
-                done
-                break ;;
-            [-]?*) set "unknown" "$1"; break ;;
-            *)
-                REST="${REST} \"\${$((OPTIND-$#))}\""
-        esac
-        shift
-    done
-    [ $# -eq 0 ] && { OPTIND=1; unset OPTARG; return 0; }
-    case $1 in
-        unknown) set "Unrecognized option: $2" "$@" ;;
-        noarg) set "Does not allow an argument: $2" "$@" ;;
-        required) set "Requires an argument: $2" "$@" ;;
-        pattern:*) set "Does not match the pattern (${1#*:}): $2" "$@" ;;
-        notcmd) set "Not a command: $2" "$@" ;;
-        *) set "Validation error ($1): $2" "$@"
-    esac
-    echo "$1" >&2
-    exit 1
-}
 
-parse "$@" && eval set -- "$REST"
+while getopts 'Dm:s:t:h' opt; do
+    case $opt in
+        D) mkdirp=1 ;;
+        s) sed=$OPTARG ;;
+        t) target=$OPTARG ;;
+        m) mode=$OPTARG ;;
+        h)
+            usage
+            exit 0
+            ;;
+        '?') exit 1
+    esac
+done
+
+shift "$((OPTIND - 1))"
 
 if [ "$target" ]; then
     [ "$mkdirp" ] || [ -d "$target" ] || die "$target doesn't exist"
