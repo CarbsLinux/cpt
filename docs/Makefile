@@ -7,14 +7,14 @@ all: cpt.txt cpt.texi cpt.info
 .SUFFIXES: .info .texi .org .txt
 .org.texi:
 	rm -f $@
-	${EMACS} $< --batch --eval "(require 'vc)" -f org-texinfo-export-to-texinfo
+	${EMACS} $< --batch -f org-texinfo-export-to-texinfo
 
 .texi.info:
 	${MAKEINFO} $< -o $@
 
 .org.txt:
 	rm -f $@
-	${EMACS} $< --batch --eval "(require 'vc)" -f org-ascii-export-to-ascii
+	${EMACS} $< --batch -f org-ascii-export-to-ascii
 
 clean:
 	rm -f cpt.info

@@ -11,53 +11,12 @@
 This is a reference document containing both the user-guide and the development
 manual for *Carbs Packaging Tools*. For development logs see [[https://git.carbslinux.org/cpt][the git repository]].
 
-* Table of Contents                                            :TOC:noexport:
-- [[#copying][Copying]]
-- [[#preface][Preface]]
-- [[#usage][Usage]]
-  - [[#cpt-alternatives][cpt-alternatives]]
-  - [[#cpt-build][cpt-build]]
-  - [[#cpt-checksum][cpt-checksum]]
-  - [[#cpt-download][cpt-download]]
-  - [[#cpt-install][cpt-install]]
-  - [[#cpt-list][cpt-list]]
-  - [[#cpt-remove][cpt-remove]]
-  - [[#cpt-search][cpt-search]]
-  - [[#cpt-update][cpt-update]]
-  - [[#global-flags][Global Flags]]
-- [[#environment-variables][Environment Variables]]
-  - [[#cpt_path][=CPT_PATH=]]
-  - [[#cpt_compress][=CPT_COMPRESS=]]
-  - [[#cpt_force][=CPT_FORCE=]]
-  - [[#cpt_pid][=CPT_PID=]]
-- [[#hooks][Hooks]]
-  - [[#editing-the-build-file-during-pre-build][Editing the =build= file during pre-build]]
-- [[#packaging-system][Packaging System]]
-  - [[#build][=build=]]
-  - [[#sources][=sources=]]
-  - [[#checksums][=checksums=]]
-  - [[#version][=version=]]
-  - [[#depends][=depends=]]
-  - [[#post-install][=post-install=]]
-  - [[#message][=message=]]
-  - [[#test][=test=]]
-- [[#rsync-repositories][Rsync Repositories]]
-  - [[#setting-up-an-rsync-repository][Setting up an Rsync repository]]
-- [[#cpt-library][CPT Library]]
-  - [[#calling-the-library][Calling the library]]
-  - [[#option-parsing][Option parsing]]
-  - [[#message-functions][Message functions]]
-  - [[#text-functions][Text functions]]
-  - [[#portability-functions][Portability functions]]
-  - [[#system-functions][System Functions]]
-  - [[#package-functions][Package Functions]]
-
 * Copying
 :PROPERTIES:
 :COPYING:  t
 :END:
 
-Copyright \copy 2020 Cem Keylan
+Copyright \copy 2020-2021 Cem Keylan
 
 #+begin_quote
 Permission is granted to copy, distribute and/or modify this document under the
@@ -131,180 +90,103 @@ system:
   -> update            Check for updates
 #+END_EXAMPLE
 
-** cpt-alternatives
+The documentation of =cpt= aims to keep tool flags and related usage information
+on concise manual pages, while moving the rest of the information to this User
+Manual to avoid unwarranted duplication. To learn more on a specific usage of a
+tool, use the ~man~ program:
+
+#+begin_src sh
+man cpt-build
+#+end_src
+
+* Configuration
 :PROPERTIES:
-:DESCRIPTION: List and swap to alternatives
+:DESCRIPTION: Configuring the package manager
 :END:
 
-You can list and swap to alternatives using =cpt-alternatives=, or
-=cpt a= for short. When run without alternatives, it will list
-alternatives. It can read from standard input if =-= is given as an
-argument.
+The package manager does *NOT* have a configuration file, but there are a
+variety of ways in order to interact with and configure the package manager.
 
-*Examples*
-
-1. List alternatives.
-
-#+BEGIN_EXAMPLE
-  $ cpt-alternatives
-  ncurses /usr/bin/clear
-  ncurses /usr/bin/reset
-#+END_EXAMPLE
-
-2. Swap to =clear= from =ncurses=.
-
-#+BEGIN_EXAMPLE
-  $ cpt-alternatives ncurses /usr/bin/clear
-  -> Swapping '/usr/bin/clear' from 'busybox' to 'ncurses'
-#+END_EXAMPLE
-
-3. Swap in bulk (all of =sbase=).
-
-#+BEGIN_EXAMPLE
-  $ cpt a | grep ^sbase | cpt a -
-#+END_EXAMPLE
-
-** cpt-build
+** CPT Base
 :PROPERTIES:
-:DESCRIPTION: Build a package
+:DESCRIPTION: Defining base packages
 :END:
 
-=cpt-build= will build given packages and their dependencies. If multiple
-packages are specified, it will ask to install the packages as well.
+An =/etc/cpt-base= file can be used in order to define the base to the package
+manager. Base packages are the packages that receive special treatment by
+utilities such as =cpt-reset=, and =cpt-orphans=.
 
-| Flags          | Explanation  |
-|----------------+--------------|
-| =-t=, =--test= | Run tests    |
+#+begin_example
+# This file defines the base packages of the system. You can add or remove
+# package names in order to redefine the base. This file will be used by
+# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+# of the tools will assume that there is no defined base, so use with caution.
+baselayout
+binutils
+byacc
+busybox
+bzip2
+ca-certificates
+curl
+flex
+gcc
+git
+rsync
+gzip
+cpt
+bearssl
+linux-headers
+m4
+make
+musl
+pkgconf
+xz
+zlib
+#+end_example
 
-** cpt-checksum
-:PROPERTIES:
-:DESCRIPTION: Generate checksums
-:END:
-
-=cpt-checksum= will generate a =checksums= file from the package's sources.
-
-** cpt-download
-:PROPERTIES:
-:DESCRIPTION: Download sources for the given package
-:END:
-
-=cpt-download= will download the sources of a package.
-
-** cpt-install
-:PROPERTIES:
-:DESCRIPTION: Install a package
-:END:
-
-=cpt-install= will install given packages.
-
-** cpt-list
-:PROPERTIES:
-:DESCRIPTION: List installed packages
-:END:
-
-When called without arguments, =cpt-list= will print all installed
-packages. You can add package names as arguments to check whether they are
-installed or not. In success, =cpt-list= will exit with status 0 if all
-given packages are installed, it will return 1 if any of the given packages
-aren't installed.
-
-| Flags             | Explanation                            |
-|-------------------+----------------------------------------|
-| =-c=, =--current= | Use the current directory as a package |
-
-** cpt-remove
-:PROPERTIES:
-:DESCRIPTION: Remove a package
-:END:
-
-=cpt-remove= will remove given packages.
-
-** cpt-search
-:PROPERTIES:
-:DESCRIPTION: Search for a package
-:END:
-
-=cpt-search= will search for packages, it accepts regular expressions as well.
-
-| Flags            | Explanation                               |
-|------------------+-------------------------------------------|
-| =-s=, =--single= | Only show the first instance of a package |
-
-
-#+BEGIN_EXAMPLE
-  $ cpt-search 'alsa-*'
-  /var/db/cpt/repo/extra/alsa-lib
-  /var/db/cpt/repo/extra/alsa-utils
-  /var/db/cpt/installed/alsa-lib
-  /var/db/cpt/installed/alsa-utils
-
-  $ cpt-search emacs
-  /home/cem/repos/main/community/emacs
-  /home/cem/repos/kiss-community/community/emacs
-  /var/db/cpt/installed/emacs
-
-  $ cpt-search --single emacs
-  /home/cem/repos/main/community/emacs
-#+END_EXAMPLE
-
-** cpt-update
-:PROPERTIES:
-:DESCRIPTION: Check for updates
-:END:
-
-=cpt-update= will update the packages on your system. It fetches remote
-repositories, and builds, and installs packages that have versions different
-from the ones installed on the system. It doesn't check if the version string
-is actually higher, it only checks whether they differ.
-
-| Flags                | Explanation                          |
-|----------------------+--------------------------------------|
-| =-d=, =--download=   | Only download updatable packages     |
-| =-n=, =--no-fetch=   | Do not update remote repositories    |
-| =-o=, =--only-fetch= | Only fetch the repositories and exit |
-
-** Global Flags
-:PROPERTIES:
-:DESCRIPTION: Flags that work globally on some cpt utilities
-:END:
-
-| Flags               | Explanation                      |
-|---------------------+----------------------------------|
-| =-f=, =--force=     | Force operation, [[=CPT_FORCE=][See =CPT_FORCE=]] |
-| =-y=, =--no-prompt= | Do not prompt for confirmation   |
-| =-root CPT_ROOT=    | Use an alternate root directory  |
-| =-h=, =--help=      | Show this help message           |
-| =-v=, =--version=   | Print version information        |
-
-* Environment Variables
+** Environment Variables
 :PROPERTIES:
 :DESCRIPTION: Change the behaviour of cpt through environment configuration
 :END:
 
-Since there is no configuration file for cpt, the package manager is configured
-through environment variables. These can be set per operation, or be set to your
-shell configuration or =~/.profile=. Here are the environment variables that
-alter the behaviour of =cpt=:
+Since there is no configuration file for =cpt=, the package manager is
+configured through environment variables. These can be set per operation, or be
+set to your shell configuration or =~/.profile=. Here are the environment
+variables that alter the behaviour of =cpt=, some of them have separate sections
+to provide detailed information.
 
-| ENVIRONMENT VARIABLE | Effects                                                                       |
-|----------------------+-------------------------------------------------------------------------------|
-| =CPT_PATH=           | Set the locations of your repositories. It is similar to the =PATH= variable. |
-| =XDG_CACHE_HOME=     | Unless this is set, the =~/.cache= directory will be used instead.            |
-| =CPT_CACHE=          | The cache directory for =cpt=. Default: =$XDG_CACHE_HOME/cpt=                 |
-| =CPT_CHOICE=         | If this is set to 0, a package installation will be aborted on conflicts.     |
-| =CPT_COMPRESS=       | Program used to compress package tarballs.                                    |
-| =CPT_DEBUG=          | If set to 1, temporary directories will not be removed after the operation.   |
-| =CPT_FETCH=          | If set to 0, =cpt-update= will not fetch repositories.                        |
-| =CPT_FORCE=          | Force operation.                                                              |
-| =CPT_HOOK=           | Location for the hook file.                                                   |
-| =CPT_KEEPLOG=        | If set to 1, cpt will keep logs regardless of operation success.              |
-| =CPT_PID=            | Set the temporary build directory name.                                       |
-| =CPT_PROMPT=         | If set to 0, =cpt= will not prompt you for anything.                          |
-| =CPT_ROOT=           | If this variable is set, =cpt= will assume this as the system root.           |
-| =CPT_TEST=           | If set to 1, =cpt-build= will run tests whenever available.                   |
-| =CPT_TMPDIR=         | The directory to create the temporary directories.                            |
+- ~CPT_PATH~ ::
+  Set the locations of your repositories. It is similar to the ~PATH~ variable.
+- ~CPT_CACHE~  ::
+  The cache directory for =cpt=. Default: ~$XDG_CACHE_HOME/cpt~.
+- ~CPT_CHOICE~ ::
+  If this is set to 0, a package installation will be aborted on conflicts.
+- ~CPT_COLOR~ ::
+  If this is set to 1, =cpt= tools will be forced to display coloured output. If
+  set to 0, they will be forced to display them without colours. Otherwise,
+  =cpt= will output colour as long as it is outputting to a terminal.
+- ~CPT_DEBUG~ ::
+  If set to 1, temporary directories will not be removed after the operation.
+- ~CPT_FETCH~ ::
+  If set to 0, ~cpt-update~ will not fetch repositories.
+- ~CPT_FORCE~ ::
+  If set to 1, =cpt= tools will force operation.
+- ~CPT_HOOK~ ::
+  Absolute path to the package manager hook file.
+- ~CPT_KEEPLOG~ ::
+  If set to 1, =cpt= will keep logs regardless of operation success.
+- ~CPT_PID~ ::
+  Set the temporary build directory name.
+- ~CPT_PROMPT~ ::
+  If set to 0, =cpt= will not prompt you for anything.
+- ~CPT_ROOT~ ::
+  If this variable is set, =cpt= will assume the given path as the system root.
+- ~CPT_TEST~ ::
+  If set to 1, ~cpt-build~ will run tests whenever available.
+- ~CPT_TMPDIR~ ::
+  The directory to create the temporary directories.
 
-** =CPT_PATH=
+*** =CPT_PATH=
 :PROPERTIES:
 :DESCRIPTION: Set the locations of your repositories
 :END:
@@ -326,7 +208,7 @@ for something a little more complex.
 
 This example brings us to the next section of this document.
 
-*** Repository preferences
+**** Repository preferences
 :PROPERTIES:
 :DESCRIPTION: Prioritise package repositories
 :END:
@@ -344,7 +226,7 @@ personal repository is listed before the =extra= repository.
   CPT_PATH=$HOME/repos/personal:$HOME/repos/carbs/extra
 #+end_src
 
-*** Setting the =CPT_PATH=
+**** Setting the =CPT_PATH=
 :PROPERTIES:
 :DESCRIPTION: Set the value of CPT_PATH on your shell configuration
 :END:
@@ -364,7 +246,7 @@ repository comes first:
   export CPT_PATH
 #+end_src
 
-** =CPT_COMPRESS=
+*** =CPT_COMPRESS=
 :PROPERTIES:
 :DESCRIPTION: Compression tool to use in cpt
 :END:
@@ -376,10 +258,11 @@ suffixes for the program. Available values are:
 - =zst=
 - =bz2=
 - =xz=
+- =lz=
 
 Defaults to =gz=.
 
-** =CPT_FORCE=
+*** =CPT_FORCE=
 :PROPERTIES:
 :DESCRIPTION: Force operations on cpt
 :END:
@@ -394,7 +277,7 @@ errors or skip certain checks. Here are some examples:
 
 Defaults to 0.
 
-** =CPT_PID=
+*** =CPT_PID=
 :PROPERTIES:
 :DESCRIPTION: Set reproducible temporary directories
 :END:
@@ -412,7 +295,7 @@ time. So the best way to use this variable is during one-time =cpt= calls.
 By running the above, you will know that the created build directories will end
 with the =*-mesa= suffix.
 
-* Hooks
+** Hooks
 :PROPERTIES:
 :DESCRIPTION: Use hooks to customize the package manager operations
 :END:
@@ -445,7 +328,7 @@ The hook is given 3 variables when it is executed. Those are:
 | =$PKG=   | The package that =cpt= is currently working on. Can be null. |
 | =$DEST=  | The destination of the operation. Can be null.               |
 
-** Editing the =build= file during pre-build
+** Editing the build file during pre-build
 :PROPERTIES:
 :DESCRIPTION: Modify a package build with your hooks
 :END:
@@ -457,27 +340,27 @@ file will be placed to the package database named as =build.diff=. Here is an
 example =build= file manipulation during the pre-build hook.
 
 #+BEGIN_SRC sh
-  cat <<EOF> .build.cpt
-  #!/bin/sh -e
+cat <<EOF> .build.cpt
+#!/bin/sh -e
 
-  for patch in bash50-0??; do
-      patch -p0 < "\$patch"
-  done
+for patch in bash50-0??; do
+    patch -p0 < "\$patch"
+done
 
-  export LDFLAGS=-static
+export LDFLAGS=-static
 
-  ./configure \
-      --prefix=/usr \
-      --without-bash-malloc \
-      --disable-nls
+./configure \
+    --prefix=/usr \
+    --without-bash-malloc \
+    --disable-nls
 
-  export MAKEFLAGS="TERMCAP_LIB=/usr/lib/libncursesw.a $MAKEFLAGS"
+export MAKEFLAGS="TERMCAP_LIB=/usr/lib/libncursesw.a $MAKEFLAGS"
 
-  make
-  make DESTDIR="\$1" install
+make
+make DESTDIR="\$1" install
 
-  ln -s bash "\$1/usr/bin/sh"
-  EOF
+ln -s bash "\$1/usr/bin/sh"
+EOF
 #+END_SRC
 
 * Packaging System
@@ -485,23 +368,16 @@ example =build= file manipulation during the pre-build hook.
 :DESCRIPTION: More detail on creating packages
 :END:
 
-A package is formed of several files, these are:
+A package is formed of several files, from these files, only ~build~,
+~checksums~, and ~version~ files are mandatory.
 
-- [[=build=]]
-- [[=sources=]]
-- [[=checksums=]]
-- [[=version=]]
-- [[=depends=]]
-- [[=post-install=]]
-- [[=message=]]
-- [[=test=]]
+This section talks about files that are interpreted specially by the package
+manager. Any other file can be added to the package directory at the discretion
+of the package maintainer. Everything in the package directory will also be
+added to the package database that is located on =/var/db/cpt/installed=. These
+can be patches, configuration files, etc.
 
-Any other file can be added to the package directory at the discretion of the
-package maintainer. Everything in the package directory will also be added to the
-package database that is located on =/var/db/cpt/installed=. These can be
-patches, configuration files, etc.
-
-** =build=
+** build
 :PROPERTIES:
 :DESCRIPTION: The build script
 :END:
@@ -524,7 +400,7 @@ Build is run with three arguments (=$#=)
 - Package version
 - System architecture
 
-** =sources=
+** sources
 :PROPERTIES:
 :DESCRIPTION: The file containing package sources
 :END:
@@ -562,17 +438,17 @@ history pointer, git will checkout the relevant revision. So,
 Other files are assumed to be residing in the package directory. They should be
 added with their paths relative to the package directory.
 
-** =checksums=
+** checksums
 :PROPERTIES:
 :DESCRIPTION: The file containing sha256sum of the sources
 :END:
 
-checksums file is generated by the =cpt c pkg= command. It is generated
+=checksums= file is generated by the ~cpt c pkg~ command. It is generated
 according to the order of the sources file. That's why you shouldn't be editing
 it manually. The checksums file is created with the digests of the files using
 the sha256 algorithm.
 
-** =version=
+** version
 :PROPERTIES:
 :DESCRIPTION: The file containing the version and the release numbers of a package
 :END:
@@ -585,7 +461,7 @@ like below.
   1.3.2 1
 #+END_EXAMPLE
 
-** =depends=
+** depends
 :PROPERTIES:
 :DESCRIPTION: The file containing the dependencies of a package
 :END:
@@ -604,7 +480,7 @@ the following =depends= file:
   zlib
 #+END_EXAMPLE
 
-** =post-install=
+** post-install
 :PROPERTIES:
 :DESCRIPTION: The post-installation script
 :END:
@@ -613,7 +489,7 @@ the following =depends= file:
 will be run after the package is installed as root (or as the user if the user
 has write permissions on =CPT_ROOT=).
 
-** =message=
+** message
 :PROPERTIES:
 :DESCRIPTION: The post-installation message to be displayed
 :END:
@@ -621,7 +497,7 @@ has write permissions on =CPT_ROOT=).
 This plaintext file will be outputted with =cat= after every package is
 installed.
 
-** =test=
+** test
 :PROPERTIES:
 :DESCRIPTION: The test script for a package
 :END:
@@ -732,6 +608,52 @@ Create a service file at =/etc/sv/rsync/run= (runit):
   exec rsync --daemon --no-detach
 #+END_SRC
 
+* Comparison Between CPT and KISS
+
+Lots of things have changed since ~cpt~ was forked from ~kiss~ in terms of
+functionalities and ideals. This section aims to describe the similarities and
+differences of both package managers as neutral as possible. Keep in mind that
+this is the ~cpt~ documentation, so it may be biased regardless.
+
+- Package Manager ::
+
+  While ~kiss~ aims to be a simple single file package manager, ~cpt~ aims to be
+  an extendable package manager library. ~kiss~ has all of its features
+  built-in, while ~cpt~ has all of its features separated into small tools.
+  These tools can be called from the main ~cpt~ tool (in order to keep
+  ~kiss~-like usage) or with their names directly (e.g ~cpt-build~).
+
+- Configuration ::
+
+  Neither ~kiss~ nor ~cpt~ use configuration files. Instead, they are configured
+  through environment variables. Additionally, all ~cpt~ tools can receive flags
+  that alter their functionality. ~kiss~ does not accept flags.
+
+- Package Repositories ::
+
+  In addition to git repositories, ~cpt~ also makes use of [[Rsync Repositories][rsync repositories]].
+
+- Package Sources ::
+
+  In addition to git repositories for sources, ~cpt~ also supports mercurial
+  repositories.
+
+- Post-Installation Messages ::
+
+  ~kiss~ and ~cpt~ interact with =post-install= messages differently. ~kiss~
+  does not differentiate between post-installation scripts and post-installation
+  messages, and will save the output of all scripts named =post-install= to be
+  printed after the installation of all packages are complete. ~cpt~ on the
+  other hand, separates these with the =message= file. ~cpt~ runs =post-install=
+  without saving the output to be printed a second time. It instead prints all
+  =message= files after the installation is over.
+
+- Portability ::
+
+  ~kiss~ aims to be as portable as possible. ~cpt~ aims to be portable, but
+  favours performance. ~cpt~ depends on ~rsync~ for package installation, while
+  ~kiss~ has removed the dependency in favour of portability.
+
 * CPT Library
 :PROPERTIES:
 :DESCRIPTION: Documentation of the Library
@@ -763,8 +685,8 @@ variables that are used inside the package manager.
 :END:
 
 =cpt-lib= includes a POSIX-shell option parser inside named =getoptions=. You
-can see its own [[https://github.com/ko1nksm/getoptions/blob/v2.0.1/README.md][documentation]] for writing an option parser. The built-in version
-of the =getoptions= library is 2.0.1 and there are no plans for updating it
+can see its own [[https://github.com/ko1nksm/getoptions/blob/v2.5.0/README.md][documentation]] for writing an option parser. The built-in version
+of the =getoptions= library is 2.5.0 and there are no plans for updating it
 apart from bug fixes.
 
 *** Defining a parser
@@ -785,8 +707,8 @@ inside. Here is the proper way of doing it.
 
   parser_definition() {
       # The rest arguments MUST be defined as 'REST'
-      setup REST help:usage -- "usage: ${0##*/} [options] [pkg...]"
-      msg                   -- '' 'Options:'
+      setup REST help:usage                  -- "usage: ${0##*/} [options] [pkg...]"
+      msg                                    -- '' 'Options:'
       flag CPT_TEST -t export:1 init:@export -- "Enable tests"
 
       global_options
@@ -803,13 +725,13 @@ inside. Here is the proper way of doing it.
 The =global_options()= function is a simple convenience call to include flags
 that can be used inside most =cpt= tools. It defines the following flags:
 
-| Flag | Long Option | Calls        |
-|------+-------------+--------------|
-| -f   | --force     | =CPT_FORCE=  |
-| -y   | --no-prompt | =CPT_PROMPT= |
-|      | --root      | =CPT_ROOT=   |
-| -h   | --help      | =usage()=    |
-| -v   | --version   | =version()=  |
+| Flag | Long Option   | Calls        |
+|------+---------------+--------------|
+| ~-f~ | ~--force~     | =CPT_FORCE=  |
+| ~-y~ | ~--no-prompt~ | =CPT_PROMPT= |
+|      | ~--root~      | =CPT_ROOT=   |
+| ~-h~ | ~--help~      | =usage()=    |
+| ~-v~ | ~--version~   | =version()=  |
 
 ** Message functions
 :PROPERTIES:
@@ -1070,6 +992,9 @@ if it fails.
 pkg_find cpt
 #+end_src
 
+*** TODO =pkg_get_base()=
+
+This function returns the base packages as defined in =/etc/cpt-base=.
 
 *** TODO =pkg_gentree=
 :PROPERTIES:

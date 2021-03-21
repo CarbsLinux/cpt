@@ -7,45 +7,33 @@
 			_______________________
 
 
-			   February 04, 2021
-
-
 Table of Contents
 _________________
 
 1. Copying
 2. Preface
 3. Usage
-.. 1. cpt-alternatives
-.. 2. cpt-build
-.. 3. cpt-checksum
-.. 4. cpt-download
-.. 5. cpt-install
-.. 6. cpt-list
-.. 7. cpt-remove
-.. 8. cpt-search
-.. 9. cpt-update
-.. 10. Global Flags
-4. Environment Variables
-.. 1. `CPT_PATH'
-..... 1. Repository preferences
-..... 2. Setting the `CPT_PATH'
-.. 2. `CPT_COMPRESS'
-.. 3. `CPT_FORCE'
-.. 4. `CPT_PID'
-5. Hooks
-.. 1. Editing the `build' file during pre-build
-6. Packaging System
-.. 1. `build'
-.. 2. `sources'
-.. 3. `checksums'
-.. 4. `version'
-.. 5. `depends'
-.. 6. `post-install'
-.. 7. `message'
-.. 8. `test'
-7. Rsync Repositories
+4. Configuration
+.. 1. CPT Base
+.. 2. Environment Variables
+..... 1. `CPT_PATH'
+..... 2. `CPT_COMPRESS'
+..... 3. `CPT_FORCE'
+..... 4. `CPT_PID'
+.. 3. Hooks
+.. 4. Editing the build file during pre-build
+5. Packaging System
+.. 1. build
+.. 2. sources
+.. 3. checksums
+.. 4. version
+.. 5. depends
+.. 6. post-install
+.. 7. message
+.. 8. test
+6. Rsync Repositories
 .. 1. Setting up an Rsync repository
+7. Comparison Between CPT and KISS
 8. CPT Library
 .. 1. Calling the library
 .. 2. Option parsing
@@ -66,14 +54,15 @@ _________________
 ..... 1. `_seq()'
 ..... 2. `_stat()'
 ..... 3. `_readlinkf()'
-.. 6. TODO System Functions
+.. 6. System Functions
 ..... 1. `as_root()'
-.. 7. TODO Package Functions
+.. 7. Package Functions
 ..... 1. `pkg_owner()'
 ..... 2. `pkg_isbuilt()'
 ..... 3. `pkg_lint()'
-..... 4. TODO `pkg_find()'
-..... 5. TODO `pkg_gentree'
+..... 4. `pkg_find()'
+..... 5. `pkg_get_base()'
+..... 6. `pkg_gentree'
 
 
 This is a reference document containing both the user-guide and the
@@ -87,7 +76,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
 1 Copying
 =========
 
-  Copyright (c) 2020 Cem Keylan
+  Copyright (c) 2020-2021 Cem Keylan
 
         Permission is granted to copy, distribute and/or modify
         this document under the terms of the GNU Free
@@ -163,178 +152,109 @@ development manual for *Carbs Packaging Tools*. For development logs see
   | -> update            Check for updates
   `----
 
-
-3.1 cpt-alternatives
-~~~~~~~~~~~~~~~~~~~~
-
-  You can list and swap to alternatives using `cpt-alternatives', or
-  `cpt a' for short. When run without alternatives, it will list
-  alternatives. It can read from standard input if `-' is given as an
-  argument.
-
-  *Examples*
-
-  1. List alternatives.
+  The documentation of `cpt' aims to keep tool flags and related usage
+  information on concise manual pages, while moving the rest of the
+  information to this User Manual to avoid unwarranted duplication. To
+  learn more on a specific usage of a tool, use the `man' program:
 
   ,----
-  | $ cpt-alternatives
-  | ncurses /usr/bin/clear
-  | ncurses /usr/bin/reset
-  `----
-
-  1. Swap to `clear' from `ncurses'.
-
-  ,----
-  | $ cpt-alternatives ncurses /usr/bin/clear
-  | -> Swapping '/usr/bin/clear' from 'busybox' to 'ncurses'
-  `----
-
-  1. Swap in bulk (all of `sbase').
-
-  ,----
-  | $ cpt a | grep ^sbase | cpt a -
+  | man cpt-build
   `----
 
 
-3.2 cpt-build
-~~~~~~~~~~~~~
+4 Configuration
+===============
 
-  `cpt-build' will build given packages and their dependencies. If
-  multiple packages are specified, it will ask to install the packages
-  as well.
-
-   Flags           Explanation 
-  -----------------------------
-   `-t', `--test'  Run tests   
+  The package manager does *NOT* have a configuration file, but there
+  are a variety of ways in order to interact with and configure the
+  package manager.
 
 
-3.3 cpt-checksum
-~~~~~~~~~~~~~~~~
-
-  `cpt-checksum' will generate a `checksums' file from the package's
-  sources.
-
-
-3.4 cpt-download
-~~~~~~~~~~~~~~~~
-
-  `cpt-download' will download the sources of a package.
-
-
-3.5 cpt-install
-~~~~~~~~~~~~~~~
-
-  `cpt-install' will install given packages.
-
-
-3.6 cpt-list
+4.1 CPT Base
 ~~~~~~~~~~~~
 
-  When called without arguments, `cpt-list' will print all installed
-  packages. You can add package names as arguments to check whether they
-  are installed or not. In success, `cpt-list' will exit with status 0
-  if all given packages are installed, it will return 1 if any of the
-  given packages aren't installed.
-
-   Flags              Explanation                            
-  -----------------------------------------------------------
-   `-c', `--current'  Use the current directory as a package 
-
-
-3.7 cpt-remove
-~~~~~~~~~~~~~~
-
-  `cpt-remove' will remove given packages.
-
-
-3.8 cpt-search
-~~~~~~~~~~~~~~
-
-  `cpt-search' will search for packages, it accepts regular expressions
-  as well.
-
-   Flags             Explanation                               
-  -------------------------------------------------------------
-   `-s', `--single'  Only show the first instance of a package 
-
+  An `/etc/cpt-base' file can be used in order to define the base to the
+  package manager. Base packages are the packages that receive special
+  treatment by utilities such as `cpt-reset', and `cpt-orphans'.
 
   ,----
-  | $ cpt-search 'alsa-*'
-  | /var/db/cpt/repo/extra/alsa-lib
-  | /var/db/cpt/repo/extra/alsa-utils
-  | /var/db/cpt/installed/alsa-lib
-  | /var/db/cpt/installed/alsa-utils
-  | 
-  | $ cpt-search emacs
-  | /home/cem/repos/main/community/emacs
-  | /home/cem/repos/kiss-community/community/emacs
-  | /var/db/cpt/installed/emacs
-  | 
-  | $ cpt-search --single emacs
-  | /home/cem/repos/main/community/emacs
+  | # This file defines the base packages of the system. You can add or remove
+  | # package names in order to redefine the base. This file will be used by
+  | # cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+  | # of the tools will assume that there is no defined base, so use with caution.
+  | baselayout
+  | binutils
+  | byacc
+  | busybox
+  | bzip2
+  | ca-certificates
+  | curl
+  | flex
+  | gcc
+  | git
+  | rsync
+  | gzip
+  | cpt
+  | bearssl
+  | linux-headers
+  | m4
+  | make
+  | musl
+  | pkgconf
+  | xz
+  | zlib
   `----
 
 
-3.9 cpt-update
-~~~~~~~~~~~~~~
+4.2 Environment Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  `cpt-update' will update the packages on your system. It fetches
-  remote repositories, and builds, and installs packages that have
-  versions different from the ones installed on the system. It doesn't
-  check if the version string is actually higher, it only checks whether
-  they differ.
-
-   Flags                 Explanation                          
-  ------------------------------------------------------------
-   `-d', `--download'    Only download updatable packages     
-   `-n', `--no-fetch'    Do not update remote repositories    
-   `-o', `--only-fetch'  Only fetch the repositories and exit 
-
-
-3.10 Global Flags
-~~~~~~~~~~~~~~~~~
-
-   Flags                Explanation                        
-  ---------------------------------------------------------
-   `-f', `--force'      Force operation, [See `CPT_FORCE'] 
-   `-y', `--no-prompt'  Do not prompt for confirmation     
-   `-root CPT_ROOT'     Use an alternate root directory    
-   `-h', `--help'       Show this help message             
-   `-v', `--version'    Print version information          
-
-
-[See `CPT_FORCE'] See section 4.3
-
-
-4 Environment Variables
-=======================
-
-  Since there is no configuration file for cpt, the package manager is
+  Since there is no configuration file for `cpt', the package manager is
   configured through environment variables. These can be set per
   operation, or be set to your shell configuration or `~/.profile'. Here
-  are the environment variables that alter the behaviour of `cpt':
+  are the environment variables that alter the behaviour of `cpt', some
+  of them have separate sections to provide detailed information.
 
-   ENVIRONMENT VARIABLE  Effects                                                                       
-  -----------------------------------------------------------------------------------------------------
-   `CPT_PATH'            Set the locations of your repositories. It is similar to the `PATH' variable. 
-   `XDG_CACHE_HOME'      Unless this is set, the `~/.cache' directory will be used instead.            
-   `CPT_CACHE'           The cache directory for `cpt'. Default: `$XDG_CACHE_HOME/cpt'                 
-   `CPT_CHOICE'          If this is set to 0, a package installation will be aborted on conflicts.     
-   `CPT_COMPRESS'        Program used to compress package tarballs.                                    
-   `CPT_DEBUG'           If set to 1, temporary directories will not be removed after the operation.   
-   `CPT_FETCH'           If set to 0, `cpt-update' will not fetch repositories.                        
-   `CPT_FORCE'           Force operation.                                                              
-   `CPT_HOOK'            Location for the hook file.                                                   
-   `CPT_KEEPLOG'         If set to 1, cpt will keep logs regardless of operation success.              
-   `CPT_PID'             Set the temporary build directory name.                                       
-   `CPT_PROMPT'          If set to 0, `cpt' will not prompt you for anything.                          
-   `CPT_ROOT'            If this variable is set, `cpt' will assume this as the system root.           
-   `CPT_TEST'            If set to 1, `cpt-build' will run tests whenever available.                   
-   `CPT_TMPDIR'          The directory to create the temporary directories.                            
+  `CPT_PATH'
+        Set the locations of your repositories. It is similar to the
+        `PATH' variable.
+  `CPT_CACHE' 
+        The cache directory for `cpt'. Default: `$XDG_CACHE_HOME/cpt'.
+  `CPT_CHOICE'
+        If this is set to 0, a package installation will be aborted on
+        conflicts.
+  `CPT_COLOR'
+        If this is set to 1, `cpt' tools will be forced to display
+        coloured output. If set to 0, they will be forced to display
+        them without colours. Otherwise, `cpt' will output colour as
+        long as it is outputting to a terminal.
+  `CPT_DEBUG'
+        If set to 1, temporary directories will not be removed after the
+        operation.
+  `CPT_FETCH'
+        If set to 0, `cpt-update' will not fetch repositories.
+  `CPT_FORCE'
+        If set to 1, `cpt' tools will force operation.
+  `CPT_HOOK'
+        Absolute path to the package manager hook file.
+  `CPT_KEEPLOG'
+        If set to 1, `cpt' will keep logs regardless of operation
+        success.
+  `CPT_PID'
+        Set the temporary build directory name.
+  `CPT_PROMPT'
+        If set to 0, `cpt' will not prompt you for anything.
+  `CPT_ROOT'
+        If this variable is set, `cpt' will assume the given path as the
+        system root.
+  `CPT_TEST'
+        If set to 1, `cpt-build' will run tests whenever available.
+  `CPT_TMPDIR'
+        The directory to create the temporary directories.
 
 
-4.1 `CPT_PATH'
-~~~~~~~~~~~~~~
+4.2.1 `CPT_PATH'
+----------------
 
   Similar to the `PATH' variable, `cpt' find repositories from the
   `CPT_PATH' variable. Here is an example:
@@ -354,8 +274,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   This example brings us to the next section of this document.
 
 
-4.1.1 Repository preferences
-----------------------------
+* 4.2.1.1 Repository preferences
 
   When you are using multiple repositories from multiple vendors, you
   will find out that some repositories have the same packages. `cpt'
@@ -372,8 +291,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-4.1.2 Setting the `CPT_PATH'
-----------------------------
+* 4.2.1.2 Setting the `CPT_PATH'
 
   You can set the `CPT_PATH' variable on your shell configuration or
   your `.profile' file in a way that is easy to read.
@@ -391,8 +309,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-4.2 `CPT_COMPRESS'
-~~~~~~~~~~~~~~~~~~
+4.2.2 `CPT_COMPRESS'
+--------------------
 
   When setting the `CPT_COMPRESS' value, you should set the name of the
   default suffixes for the program. Available values are:
@@ -401,12 +319,13 @@ development manual for *Carbs Packaging Tools*. For development logs see
   - `zst'
   - `bz2'
   - `xz'
+  - `lz'
 
   Defaults to `gz'.
 
 
-4.3 `CPT_FORCE'
-~~~~~~~~~~~~~~~
+4.2.3 `CPT_FORCE'
+-----------------
 
   If this is set to 1, some of the `cpt' tools will continue regardless
   of errors or skip certain checks. Here are some examples:
@@ -420,8 +339,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   Defaults to 0.
 
 
-4.4 `CPT_PID'
-~~~~~~~~~~~~~
+4.2.4 `CPT_PID'
+---------------
 
   If this variable is set, the temporary files will be created with this
   variable as the suffix, instead of the PID of the `cpt' process. The
@@ -438,8 +357,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   will end with the `*-mesa' suffix.
 
 
-5 Hooks
-=======
+4.3 Hooks
+~~~~~~~~~
 
   Hooks can be used in order to change the runtime behaviour of the
   package manager.  There are a variety of package hooks, mostly self
@@ -471,8 +390,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
    `$DEST'   The destination of the operation. Can be null.               
 
 
-5.1 Editing the `build' file during pre-build
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+4.4 Editing the build file during pre-build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   You can edit the `build' file during pre-build. The file is copied
   from the repository to the build directory named as `.build.cpt'. You
@@ -506,29 +425,22 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-6 Packaging System
+5 Packaging System
 ==================
 
-  A package is formed of several files, these are:
+  A package is formed of several files, from these files, only `build',
+  `checksums', and `version' files are mandatory.
 
-  - 6.1
-  - 6.2
-  - 6.3
-  - 6.4
-  - 6.5
-  - 6.6
-  - 6.7
-  - 6.8
-
-  Any other file can be added to the package directory at the discretion
-  of the package maintainer. Everything in the package directory will
-  also be added to the package database that is located on
-  `/var/db/cpt/installed'. These can be patches, configuration files,
+  This section talks about files that are interpreted specially by the
+  package manager. Any other file can be added to the package directory
+  at the discretion of the package maintainer. Everything in the package
+  directory will also be added to the package database that is located
+  on `/var/db/cpt/installed'. These can be patches, configuration files,
   etc.
 
 
-6.1 `build'
-~~~~~~~~~~~
+5.1 build
+~~~~~~~~~
 
   Typically `build' files are shell scripts that run commands to prepare
   the source code to be installed on the target system. Even though we
@@ -550,8 +462,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   - System architecture
 
 
-6.2 `sources'
-~~~~~~~~~~~~~
+5.2 sources
+~~~~~~~~~~~
 
   `sources' file is a list of files and sources that will be put to the
   build directory during the build process. Those can be remote sources
@@ -593,17 +505,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
   should be added with their paths relative to the package directory.
 
 
-6.3 `checksums'
-~~~~~~~~~~~~~~~
+5.3 checksums
+~~~~~~~~~~~~~
 
-  checksums file is generated by the `cpt c pkg' command. It is
+  `checksums' file is generated by the `cpt c pkg' command. It is
   generated according to the order of the sources file. That's why you
   shouldn't be editing it manually. The checksums file is created with
   the digests of the files using the sha256 algorithm.
 
 
-6.4 `version'
-~~~~~~~~~~~~~
+5.4 version
+~~~~~~~~~~~
 
   The version file includes the version of the software and the release
   number of of the package on a space seperated format. The contents of
@@ -614,8 +526,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-6.5 `depends'
-~~~~~~~~~~~~~
+5.5 depends
+~~~~~~~~~~~
 
   This is a list of dependencies that must be installed before a package
   build. You can append "make" after a dependency to mark a package is
@@ -633,23 +545,23 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-6.6 `post-install'
-~~~~~~~~~~~~~~~~~~
+5.6 post-install
+~~~~~~~~~~~~~~~~
 
   `post-install' files have the same requirements as the build
   script. They will be run after the package is installed as root (or as
   the user if the user has write permissions on `CPT_ROOT').
 
 
-6.7 `message'
-~~~~~~~~~~~~~
+5.7 message
+~~~~~~~~~~~
 
   This plaintext file will be outputted with `cat' after every package
   is installed.
 
 
-6.8 `test'
-~~~~~~~~~~
+5.8 test
+~~~~~~~~
 
   Test files are mainly for the repository maintainer to test the
   packages, and will only run if the user has the `CPT_TEST' variable
@@ -658,7 +570,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   script is finished.
 
 
-7 Rsync Repositories
+6 Rsync Repositories
 ====================
 
   Rsync repositories are simple to serve and simple to use. In the
@@ -708,7 +620,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   fetch accordingly.
 
 
-7.1 Setting up an Rsync repository
+6.1 Setting up an Rsync repository
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Carbs Linux repositories automatically sync from the git repostitories
@@ -762,6 +674,58 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
+7 Comparison Between CPT and KISS
+=================================
+
+  Lots of things have changed since `cpt' was forked from `kiss' in
+  terms of functionalities and ideals. This section aims to describe the
+  similarities and differences of both package managers as neutral as
+  possible. Keep in mind that this is the `cpt' documentation, so it may
+  be biased regardless.
+
+  Package Manager
+        While `kiss' aims to be a simple single file package manager,
+        `cpt' aims to be an extendable package manager library. `kiss'
+        has all of its features built-in, while `cpt' has all of its
+        features separated into small tools.  These tools can be called
+        from the main `cpt' tool (in order to keep `kiss'-like usage) or
+        with their names directly (e.g `cpt-build').
+
+  Configuration
+        Neither `kiss' nor `cpt' use configuration files. Instead, they
+        are configured through environment variables. Additionally, all
+        `cpt' tools can receive flags that alter their
+        functionality. `kiss' does not accept flags.
+
+  Package Repositories
+        In addition to git repositories, `cpt' also makes use of [rsync
+        repositories].
+
+  Package Sources
+        In addition to git repositories for sources, `cpt' also supports
+        mercurial repositories.
+
+  Post-Installation Messages
+        `kiss' and `cpt' interact with `post-install' messages
+        differently. `kiss' does not differentiate between
+        post-installation scripts and post-installation messages, and
+        will save the output of all scripts named `post-install' to be
+        printed after the installation of all packages are
+        complete. `cpt' on the other hand, separates these with the
+        `message' file. `cpt' runs `post-install' without saving the
+        output to be printed a second time. It instead prints all
+        `message' files after the installation is over.
+
+  Portability
+        `kiss' aims to be as portable as possible. `cpt' aims to be
+        portable, but favours performance. `cpt' depends on `rsync' for
+        package installation, while `kiss' has removed the dependency in
+        favour of portability.
+
+
+[rsync repositories] See section 6
+
+
 8 CPT Library
 =============
 
@@ -791,11 +755,11 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `cpt-lib' includes a POSIX-shell option parser inside named
   `getoptions'. You can see its own [documentation] for writing an
   option parser. The built-in version of the `getoptions' library is
-  2.0.1 and there are no plans for updating it apart from bug fixes.
+  2.5.0 and there are no plans for updating it apart from bug fixes.
 
 
 [documentation]
-<https://github.com/ko1nksm/getoptions/blob/v2.0.1/README.md>
+<https://github.com/ko1nksm/getoptions/blob/v2.5.0/README.md>
 
 8.2.1 Defining a parser
 -----------------------
@@ -813,8 +777,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   | 
   | parser_definition() {
   |     # The rest arguments MUST be defined as 'REST'
-  |     setup REST help:usage -- "usage: ${0##*/} [options] [pkg...]"
-  |     msg                   -- '' 'Options:'
+  |     setup REST help:usage                  -- "usage: ${0##*/} [options] [pkg...]"
+  |     msg                                    -- '' 'Options:'
   |     flag CPT_TEST -t export:1 init:@export -- "Enable tests"
   | 
   |     global_options
@@ -831,13 +795,13 @@ development manual for *Carbs Packaging Tools*. For development logs see
   include flags that can be used inside most `cpt' tools. It defines the
   following flags:
 
-   Flag  Long Option  Calls        
-  ---------------------------------
-   -f    --force      `CPT_FORCE'  
-   -y    --no-prompt  `CPT_PROMPT' 
-         --root       `CPT_ROOT'   
-   -h    --help       `usage()'    
-   -v    --version    `version()'  
+   Flag  Long Option    Calls        
+  -----------------------------------
+   `-f'  `--force'      `CPT_FORCE'  
+   `-y'  `--no-prompt'  `CPT_PROMPT' 
+         `--root'       `CPT_ROOT'   
+   `-h'  `--help'       `usage()'    
+   `-v'  `--version'    `version()'  
 
 
 8.3 Message functions
@@ -1015,8 +979,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
 <https://github.com/ko1nksm/readlinkf>
 
 
-8.6 TODO System Functions
-~~~~~~~~~~~~~~~~~~~~~~~~~
+8.6 System Functions
+~~~~~~~~~~~~~~~~~~~~
 
   - [ ] Add description
 
@@ -1035,8 +999,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   4. `su'
 
 
-8.7 TODO Package Functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+8.7 Package Functions
+~~~~~~~~~~~~~~~~~~~~~
 
   Obviously, package functions are the most important ones for
   `cpt-lib', those are the ones you will use to build, to query, to
@@ -1080,8 +1044,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   outright* if it fails.
 
 
-8.7.4 TODO `pkg_find()'
------------------------
+8.7.4 `pkg_find()'
+------------------
 
   `pkg_find()' is the tool for searching packages. It accepts up to 3
   arguments.
@@ -1103,7 +1067,13 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.5 TODO `pkg_gentree'
-------------------------
+8.7.5 `pkg_get_base()'
+----------------------
+
+  This function returns the base packages as defined in `/etc/cpt-base'.
+
+
+8.7.6 `pkg_gentree'
+-------------------
 
   Keep in mind /etc/cpt-base

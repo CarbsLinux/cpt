@@ -7,7 +7,7 @@
 @c %**end of header
 
 @copying
-Copyright @copyright{} 2020 Cem Keylan
+Copyright @copyright{} 2020-2021 Cem Keylan
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the
@@ -47,27 +47,21 @@ manual for @strong{Carbs Packaging Tools}. For development logs see @uref{https:
 @menu
 * Preface::                      Introduction to Carbs Packaging Tools
 * Usage::                        Basic usage of Carbs Packaging Tools
-* Environment Variables::        Change the behaviour of cpt through environment configuration
-* Hooks::                        Use hooks to customize the package manager operations
+* Configuration::                Configuring the package manager
 * Packaging System::             More detail on creating packages
 * Rsync Repositories::           Information on using or creating rsync repositories
+* Comparison Between CPT and KISS::
 * CPT Library::                  Documentation of the Library
 
 @detailmenu
 --- The Detailed Node Listing ---
 
-Usage
+Configuration
 
-* cpt-alternatives::             List and swap to alternatives
-* cpt-build::                    Build a package
-* cpt-checksum::                 Generate checksums
-* cpt-download::                 Download sources for the given package
-* cpt-install::                  Install a package
-* cpt-list::                     List installed packages
-* cpt-remove::                   Remove a package
-* cpt-search::                   Search for a package
-* cpt-update::                   Check for updates
-* Global Flags::                 Flags that work globally on some cpt utilities
+* CPT Base::                     Defining base packages
+* Environment Variables::        Change the behaviour of cpt through environment configuration
+* Hooks::                        Use hooks to customize the package manager operations
+* Editing the build file during pre-build:: Modify a package build with your hooks
 
 Environment Variables
 
@@ -76,25 +70,16 @@ Environment Variables
 * @samp{CPT_FORCE}::             Force operations on cpt
 * @samp{CPT_PID}::               Set reproducible temporary directories
 
-@samp{CPT_PATH}
-
-* Repository preferences::       Prioritise package repositories
-* Setting the @samp{CPT_PATH}::  Set the value of CPT_PATH on your shell configuration
-
-Hooks
-
-* Editing the @samp{build} file during pre-build:: Modify a package build with your hooks
-
 Packaging System
 
-* @samp{build}::                 The build script
-* @samp{sources}::               The file containing package sources
-* @samp{checksums}::             The file containing sha256sum of the sources
-* @samp{version}::               The file containing the version and the release numbers of a package
-* @samp{depends}::               The file containing the dependencies of a package
-* @samp{post-install}::          The post-installation script
-* @samp{message}::               The post-installation message to be displayed
-* @samp{test}::                  The test script for a package
+* build::                        The build script
+* sources::                      The file containing package sources
+* checksums::                    The file containing sha256sum of the sources
+* version::                      The file containing the version and the release numbers of a package
+* depends::                      The file containing the dependencies of a package
+* post-install::                 The post-installation script
+* message::                      The post-installation message to be displayed
+* test::                         The test script for a package
 
 Rsync Repositories
 
@@ -146,6 +131,7 @@ Package Functions
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
 * @samp{pkg_find()}::            Query package locations
+* @samp{pkg_get_base()}::
 * @samp{pkg_gentree}::           Generate a dependency tree for the given package
 
 @end detailmenu
@@ -211,216 +197,104 @@ system:
 -> update            Check for updates
 @end example
 
+The documentation of @samp{cpt} aims to keep tool flags and related usage information
+on concise manual pages, while moving the rest of the information to this User
+Manual to avoid unwarranted duplication. To learn more on a specific usage of a
+tool, use the @code{man} program:
+
+@example
+man cpt-build
+@end example
+
+@node Configuration
+@chapter Configuration
+
+The package manager does @strong{NOT} have a configuration file, but there are a
+variety of ways in order to interact with and configure the package manager.
+
 @menu
-* cpt-alternatives::             List and swap to alternatives
-* cpt-build::                    Build a package
-* cpt-checksum::                 Generate checksums
-* cpt-download::                 Download sources for the given package
-* cpt-install::                  Install a package
-* cpt-list::                     List installed packages
-* cpt-remove::                   Remove a package
-* cpt-search::                   Search for a package
-* cpt-update::                   Check for updates
-* Global Flags::                 Flags that work globally on some cpt utilities
+* CPT Base::                     Defining base packages
+* Environment Variables::        Change the behaviour of cpt through environment configuration
+* Hooks::                        Use hooks to customize the package manager operations
+* Editing the build file during pre-build:: Modify a package build with your hooks
 @end menu
 
-@node cpt-alternatives
-@section cpt-alternatives
+@node CPT Base
+@section CPT Base
 
-You can list and swap to alternatives using @samp{cpt-alternatives}, or
-@samp{cpt a} for short. When run without alternatives, it will list
-alternatives. It can read from standard input if @samp{-} is given as an
-argument.
-
-@strong{Examples}
-
-@enumerate
-@item
-List alternatives.
-@end enumerate
+An @samp{/etc/cpt-base} file can be used in order to define the base to the package
+manager. Base packages are the packages that receive special treatment by
+utilities such as @samp{cpt-reset}, and @samp{cpt-orphans}.
 
 @example
-$ cpt-alternatives
-ncurses /usr/bin/clear
-ncurses /usr/bin/reset
+# This file defines the base packages of the system. You can add or remove
+# package names in order to redefine the base. This file will be used by
+# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+# of the tools will assume that there is no defined base, so use with caution.
+baselayout
+binutils
+byacc
+busybox
+bzip2
+ca-certificates
+curl
+flex
+gcc
+git
+rsync
+gzip
+cpt
+bearssl
+linux-headers
+m4
+make
+musl
+pkgconf
+xz
+zlib
 @end example
-
-@enumerate
-@item
-Swap to @samp{clear} from @samp{ncurses}.
-@end enumerate
-
-@example
-$ cpt-alternatives ncurses /usr/bin/clear
--> Swapping '/usr/bin/clear' from 'busybox' to 'ncurses'
-@end example
-
-@enumerate
-@item
-Swap in bulk (all of @samp{sbase}).
-@end enumerate
-
-@example
-$ cpt a | grep ^sbase | cpt a -
-@end example
-
-@node cpt-build
-@section cpt-build
-
-@samp{cpt-build} will build given packages and their dependencies. If multiple
-packages are specified, it will ask to install the packages as well.
-
-@multitable {aaaaaaaaaaaaaa} {aaaaaaaaaaa}
-@headitem Flags
-@tab Explanation
-@item @samp{-t}, @samp{--test}
-@tab Run tests
-@end multitable
-
-@node cpt-checksum
-@section cpt-checksum
-
-@samp{cpt-checksum} will generate a @samp{checksums} file from the package's sources.
-
-@node cpt-download
-@section cpt-download
-
-@samp{cpt-download} will download the sources of a package.
-
-@node cpt-install
-@section cpt-install
-
-@samp{cpt-install} will install given packages.
-
-@node cpt-list
-@section cpt-list
-
-When called without arguments, @samp{cpt-list} will print all installed
-packages. You can add package names as arguments to check whether they are
-installed or not. In success, @samp{cpt-list} will exit with status 0 if all
-given packages are installed, it will return 1 if any of the given packages
-aren't installed.
-
-@multitable {aaaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem Flags
-@tab Explanation
-@item @samp{-c}, @samp{--current}
-@tab Use the current directory as a package
-@end multitable
-
-@node cpt-remove
-@section cpt-remove
-
-@samp{cpt-remove} will remove given packages.
-
-@node cpt-search
-@section cpt-search
-
-@samp{cpt-search} will search for packages, it accepts regular expressions as well.
-
-@multitable {aaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem Flags
-@tab Explanation
-@item @samp{-s}, @samp{--single}
-@tab Only show the first instance of a package
-@end multitable
-
-
-@example
-$ cpt-search 'alsa-*'
-/var/db/cpt/repo/extra/alsa-lib
-/var/db/cpt/repo/extra/alsa-utils
-/var/db/cpt/installed/alsa-lib
-/var/db/cpt/installed/alsa-utils
-
-$ cpt-search emacs
-/home/cem/repos/main/community/emacs
-/home/cem/repos/kiss-community/community/emacs
-/var/db/cpt/installed/emacs
-
-$ cpt-search --single emacs
-/home/cem/repos/main/community/emacs
-@end example
-
-@node cpt-update
-@section cpt-update
-
-@samp{cpt-update} will update the packages on your system. It fetches remote
-repositories, and builds, and installs packages that have versions different
-from the ones installed on the system. It doesn't check if the version string
-is actually higher, it only checks whether they differ.
-
-@multitable {aaaaaaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem Flags
-@tab Explanation
-@item @samp{-d}, @samp{--download}
-@tab Only download updatable packages
-@item @samp{-n}, @samp{--no-fetch}
-@tab Do not update remote repositories
-@item @samp{-o}, @samp{--only-fetch}
-@tab Only fetch the repositories and exit
-@end multitable
-
-@node Global Flags
-@section Global Flags
-
-@multitable {aaaaaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem Flags
-@tab Explanation
-@item @samp{-f}, @samp{--force}
-@tab Force operation, @ref{@samp{CPT_FORCE}, , See @samp{CPT_FORCE}}
-@item @samp{-y}, @samp{--no-prompt}
-@tab Do not prompt for confirmation
-@item @samp{-root CPT_ROOT}
-@tab Use an alternate root directory
-@item @samp{-h}, @samp{--help}
-@tab Show this help message
-@item @samp{-v}, @samp{--version}
-@tab Print version information
-@end multitable
 
 @node Environment Variables
-@chapter Environment Variables
+@section Environment Variables
 
-Since there is no configuration file for cpt, the package manager is configured
-through environment variables. These can be set per operation, or be set to your
-shell configuration or @samp{~/.profile}. Here are the environment variables that
-alter the behaviour of @samp{cpt}:
+Since there is no configuration file for @samp{cpt}, the package manager is
+configured through environment variables. These can be set per operation, or be
+set to your shell configuration or @samp{~/.profile}. Here are the environment
+variables that alter the behaviour of @samp{cpt}, some of them have separate sections
+to provide detailed information.
 
-@multitable {aaaaaaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem ENVIRONMENT VARIABLE
-@tab Effects
-@item @samp{CPT_PATH}
-@tab Set the locations of your repositories. It is similar to the @samp{PATH} variable.
-@item @samp{XDG_CACHE_HOME}
-@tab Unless this is set, the @samp{~/.cache} directory will be used instead.
-@item @samp{CPT_CACHE}
-@tab The cache directory for @samp{cpt}. Default: @samp{$XDG_CACHE_HOME/cpt}
-@item @samp{CPT_CHOICE}
-@tab If this is set to 0, a package installation will be aborted on conflicts.
-@item @samp{CPT_COMPRESS}
-@tab Program used to compress package tarballs.
-@item @samp{CPT_DEBUG}
-@tab If set to 1, temporary directories will not be removed after the operation.
-@item @samp{CPT_FETCH}
-@tab If set to 0, @samp{cpt-update} will not fetch repositories.
-@item @samp{CPT_FORCE}
-@tab Force operation.
-@item @samp{CPT_HOOK}
-@tab Location for the hook file.
-@item @samp{CPT_KEEPLOG}
-@tab If set to 1, cpt will keep logs regardless of operation success.
-@item @samp{CPT_PID}
-@tab Set the temporary build directory name.
-@item @samp{CPT_PROMPT}
-@tab If set to 0, @samp{cpt} will not prompt you for anything.
-@item @samp{CPT_ROOT}
-@tab If this variable is set, @samp{cpt} will assume this as the system root.
-@item @samp{CPT_TEST}
-@tab If set to 1, @samp{cpt-build} will run tests whenever available.
-@item @samp{CPT_TMPDIR}
-@tab The directory to create the temporary directories.
-@end multitable
+@table @asis
+@item @code{CPT_PATH}
+Set the locations of your repositories. It is similar to the @code{PATH} variable.
+@item @code{CPT_CACHE} 
+The cache directory for @samp{cpt}. Default: @code{$XDG_CACHE_HOME/cpt}.
+@item @code{CPT_CHOICE}
+If this is set to 0, a package installation will be aborted on conflicts.
+@item @code{CPT_COLOR}
+If this is set to 1, @samp{cpt} tools will be forced to display coloured output. If
+set to 0, they will be forced to display them without colours. Otherwise,
+@samp{cpt} will output colour as long as it is outputting to a terminal.
+@item @code{CPT_DEBUG}
+If set to 1, temporary directories will not be removed after the operation.
+@item @code{CPT_FETCH}
+If set to 0, @code{cpt-update} will not fetch repositories.
+@item @code{CPT_FORCE}
+If set to 1, @samp{cpt} tools will force operation.
+@item @code{CPT_HOOK}
+Absolute path to the package manager hook file.
+@item @code{CPT_KEEPLOG}
+If set to 1, @samp{cpt} will keep logs regardless of operation success.
+@item @code{CPT_PID}
+Set the temporary build directory name.
+@item @code{CPT_PROMPT}
+If set to 0, @samp{cpt} will not prompt you for anything.
+@item @code{CPT_ROOT}
+If this variable is set, @samp{cpt} will assume the given path as the system root.
+@item @code{CPT_TEST}
+If set to 1, @code{cpt-build} will run tests whenever available.
+@item @code{CPT_TMPDIR}
+The directory to create the temporary directories.
+@end table
 
 @menu
 * @samp{CPT_PATH}::              Set the locations of your repositories
@@ -430,7 +304,7 @@ alter the behaviour of @samp{cpt}:
 @end menu
 
 @node @samp{CPT_PATH}
-@section @samp{CPT_PATH}
+@subsection @samp{CPT_PATH}
 
 Similar to the @samp{PATH} variable, @samp{cpt} find repositories from the @samp{CPT_PATH}
 variable. Here is an example:
@@ -449,13 +323,10 @@ CPT_PATH=$HOME/repos/overrides:/var/db/cpt/repo/core:/var/db/cpt/repo/extra:$HOM
 
 This example brings us to the next section of this document.
 
-@menu
-* Repository preferences::       Prioritise package repositories
-* Setting the @samp{CPT_PATH}::  Set the value of CPT_PATH on your shell configuration
-@end menu
+@enumerate
+@item
+Repository preferences
 
-@node Repository preferences
-@subsection Repository preferences
 
 When you are using multiple repositories from multiple vendors, you will find
 out that some repositories have the same packages. @samp{cpt} doesn't care about
@@ -470,8 +341,9 @@ personal repository is listed before the @samp{extra} repository.
 CPT_PATH=$HOME/repos/personal:$HOME/repos/carbs/extra
 @end example
 
-@node Setting the @samp{CPT_PATH}
-@subsection Setting the @samp{CPT_PATH}
+@item
+Setting the @samp{CPT_PATH}
+
 
 You can set the @samp{CPT_PATH} variable on your shell configuration or your
 @samp{.profile} file in a way that is easy to read.
@@ -487,9 +359,10 @@ CPT_PATH=$CPT_PATH:$HOME/repos/carbs/xorg
 CPT_PATH=$CPT_PATH:$HOME/repos/personal
 export CPT_PATH
 @end example
+@end enumerate
 
 @node @samp{CPT_COMPRESS}
-@section @samp{CPT_COMPRESS}
+@subsection @samp{CPT_COMPRESS}
 
 When setting the @samp{CPT_COMPRESS} value, you should set the name of the default
 suffixes for the program. Available values are:
@@ -503,12 +376,14 @@ suffixes for the program. Available values are:
 @samp{bz2}
 @item
 @samp{xz}
+@item
+@samp{lz}
 @end itemize
 
 Defaults to @samp{gz}.
 
 @node @samp{CPT_FORCE}
-@section @samp{CPT_FORCE}
+@subsection @samp{CPT_FORCE}
 
 If this is set to 1, some of the @samp{cpt} tools will continue regardless of
 errors or skip certain checks. Here are some examples:
@@ -526,7 +401,7 @@ depend on the current package.
 Defaults to 0.
 
 @node @samp{CPT_PID}
-@section @samp{CPT_PID}
+@subsection @samp{CPT_PID}
 
 If this variable is set, the temporary files will be created with this variable
 as the suffix, instead of the PID of the @samp{cpt} process. The advantage is that
@@ -542,7 +417,7 @@ By running the above, you will know that the created build directories will end
 with the @samp{*-mesa} suffix.
 
 @node Hooks
-@chapter Hooks
+@section Hooks
 
 Hooks can be used in order to change the runtime behaviour of the package manager.
 There are a variety of package hooks, mostly self explanatory:
@@ -591,12 +466,8 @@ The hook is given 3 variables when it is executed. Those are:
 @tab The destination of the operation. Can be null.
 @end multitable
 
-@menu
-* Editing the @samp{build} file during pre-build:: Modify a package build with your hooks
-@end menu
-
-@node Editing the @samp{build} file during pre-build
-@section Editing the @samp{build} file during pre-build
+@node Editing the build file during pre-build
+@section Editing the build file during pre-build
 
 You can edit the @samp{build} file during pre-build. The file is copied from the
 repository to the build directory named as @samp{.build.cpt}. You can use @samp{sed} or
@@ -631,45 +502,28 @@ EOF
 @node Packaging System
 @chapter Packaging System
 
-A package is formed of several files, these are:
+A package is formed of several files, from these files, only @code{build},
+@code{checksums}, and @code{version} files are mandatory.
 
-@itemize
-@item
-@ref{@samp{build}}
-@item
-@ref{@samp{sources}}
-@item
-@ref{@samp{checksums}}
-@item
-@ref{@samp{version}}
-@item
-@ref{@samp{depends}}
-@item
-@ref{@samp{post-install}}
-@item
-@ref{@samp{message}}
-@item
-@ref{@samp{test}}
-@end itemize
-
-Any other file can be added to the package directory at the discretion of the
-package maintainer. Everything in the package directory will also be added to the
-package database that is located on @samp{/var/db/cpt/installed}. These can be
-patches, configuration files, etc.
+This section talks about files that are interpreted specially by the package
+manager. Any other file can be added to the package directory at the discretion
+of the package maintainer. Everything in the package directory will also be
+added to the package database that is located on @samp{/var/db/cpt/installed}. These
+can be patches, configuration files, etc.
 
 @menu
-* @samp{build}::                 The build script
-* @samp{sources}::               The file containing package sources
-* @samp{checksums}::             The file containing sha256sum of the sources
-* @samp{version}::               The file containing the version and the release numbers of a package
-* @samp{depends}::               The file containing the dependencies of a package
-* @samp{post-install}::          The post-installation script
-* @samp{message}::               The post-installation message to be displayed
-* @samp{test}::                  The test script for a package
+* build::                        The build script
+* sources::                      The file containing package sources
+* checksums::                    The file containing sha256sum of the sources
+* version::                      The file containing the version and the release numbers of a package
+* depends::                      The file containing the dependencies of a package
+* post-install::                 The post-installation script
+* message::                      The post-installation message to be displayed
+* test::                         The test script for a package
 @end menu
 
-@node @samp{build}
-@section @samp{build}
+@node build
+@section build
 
 Typically @samp{build} files are shell scripts that run commands to prepare the source
 code to be installed on the target system. Even though we will be assuming that
@@ -694,8 +548,8 @@ Package version
 System architecture
 @end itemize
 
-@node @samp{sources}
-@section @samp{sources}
+@node sources
+@section sources
 
 @samp{sources} file is a list of files and sources that will be put to the build
 directory during the build process. Those can be remote sources (such as tarballs),
@@ -735,16 +589,16 @@ will checkout the commit named "1a314s87"
 Other files are assumed to be residing in the package directory. They should be
 added with their paths relative to the package directory.
 
-@node @samp{checksums}
-@section @samp{checksums}
+@node checksums
+@section checksums
 
-checksums file is generated by the @samp{cpt c pkg} command. It is generated
+@samp{checksums} file is generated by the @code{cpt c pkg} command. It is generated
 according to the order of the sources file. That's why you shouldn't be editing
 it manually. The checksums file is created with the digests of the files using
 the sha256 algorithm.
 
-@node @samp{version}
-@section @samp{version}
+@node version
+@section version
 
 The version file includes the version of the software and the release number of
 of the package on a space seperated format. The contents of the file should look
@@ -754,8 +608,8 @@ like below.
 1.3.2 1
 @end example
 
-@node @samp{depends}
-@section @samp{depends}
+@node depends
+@section depends
 
 This is a list of dependencies that must be installed before a package build. You
 can append "make" after a dependency to mark a package is only required during
@@ -771,21 +625,21 @@ python        test
 zlib
 @end example
 
-@node @samp{post-install}
-@section @samp{post-install}
+@node post-install
+@section post-install
 
 @samp{post-install} files have the same requirements as the build script. They
 will be run after the package is installed as root (or as the user if the user
 has write permissions on @samp{CPT_ROOT}).
 
-@node @samp{message}
-@section @samp{message}
+@node message
+@section message
 
 This plaintext file will be outputted with @samp{cat} after every package is
 installed.
 
-@node @samp{test}
-@section @samp{test}
+@node test
+@section test
 
 Test files are mainly for the repository maintainer to test the packages, and
 will only run if the user has the @samp{CPT_TEST} variable set, or the build is
@@ -893,6 +747,49 @@ Create a service file at @samp{/etc/sv/rsync/run} (runit):
 exec rsync --daemon --no-detach
 @end example
 
+@node Comparison Between CPT and KISS
+@chapter Comparison Between CPT and KISS
+
+Lots of things have changed since @code{cpt} was forked from @code{kiss} in terms of
+functionalities and ideals. This section aims to describe the similarities and
+differences of both package managers as neutral as possible. Keep in mind that
+this is the @code{cpt} documentation, so it may be biased regardless.
+
+@table @asis
+@item Package Manager
+While @code{kiss} aims to be a simple single file package manager, @code{cpt} aims to be
+an extendable package manager library. @code{kiss} has all of its features
+built-in, while @code{cpt} has all of its features separated into small tools.
+These tools can be called from the main @code{cpt} tool (in order to keep
+@code{kiss}-like usage) or with their names directly (e.g @code{cpt-build}).
+
+@item Configuration
+Neither @code{kiss} nor @code{cpt} use configuration files. Instead, they are configured
+through environment variables. Additionally, all @code{cpt} tools can receive flags
+that alter their functionality. @code{kiss} does not accept flags.
+
+@item Package Repositories
+In addition to git repositories, @code{cpt} also makes use of @ref{Rsync Repositories, , rsync repositories}.
+
+@item Package Sources
+In addition to git repositories for sources, @code{cpt} also supports mercurial
+repositories.
+
+@item Post-Installation Messages
+@code{kiss} and @code{cpt} interact with @samp{post-install} messages differently. @code{kiss}
+does not differentiate between post-installation scripts and post-installation
+messages, and will save the output of all scripts named @samp{post-install} to be
+printed after the installation of all packages are complete. @code{cpt} on the
+other hand, separates these with the @samp{message} file. @code{cpt} runs @samp{post-install}
+without saving the output to be printed a second time. It instead prints all
+@samp{message} files after the installation is over.
+
+@item Portability
+@code{kiss} aims to be as portable as possible. @code{cpt} aims to be portable, but
+favours performance. @code{cpt} depends on @code{rsync} for package installation, while
+@code{kiss} has removed the dependency in favour of portability.
+@end table
+
 @node CPT Library
 @chapter CPT Library
 
@@ -928,8 +825,8 @@ variables that are used inside the package manager.
 @section Option parsing
 
 @samp{cpt-lib} includes a POSIX-shell option parser inside named @samp{getoptions}. You
-can see its own @uref{https://github.com/ko1nksm/getoptions/blob/v2.0.1/README.md, documentation} for writing an option parser. The built-in version
-of the @samp{getoptions} library is 2.0.1 and there are no plans for updating it
+can see its own @uref{https://github.com/ko1nksm/getoptions/blob/v2.5.0/README.md, documentation} for writing an option parser. The built-in version
+of the @samp{getoptions} library is 2.5.0 and there are no plans for updating it
 apart from bug fixes.
 
 @menu
@@ -953,8 +850,8 @@ inside. Here is the proper way of doing it.
 
 parser_definition() @{
     # The rest arguments MUST be defined as 'REST'
-    setup REST help:usage -- "usage: $@{0##*/@} [options] [pkg...]"
-    msg                   -- '' 'Options:'
+    setup REST help:usage                  -- "usage: $@{0##*/@} [options] [pkg...]"
+    msg                                    -- '' 'Options:'
     flag CPT_TEST -t export:1 init:@@export -- "Enable tests"
 
     global_options
@@ -969,24 +866,24 @@ parser_definition() @{
 The @samp{global_options()} function is a simple convenience call to include flags
 that can be used inside most @samp{cpt} tools. It defines the following flags:
 
-@multitable {aaaa} {aaaaaaaaaaa} {aaaaaaaaaaaa}
+@multitable {aaaa} {aaaaaaaaaaaaa} {aaaaaaaaaaaa}
 @headitem Flag
 @tab Long Option
 @tab Calls
-@item -f
-@tab --force
+@item @code{-f}
+@tab @code{--force}
 @tab @samp{CPT_FORCE}
-@item -y
-@tab --no-prompt
+@item @code{-y}
+@tab @code{--no-prompt}
 @tab @samp{CPT_PROMPT}
 @item 
-@tab --root
+@tab @code{--root}
 @tab @samp{CPT_ROOT}
-@item -h
-@tab --help
+@item @code{-h}
+@tab @code{--help}
 @tab @samp{usage()}
-@item -v
-@tab --version
+@item @code{-v}
+@tab @code{--version}
 @tab @samp{version()}
 @end multitable
 
@@ -1165,7 +1062,7 @@ This function was taken from @uref{https://github.com/ko1nksm/readlinkf, POSIX s
 symbolic links until it reaches the actual file.
 
 @node System Functions
-@section @strong{TODO} System Functions
+@section System Functions
 
 @itemize
 @item
@@ -1196,7 +1093,7 @@ following order:
 @end enumerate
 
 @node Package Functions
-@section @strong{TODO} Package Functions
+@section Package Functions
 
 Obviously, package functions are the most important ones for @samp{cpt-lib}, those
 are the ones you will use to build, to query, to manipulate, or to otherwise
@@ -1207,6 +1104,7 @@ interact with packages.
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
 * @samp{pkg_find()}::            Query package locations
+* @samp{pkg_get_base()}::
 * @samp{pkg_gentree}::           Generate a dependency tree for the given package
 @end menu
 
@@ -1243,7 +1141,7 @@ specification. This function @strong{does not return with failure, it exits outr
 if it fails.
 
 @node @samp{pkg_find()}
-@subsection @strong{TODO} @samp{pkg_find()}
+@subsection @samp{pkg_find()}
 
 @samp{pkg_find()} is the tool for searching packages. It accepts up to 3 arguments.
 
@@ -1264,8 +1162,13 @@ this argument is given, it defaults to @samp{-d}, which tests for directories.
 pkg_find cpt
 @end example
 
+@node @samp{pkg_get_base()}
+@subsection @samp{pkg_get_base()}
+
+This function returns the base packages as defined in @samp{/etc/cpt-base}.
+
 @node @samp{pkg_gentree}
-@subsection @strong{TODO} @samp{pkg_gentree}
+@subsection @samp{pkg_gentree}
 
 Keep in mind /etc/cpt-base
 
