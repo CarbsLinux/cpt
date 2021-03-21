@@ -2,10 +2,12 @@
 # List installed packages
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [-c] [pkg...]"
+    setup REST help:usage -- \
+        "usage: ${0##*/} [-c] [pkg...]" \
+        "or:    ${0##*/} -C pkg true-statement false-statement"
     msg -- '' 'Options:'
     flag CURRENT -c --current -- "Use the current directory as a package"
-    param PKG --check label:"    --check PKG TRUE FALSE" -- \
+    param PKG    -C --check label:"    -C,--check PKG TRUE FALSE" -- \
           "Check if PKG exists and return the string of TRUE if"\
           "it exists, and the string of FALSE if it doesn't." \
           "Useful for optional packaging."
