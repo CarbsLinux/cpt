@@ -16,9 +16,12 @@ src/cpt-lib: src/cpt-lib.in
 		-e "s|@DOCSTRING@|Call functions from the library|g" < src/cpt-lib.in > $@
 	chmod 755 $@
 
-test: all
+test: all tests/etc/cpt-hook
 	shellspec
 	cd src; find . ../contrib -name 'cpt*' ! -name '*.*' -exec shellcheck -e 2119 -x -f gcc {} +
+
+tests/etc/cpt-hook:
+	ln -s ../hook-file $@
 
 dist: docs/cpt.info
 	mkdir "cpt-${VERSION}"
@@ -46,5 +49,6 @@ uninstall:
 clean:
 	test "${DOCS}" != yes || ${MAKE} -C docs clean
 	rm -rf src/cpt-lib "cpt-${VERSION}.tar.xz" coverage report
+	rm -f tests/etc/cpt-hook
 
 .PHONY: all dist clean install uninstall

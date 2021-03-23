@@ -1,4 +1,5 @@
 src/cpt-lib
+tests/etc/cpt-hook
 
 *#*#
 *~
