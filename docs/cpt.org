@@ -910,21 +910,26 @@ This function was taken from [[https://github.com/ko1nksm/readlinkf][POSIX sh re
 symbolic links until it reaches the actual file.
 
 ** TODO System Functions
-- [ ] Add description
+:PROPERTIES:
+:DESCRIPTION: Functions to manipulate your system
+:END:
 *** =as_root()=
 :PROPERTIES:
 :DESCRIPTION: Run a command as the root user
 :END:
 
-=as_root()= calls the rest of the arguments as a different user. Unless a =user=
+=as_root()= calls the rest of the arguments as a different user. Unless a ~$user~
 environment variable is set, it will call the following arguments as the root
 user. It supports the following programs for privilege escalation with the
 following order:
 
-1. =sls=
+1. =ssu=
 2. =sudo=
 3. =doas=
 4. =su=
+
+The program called for this operation can be overridden using the ~$CPT_SU~
+variable.
 
 ** TODO Package Functions
 :PROPERTIES:
@@ -973,23 +978,35 @@ This function checks whether a given package fits the proper package
 specification. This function *does not return with failure, it exits outright*
 if it fails.
 
-*** TODO =pkg_find()=
+*** =pkg_find()=
 :PROPERTIES:
 :DESCRIPTION: Query package locations
 :END:
 
 =pkg_find()= is the tool for searching packages. It accepts up to 3 arguments.
 
-- $1: Query :: This is the only mandatory argument. It accepts globbing, meaning
-  that shell wildcards can be used in the query.
-- $2: Match :: If this exists =pkg_find()= will print every single match found
-  in the search path. If it doesn't, =pkg_find()= will print the first match and
-  exit.
-- $3: Type :: This is the argument to be passed to the =test= function. Unless
-  this argument is given, it defaults to =-d=, which tests for directories.
+- $1: Query ::
+  This is the only mandatory argument. It accepts globbing, meaning that shell
+  wildcards can be used in the query.
+- $2: Match ::
+  If this exists =pkg_find()= will print every single match found in the search
+  path. If it doesn't, =pkg_find()= will print the first match and exit.
+- $3: Type ::
+  This is the argument to be passed to the =test= function. Unless this argument
+  is given, it defaults to =-d=, which tests for directories.
 
 #+begin_src sh
+# Returns the first match of cpt
 pkg_find cpt
+
+# Returns all matches of cpt
+pkg_find cpt all
+
+# Returns all globbed matches for cpt* (e.g. cpt and cpt-extra)
+pkg_find 'cpt*' all
+
+# Returns all matching cpt-* executables on user's PATH
+SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
 #+end_src
 
 *** TODO =pkg_get_base()=

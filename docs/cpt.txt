@@ -982,21 +982,21 @@ development manual for *Carbs Packaging Tools*. For development logs see
 8.6 System Functions
 ~~~~~~~~~~~~~~~~~~~~
 
-  - [ ] Add description
-
-
 8.6.1 `as_root()'
 -----------------
 
   `as_root()' calls the rest of the arguments as a different
-  user. Unless a `user' environment variable is set, it will call the
+  user. Unless a `$user' environment variable is set, it will call the
   following arguments as the root user. It supports the following
   programs for privilege escalation with the following order:
 
-  1. `sls'
+  1. `ssu'
   2. `sudo'
   3. `doas'
   4. `su'
+
+  The program called for this operation can be overridden using the
+  `$CPT_SU' variable.
 
 
 8.7 Package Functions
@@ -1063,7 +1063,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
         directories.
 
   ,----
+  | # Returns the first match of cpt
   | pkg_find cpt
+  | 
+  | # Returns all matches of cpt
+  | pkg_find cpt all
+  | 
+  | # Returns all globbed matches for cpt* (e.g. cpt and cpt-extra)
+  | pkg_find 'cpt*' all
+  | 
+  | # Returns all matching cpt-* executables on user's PATH
+  | SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
   `----
 
 

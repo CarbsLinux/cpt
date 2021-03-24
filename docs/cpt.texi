@@ -92,7 +92,7 @@ CPT Library
 * Message functions::            Communicate to users
 * Text functions::               Manipulate or check text
 * Portability functions::        Functions to replace non-POSIX commands
-* System Functions::
+* System Functions::             Functions to manipulate your system
 * Package Functions::            Manipulate, or query anything related to packages
 
 Option parsing
@@ -803,7 +803,7 @@ package manager library.
 * Message functions::            Communicate to users
 * Text functions::               Manipulate or check text
 * Portability functions::        Functions to replace non-POSIX commands
-* System Functions::
+* System Functions::             Functions to manipulate your system
 * Package Functions::            Manipulate, or query anything related to packages
 @end menu
 
@@ -1064,11 +1064,6 @@ symbolic links until it reaches the actual file.
 @node System Functions
 @section System Functions
 
-@itemize
-@item
-Add description
-@end itemize
-
 @menu
 * @samp{as_root()}::             Run a command as the root user
 @end menu
@@ -1076,14 +1071,14 @@ Add description
 @node @samp{as_root()}
 @subsection @samp{as_root()}
 
-@samp{as_root()} calls the rest of the arguments as a different user. Unless a @samp{user}
+@samp{as_root()} calls the rest of the arguments as a different user. Unless a @code{$user}
 environment variable is set, it will call the following arguments as the root
 user. It supports the following programs for privilege escalation with the
 following order:
 
 @enumerate
 @item
-@samp{sls}
+@samp{ssu}
 @item
 @samp{sudo}
 @item
@@ -1091,6 +1086,9 @@ following order:
 @item
 @samp{su}
 @end enumerate
+
+The program called for this operation can be overridden using the @code{$CPT_SU}
+variable.
 
 @node Package Functions
 @section Package Functions
@@ -1147,19 +1145,28 @@ if it fails.
 
 @table @asis
 @item $1: Query
-This is the only mandatory argument. It accepts globbing, meaning
-that shell wildcards can be used in the query.
+This is the only mandatory argument. It accepts globbing, meaning that shell
+wildcards can be used in the query.
 @item $2: Match
-If this exists @samp{pkg_find()} will print every single match found
-in the search path. If it doesn't, @samp{pkg_find()} will print the first match and
-exit.
+If this exists @samp{pkg_find()} will print every single match found in the search
+path. If it doesn't, @samp{pkg_find()} will print the first match and exit.
 @item $3: Type
-This is the argument to be passed to the @samp{test} function. Unless
-this argument is given, it defaults to @samp{-d}, which tests for directories.
+This is the argument to be passed to the @samp{test} function. Unless this argument
+is given, it defaults to @samp{-d}, which tests for directories.
 @end table
 
 @example
+# Returns the first match of cpt
 pkg_find cpt
+
+# Returns all matches of cpt
+pkg_find cpt all
+
+# Returns all globbed matches for cpt* (e.g. cpt and cpt-extra)
+pkg_find 'cpt*' all
+
+# Returns all matching cpt-* executables on user's PATH
+SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
 @end example
 
 @node @samp{pkg_get_base()}
