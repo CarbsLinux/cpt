@@ -470,12 +470,11 @@ decompress() {
 }
 
 sh256() {
-    # This is a sha256sum function for outputting a standard
-    # hash digest. sha256 on BSD systems require an '-r' flag
-    # for outputting the same way with sha256sum, and still,
-    # it outputs a single space between the hash and the file
-    # whereas sha256sum outputs double spaces. It fallbacks to
-    # openssl, but that is rarely ever needed.
+    # This is a sha256sum function for outputting a standard hash digest. sha256
+    # on BSD systems require an '-r' flag for outputting the same way with
+    # sha256sum, and still, it outputs a single space between the hash and the
+    # file whereas sha256sum outputs double spaces. It fallbacks to openssl, but
+    # that is rarely ever needed.
     { sha256sum "$1" 2>/dev/null   ||
       sha256 -r "$1" 2>/dev/null   ||
       openssl dgst -r -sha256 "$1" ||
