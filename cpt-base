@@ -2,6 +2,9 @@
 # package names in order to redefine the base. This file will be used by
 # cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
 # of the tools will assume that there is no defined base, so use with caution.
+#
+# This file is not the actual file used for Carbs Linux, so do not expect it
+# to be updated, this serves as an example.
 baselayout
 binutils
 byacc
