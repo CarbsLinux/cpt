@@ -364,18 +364,30 @@ development manual for *Carbs Packaging Tools*. For development logs see
   package manager.  There are a variety of package hooks, mostly self
   explanatory:
 
-  - pre-build
-  - post-build
-  - build-fail
-  - pre-test
-  - test-fail
-  - pre-install
-  - post-install
-  - pre-remove
-  - post-remove
-  - pre-fetch
-  - post-fetch
-  - post-package
+  pre-build   
+        Run just before the `build' script is run
+  post-build  
+        Run after the `build' script is run successfully
+  build-fail  
+        Run if the `build' script fails
+  pre-test    
+        Run before the `test' script is run
+  test-fail   
+        Run if the `test' script fails
+  pre-install 
+        Run before a package is installed for each package
+  post-install
+        Run after a package is installed for each package
+  pre-remove  
+        Run before a package is removed for each package
+  post-remove 
+        Run after a package is removed for each package
+  pre-fetch   
+        Run before all repositories are fetched
+  post-fetch  
+        Run after all repositories are fetched
+  post-package
+        Run after a tarball for a package is created
 
   In order to use hooks, you will need to set the `CPT_HOOK' variable
   pointing to your hook file. Your hook file *MUST* be a POSIX shell
@@ -383,11 +395,12 @@ development manual for *Carbs Packaging Tools*. For development logs see
 
   The hook is given 3 variables when it is executed. Those are:
 
-   Variable  Explanation                                                  
-  ------------------------------------------------------------------------
-   `$TYPE'   The type of the hook, (`pre-build', `post-build', etc.)      
-   `$PKG'    The package that `cpt' is currently working on. Can be null. 
-   `$DEST'   The destination of the operation. Can be null.               
+  `$TYPE'
+        The type of the hook, (`pre-build', `post-build', etc.)
+  `$PKG' 
+        The package that `cpt' is currently working on. Can be null.
+  `$DEST'
+        The destination of the operation. Can be null.
 
 
 4.4 Editing the build file during pre-build

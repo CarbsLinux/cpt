@@ -422,32 +422,32 @@ with the @samp{*-mesa} suffix.
 Hooks can be used in order to change the runtime behaviour of the package manager.
 There are a variety of package hooks, mostly self explanatory:
 
-@itemize
-@item
-pre-build
-@item
-post-build
-@item
-build-fail
-@item
-pre-test
-@item
-test-fail
-@item
-pre-install
-@item
-post-install
-@item
-pre-remove
-@item
-post-remove
-@item
-pre-fetch
-@item
-post-fetch
-@item
-post-package
-@end itemize
+@table @asis
+@item pre-build   
+Run just before the @code{build} script is run
+@item post-build  
+Run after the @code{build} script is run successfully
+@item build-fail  
+Run if the @code{build} script fails
+@item pre-test    
+Run before the @code{test} script is run
+@item test-fail   
+Run if the @code{test} script fails
+@item pre-install 
+Run before a package is installed for each package
+@item post-install
+Run after a package is installed for each package
+@item pre-remove  
+Run before a package is removed for each package
+@item post-remove 
+Run after a package is removed for each package
+@item pre-fetch   
+Run before all repositories are fetched
+@item post-fetch  
+Run after all repositories are fetched
+@item post-package
+Run after a tarball for a package is created
+@end table
 
 In order to use hooks, you will need to set the @samp{CPT_HOOK} variable pointing to
 your hook file. Your hook file @strong{MUST} be a POSIX shell script as its contents
@@ -455,16 +455,14 @@ are sourced by the package manager.
 
 The hook is given 3 variables when it is executed. Those are:
 
-@multitable {aaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
-@headitem Variable
-@tab Explanation
-@item @samp{$TYPE}
-@tab The type of the hook, (@samp{pre-build}, @samp{post-build}, etc.)
-@item @samp{$PKG}
-@tab The package that @samp{cpt} is currently working on. Can be null.
-@item @samp{$DEST}
-@tab The destination of the operation. Can be null.
-@end multitable
+@table @asis
+@item @code{$TYPE}
+The type of the hook, (@samp{pre-build}, @samp{post-build}, etc.)
+@item @code{$PKG} 
+The package that @samp{cpt} is currently working on. Can be null.
+@item @code{$DEST}
+The destination of the operation. Can be null.
+@end table
 
 @node Editing the build file during pre-build
 @section Editing the build file during pre-build
