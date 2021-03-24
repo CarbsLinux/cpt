@@ -127,6 +127,7 @@ System Functions
 
 Package Functions
 
+* @samp{pkg_build()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
@@ -1096,6 +1097,7 @@ are the ones you will use to build, to query, to manipulate, or to otherwise
 interact with packages.
 
 @menu
+* @samp{pkg_build()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
@@ -1103,6 +1105,22 @@ interact with packages.
 * @samp{pkg_get_base()}::
 * @samp{pkg_gentree}::           Generate a dependency tree for the given package
 @end menu
+
+@node @samp{pkg_build()}
+@subsection @samp{pkg_build()}
+
+This function builds all given packages. It resolves dependencies for the given
+packages, lints the package, extracts its sources and runs the @code{build} script.
+
+@example
+# Example
+
+# Create the cache directories first, this is where the package will be built.
+create_cache
+
+# Build the package(s) you want to build.
+pkg_build cpt
+@end example
 
 @node @samp{pkg_owner()}
 @subsection @samp{pkg_owner()}

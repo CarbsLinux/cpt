@@ -57,12 +57,13 @@ _________________
 .. 6. System Functions
 ..... 1. `as_root()'
 .. 7. Package Functions
-..... 1. `pkg_owner()'
-..... 2. `pkg_isbuilt()'
-..... 3. `pkg_lint()'
-..... 4. `pkg_find()'
-..... 5. `pkg_get_base()'
-..... 6. `pkg_gentree'
+..... 1. `pkg_build()'
+..... 2. `pkg_owner()'
+..... 3. `pkg_isbuilt()'
+..... 4. `pkg_lint()'
+..... 5. `pkg_find()'
+..... 6. `pkg_get_base()'
+..... 7. `pkg_gentree'
 
 
 This is a reference document containing both the user-guide and the
@@ -1020,7 +1021,25 @@ development manual for *Carbs Packaging Tools*. For development logs see
   manipulate, or to otherwise interact with packages.
 
 
-8.7.1 `pkg_owner()'
+8.7.1 `pkg_build()'
+-------------------
+
+  This function builds all given packages. It resolves dependencies for
+  the given packages, lints the package, extracts its sources and runs
+  the `build' script.
+
+  ,----
+  | # Example
+  | 
+  | # Create the cache directories first, this is where the package will be built.
+  | create_cache
+  | 
+  | # Build the package(s) you want to build.
+  | pkg_build cpt
+  `----
+
+
+8.7.2 `pkg_owner()'
 -------------------
 
   This function can be used to determine the owner of a package. The
@@ -1041,7 +1060,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.2 `pkg_isbuilt()'
+8.7.3 `pkg_isbuilt()'
 ---------------------
 
   This function returns with success when the given package has a built
@@ -1049,7 +1068,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   repository.
 
 
-8.7.3 `pkg_lint()'
+8.7.4 `pkg_lint()'
 ------------------
 
   This function checks whether a given package fits the proper package
@@ -1057,7 +1076,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   outright* if it fails.
 
 
-8.7.4 `pkg_find()'
+8.7.5 `pkg_find()'
 ------------------
 
   `pkg_find()' is the tool for searching packages. It accepts up to 3
@@ -1090,13 +1109,13 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.5 `pkg_get_base()'
+8.7.6 `pkg_get_base()'
 ----------------------
 
   This function returns the base packages as defined in `/etc/cpt-base'.
 
 
-8.7.6 `pkg_gentree'
+8.7.7 `pkg_gentree'
 -------------------
 
   Keep in mind /etc/cpt-base

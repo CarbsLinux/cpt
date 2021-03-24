@@ -941,6 +941,21 @@ Obviously, package functions are the most important ones for =cpt-lib=, those
 are the ones you will use to build, to query, to manipulate, or to otherwise
 interact with packages.
 
+*** =pkg_build()=
+
+This function builds all given packages. It resolves dependencies for the given
+packages, lints the package, extracts its sources and runs the ~build~ script.
+
+#+begin_src sh
+# Example
+
+# Create the cache directories first, this is where the package will be built.
+create_cache
+
+# Build the package(s) you want to build.
+pkg_build cpt
+#+end_src
+
 *** =pkg_owner()=
 :PROPERTIES:
 :DESCRIPTION: Check which package owns the given file
