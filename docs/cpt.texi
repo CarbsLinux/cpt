@@ -77,6 +77,7 @@ Packaging System
 * checksums::                    The file containing sha256sum of the sources
 * version::                      The file containing the version and the release numbers of a package
 * depends::                      The file containing the dependencies of a package
+* meta::
 * post-install::                 The post-installation script
 * message::                      The post-installation message to be displayed
 * test::                         The test script for a package
@@ -128,12 +129,14 @@ System Functions
 Package Functions
 
 * @samp{pkg_build()}::
+* @samp{pkg_depends()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
 * @samp{pkg_find()}::            Query package locations
-* @samp{pkg_get_base()}::
-* @samp{pkg_gentree}::           Generate a dependency tree for the given package
+* @samp{pkg_get_base()}::        List system base packages
+* @samp{pkg_gentree()}::         Generate a dependency tree for the given package
+* @samp{pkg_query_meta()}::
 
 @end detailmenu
 @end menu
@@ -516,6 +519,7 @@ can be patches, configuration files, etc.
 * checksums::                    The file containing sha256sum of the sources
 * version::                      The file containing the version and the release numbers of a package
 * depends::                      The file containing the dependencies of a package
+* meta::
 * post-install::                 The post-installation script
 * message::                      The post-installation message to be displayed
 * test::                         The test script for a package
@@ -622,6 +626,21 @@ the following @samp{depends} file:
 linux-headers make
 python        test
 zlib
+@end example
+
+@node meta
+@section meta
+
+@samp{meta} is a non-mandatory package file that can be used to provide information
+otherwise non-relevant to the functions of the package manager. This file can
+later be queried with the @ref{@samp{pkg_query_meta()}, , pkg@math{_query}@math{_meta}()} function. The file has a simple
+markup format, it must adhere to the @samp{KEY: VAL} format. An example for the @samp{cpt}
+package would be as follows:
+
+@example
+description: Carbs Packaging Tools
+license: MIT
+maintainer: Linux User <linux-user@@example.com>
 @end example
 
 @node post-install
@@ -1098,12 +1117,14 @@ interact with packages.
 
 @menu
 * @samp{pkg_build()}::
+* @samp{pkg_depends()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
 * @samp{pkg_find()}::            Query package locations
-* @samp{pkg_get_base()}::
-* @samp{pkg_gentree}::           Generate a dependency tree for the given package
+* @samp{pkg_get_base()}::        List system base packages
+* @samp{pkg_gentree()}::         Generate a dependency tree for the given package
+* @samp{pkg_query_meta()}::
 @end menu
 
 @node @samp{pkg_build()}
@@ -1121,6 +1142,9 @@ create_cache
 # Build the package(s) you want to build.
 pkg_build cpt
 @end example
+
+@node @samp{pkg_depends()}
+@subsection @samp{pkg_depends()}
 
 @node @samp{pkg_owner()}
 @subsection @samp{pkg_owner()}
@@ -1188,11 +1212,72 @@ SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
 @node @samp{pkg_get_base()}
 @subsection @samp{pkg_get_base()}
 
-This function returns the base packages as defined in @samp{/etc/cpt-base}.
+This function returns the base packages as defined in @samp{/etc/cpt-base}. If an
+optional argument is present, it will print all package names in a single line.
+If it is not given any arguments, it will return one package per line. See @ref{CPT Base} for more information on base packages.
 
-@node @samp{pkg_gentree}
-@subsection @samp{pkg_gentree}
+@node @samp{pkg_gentree()}
+@subsection @samp{pkg_gentree()}
 
-Keep in mind /etc/cpt-base
+This function generates a dependency tree for the given package. The output and
+the dependency generation can be configured through a series of keys given as
+the second argument. Those keys are:
+
+@table @asis
+@item @samp{b}
+Include the base packages to the dependency tree.
+@item @samp{f}
+Include the given package itself to the generated tree.
+@item @samp{x}
+Do not include make dependencies of the package.
+@item @samp{r}
+Print the generated tree in reverse order.
+@item @samp{n}
+Print all packages in a single line instead of a package per line.
+@end table
+
+@enumerate
+@item
+Examples
+
+
+This example uses the @samp{cpt} package for Carbs Linux. The package itself is
+listed to depend on @samp{curl} and @samp{rsync}. Here is the output of calling the
+function for cpt directly:
+
+@example
+$ pkg_gentree cpt
+bearssl
+ca-certificates
+zlib
+curl
+rsync
+@end example
+
+The example above shows that even though @samp{cpt} itself only depends on @samp{curl} and
+@samp{rsync}, we also indirectly need @samp{zlib}, @samp{bearssl} (for @samp{curl}), and
+@samp{ca-certificates} (for @samp{bearssl}).
+
+@example
+# Print the dependency tree reverse sorted in a single line:
+$ pkg_gentree cpt rn
+rsync curl zlib ca-certificates bearssl
+@end example
+@end enumerate
+
+@node @samp{pkg_query_meta()}
+@subsection @samp{pkg_query_meta()}
+
+This function is used to query the @ref{meta, , meta file} inside package directories. It can
+be used to retrieve information on a package that is otherwise irrelevant to the
+package manager itself. It takes two arguments, first being the package and the
+second being the key to be retrieved. If the package does not have a @samp{meta}
+file or the file does not contain the requested key, the function will return
+with 1.
+
+@example
+$ pkg_query_meta cpt description
+Carbs Packaging Tools
+@end example
 
 @bye

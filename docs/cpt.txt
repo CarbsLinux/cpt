@@ -28,9 +28,10 @@ _________________
 .. 3. checksums
 .. 4. version
 .. 5. depends
-.. 6. post-install
-.. 7. message
-.. 8. test
+.. 6. meta
+.. 7. post-install
+.. 8. message
+.. 9. test
 6. Rsync Repositories
 .. 1. Setting up an Rsync repository
 7. Comparison Between CPT and KISS
@@ -58,12 +59,14 @@ _________________
 ..... 1. `as_root()'
 .. 7. Package Functions
 ..... 1. `pkg_build()'
-..... 2. `pkg_owner()'
-..... 3. `pkg_isbuilt()'
-..... 4. `pkg_lint()'
-..... 5. `pkg_find()'
-..... 6. `pkg_get_base()'
-..... 7. `pkg_gentree'
+..... 2. `pkg_depends()'
+..... 3. `pkg_owner()'
+..... 4. `pkg_isbuilt()'
+..... 5. `pkg_lint()'
+..... 6. `pkg_find()'
+..... 7. `pkg_get_base()'
+..... 8. `pkg_gentree()'
+..... 9. `pkg_query_meta()'
 
 
 This is a reference document containing both the user-guide and the
@@ -559,7 +562,27 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-5.6 post-install
+5.6 meta
+~~~~~~~~
+
+  `meta' is a non-mandatory package file that can be used to provide
+  information otherwise non-relevant to the functions of the package
+  manager. This file can later be queried with the [pkg_query_meta()]
+  function. The file has a simple markup format, it must adhere to the
+  `KEY: VAL' format. An example for the `cpt' package would be as
+  follows:
+
+  ,----
+  | description: Carbs Packaging Tools
+  | license: MIT
+  | maintainer: Linux User <linux-user@example.com>
+  `----
+
+
+[pkg_query_meta()] See section 8.7.9
+
+
+5.7 post-install
 ~~~~~~~~~~~~~~~~
 
   `post-install' files have the same requirements as the build
@@ -567,14 +590,14 @@ development manual for *Carbs Packaging Tools*. For development logs see
   the user if the user has write permissions on `CPT_ROOT').
 
 
-5.7 message
+5.8 message
 ~~~~~~~~~~~
 
   This plaintext file will be outputted with `cat' after every package
   is installed.
 
 
-5.8 test
+5.9 test
 ~~~~~~~~
 
   Test files are mainly for the repository maintainer to test the
@@ -1039,7 +1062,11 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.2 `pkg_owner()'
+8.7.2 `pkg_depends()'
+---------------------
+
+
+8.7.3 `pkg_owner()'
 -------------------
 
   This function can be used to determine the owner of a package. The
@@ -1060,7 +1087,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.3 `pkg_isbuilt()'
+8.7.4 `pkg_isbuilt()'
 ---------------------
 
   This function returns with success when the given package has a built
@@ -1068,7 +1095,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   repository.
 
 
-8.7.4 `pkg_lint()'
+8.7.5 `pkg_lint()'
 ------------------
 
   This function checks whether a given package fits the proper package
@@ -1076,7 +1103,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   outright* if it fails.
 
 
-8.7.5 `pkg_find()'
+8.7.6 `pkg_find()'
 ------------------
 
   `pkg_find()' is the tool for searching packages. It accepts up to 3
@@ -1109,13 +1136,76 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.6 `pkg_get_base()'
+8.7.7 `pkg_get_base()'
 ----------------------
 
-  This function returns the base packages as defined in `/etc/cpt-base'.
+  This function returns the base packages as defined in
+  `/etc/cpt-base'. If an optional argument is present, it will print all
+  package names in a single line.  If it is not given any arguments, it
+  will return one package per line. See 4.1 for more information on base
+  packages.
 
 
-8.7.7 `pkg_gentree'
--------------------
+8.7.8 `pkg_gentree()'
+---------------------
 
-  Keep in mind /etc/cpt-base
+  This function generates a dependency tree for the given package. The
+  output and the dependency generation can be configured through a
+  series of keys given as the second argument. Those keys are:
+
+  `b'
+        Include the base packages to the dependency tree.
+  `f'
+        Include the given package itself to the generated tree.
+  `x'
+        Do not include make dependencies of the package.
+  `r'
+        Print the generated tree in reverse order.
+  `n'
+        Print all packages in a single line instead of a package per
+        line.
+
+
+* 8.7.8.1 Examples
+
+  This example uses the `cpt' package for Carbs Linux. The package
+  itself is listed to depend on `curl' and `rsync'. Here is the output
+  of calling the function for cpt directly:
+
+  ,----
+  | $ pkg_gentree cpt
+  | bearssl
+  | ca-certificates
+  | zlib
+  | curl
+  | rsync
+  `----
+
+  The example above shows that even though `cpt' itself only depends on
+  `curl' and `rsync', we also indirectly need `zlib', `bearssl' (for
+  `curl'), and `ca-certificates' (for `bearssl').
+
+  ,----
+  | # Print the dependency tree reverse sorted in a single line:
+  | $ pkg_gentree cpt rn
+  | rsync curl zlib ca-certificates bearssl
+  `----
+
+
+8.7.9 `pkg_query_meta()'
+------------------------
+
+  This function is used to query the [meta file] inside package
+  directories. It can be used to retrieve information on a package that
+  is otherwise irrelevant to the package manager itself. It takes two
+  arguments, first being the package and the second being the key to be
+  retrieved. If the package does not have a `meta' file or the file does
+  not contain the requested key, the function will return with 1.
+
+  ,----
+  | $ pkg_query_meta cpt description
+  | Carbs Packaging Tools
+  `----
+
+
+[meta file] See section 5.6
