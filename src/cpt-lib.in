@@ -1893,7 +1893,7 @@ pkg_gentree() (
     deps='' reverse='' format='%s\n' make_deps=first
     for op in $(sepchar "$2"); do
         case "$op" in
-            b) deps="$(pkg_get_base nonl)" ;;
+            b) deps=$(pkg_get_base nonl) ;;
             f) make_deps='' ;;
             x) make_deps=first-nomake ;;
             r) reverse=1 ;;
@@ -1902,6 +1902,17 @@ pkg_gentree() (
         esac
     done
     pkg_depends "$1" tree "$make_deps"
+
+    # Unless 'f' is given, pop the package from the list so that we don't list
+    # the package (for example if it's part of the base package list). Normally
+    # this should happen only when 'b' is used, so getting the package when no
+    # keys are supplied points to a circular dependency, which isn't supported
+    # by the package manager.
+    #
+    # Word splitting is intentional.
+    # shellcheck disable=2086
+    [ -z "${2##*f*}" ] || deps=$(pop "$1" from $deps)
+
     eval set -- "$deps"
     pkg_order "$@"
     if [ "$reverse" ]; then eval set -- "$redro"; else eval set -- "$order"; fi
