@@ -495,7 +495,6 @@ license: MIT
 maintainer: Linux User <linux-user@example.com>
 #+end_example
 
-
 ** post-install
 :PROPERTIES:
 :DESCRIPTION: The post-installation script
@@ -925,7 +924,7 @@ This function was taken from [[https://github.com/ko1nksm/readlinkf][POSIX sh re
 =readlink= is also not defined by POSIX, so this function uses =ls= to follow
 symbolic links until it reaches the actual file.
 
-** TODO System Functions
+** System Functions
 :PROPERTIES:
 :DESCRIPTION: Functions to manipulate your system
 :END:
@@ -947,7 +946,7 @@ following order:
 The program called for this operation can be overridden using the ~$CPT_SU~
 variable.
 
-** TODO Package Functions
+** Package Functions
 :PROPERTIES:
 :DESCRIPTION: Manipulate, or query anything related to packages
 :END:
@@ -971,7 +970,16 @@ create_cache
 pkg_build cpt
 #+end_src
 
-*** TODO =pkg_depends()=
+*** =pkg_depends()=
+
+This function calculates the dependencies for the requested package, returning
+the variable ~$deps~. This variable can then be passed to [[=pkg_order()=][pkg_order()]] in order
+to generate an ordered list for building packages.
+
+*** =pkg_order()=
+
+This function receives package names and returns ~$order~ and ~$redro~ variables
+that can be used for building and removing packages.
 
 *** =pkg_owner()=
 :PROPERTIES:

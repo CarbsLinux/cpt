@@ -60,13 +60,14 @@ _________________
 .. 7. Package Functions
 ..... 1. `pkg_build()'
 ..... 2. `pkg_depends()'
-..... 3. `pkg_owner()'
-..... 4. `pkg_isbuilt()'
-..... 5. `pkg_lint()'
-..... 6. `pkg_find()'
-..... 7. `pkg_get_base()'
-..... 8. `pkg_gentree()'
-..... 9. `pkg_query_meta()'
+..... 3. `pkg_order()'
+..... 4. `pkg_owner()'
+..... 5. `pkg_isbuilt()'
+..... 6. `pkg_lint()'
+..... 7. `pkg_find()'
+..... 8. `pkg_get_base()'
+..... 9. `pkg_gentree()'
+..... 10. `pkg_query_meta()'
 
 
 This is a reference document containing both the user-guide and the
@@ -579,7 +580,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-[pkg_query_meta()] See section 8.7.9
+[pkg_query_meta()] See section 8.7.10
 
 
 5.7 post-install
@@ -1065,8 +1066,23 @@ development manual for *Carbs Packaging Tools*. For development logs see
 8.7.2 `pkg_depends()'
 ---------------------
 
+  This function calculates the dependencies for the requested package,
+  returning the variable `$deps'. This variable can then be passed to
+  [pkg_order()] in order to generate an ordered list for building
+  packages.
 
-8.7.3 `pkg_owner()'
+
+[pkg_order()] See section 8.7.3
+
+
+8.7.3 `pkg_order()'
+-------------------
+
+  This function receives package names and returns `$order' and `$redro'
+  variables that can be used for building and removing packages.
+
+
+8.7.4 `pkg_owner()'
 -------------------
 
   This function can be used to determine the owner of a package. The
@@ -1087,7 +1103,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.4 `pkg_isbuilt()'
+8.7.5 `pkg_isbuilt()'
 ---------------------
 
   This function returns with success when the given package has a built
@@ -1095,7 +1111,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   repository.
 
 
-8.7.5 `pkg_lint()'
+8.7.6 `pkg_lint()'
 ------------------
 
   This function checks whether a given package fits the proper package
@@ -1103,7 +1119,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   outright* if it fails.
 
 
-8.7.6 `pkg_find()'
+8.7.7 `pkg_find()'
 ------------------
 
   `pkg_find()' is the tool for searching packages. It accepts up to 3
@@ -1136,7 +1152,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.7 `pkg_get_base()'
+8.7.8 `pkg_get_base()'
 ----------------------
 
   This function returns the base packages as defined in
@@ -1146,7 +1162,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   packages.
 
 
-8.7.8 `pkg_gentree()'
+8.7.9 `pkg_gentree()'
 ---------------------
 
   This function generates a dependency tree for the given package. The
@@ -1166,7 +1182,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
         line.
 
 
-* 8.7.8.1 Examples
+* 8.7.9.1 Examples
 
   This example uses the `cpt' package for Carbs Linux. The package
   itself is listed to depend on `curl' and `rsync'. Here is the output
@@ -1192,8 +1208,8 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.9 `pkg_query_meta()'
-------------------------
+8.7.10 `pkg_query_meta()'
+-------------------------
 
   This function is used to query the [meta file] inside package
   directories. It can be used to retrieve information on a package that

@@ -130,6 +130,7 @@ Package Functions
 
 * @samp{pkg_build()}::
 * @samp{pkg_depends()}::
+* @samp{pkg_order()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
@@ -1118,6 +1119,7 @@ interact with packages.
 @menu
 * @samp{pkg_build()}::
 * @samp{pkg_depends()}::
+* @samp{pkg_order()}::
 * @samp{pkg_owner()}::           Check which package owns the given file
 * @samp{pkg_isbuilt()}::         Check whether the given package is built
 * @samp{pkg_lint()}::            Check whether a package directory fits the standards
@@ -1145,6 +1147,16 @@ pkg_build cpt
 
 @node @samp{pkg_depends()}
 @subsection @samp{pkg_depends()}
+
+This function calculates the dependencies for the requested package, returning
+the variable @code{$deps}. This variable can then be passed to @ref{@samp{pkg_order()}, , pkg@math{_order}()} in order
+to generate an ordered list for building packages.
+
+@node @samp{pkg_order()}
+@subsection @samp{pkg_order()}
+
+This function receives package names and returns @code{$order} and @code{$redro} variables
+that can be used for building and removing packages.
 
 @node @samp{pkg_owner()}
 @subsection @samp{pkg_owner()}
