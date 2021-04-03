@@ -18,5 +18,23 @@ MAKEINFO  = makeinfo
 DOCS = yes
 
 # Files to be added into the distribution tarball
-DISTFILES = contrib docs man spec src tests tools \
-            CHANGELOG.md LICENSE Makefile README.md config.mk cpt-base
+DISTFILES = \
+    .build.yml \
+    .dir-locals.el \
+    .editorconfig \
+    .fossil-settings \
+    .gitignore \
+    .shellspec \
+    CHANGELOG.md \
+    LICENSE \
+    Makefile \
+    README.md \
+    config.mk \
+    contrib \
+    cpt-base \
+    docs \
+    man \
+    spec \
+    src \
+    tests \
+    tools
