@@ -1792,8 +1792,8 @@ pkg_updates(){
 
         # Read version and release information from the installed packages
         # and repository.
-        read -r db_ver db_rel < "$pkg/version"
-        read -r re_ver re_rel < "$(pkg_find "$pkg_name")/version"
+        read -r db_ver db_rel < "$pkg/version" || exit 1
+        read -r re_ver re_rel < "$(pkg_find "$pkg_name")/version" || exit 1
 
         # Compare installed packages to repository packages.
         [ "$db_ver-$db_rel" != "$re_ver-$re_rel" ] && {
