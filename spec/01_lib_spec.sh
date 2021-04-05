@@ -104,7 +104,7 @@ Describe 'CPT Library'
 
         Describe '_stat()'
             It 'outputs the owner of the given file'
-               When call _stat README.md
+               When call _stat LICENSE
                The output should eq "$(id -un)"
             End
         End
