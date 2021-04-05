@@ -39,7 +39,10 @@ die() {
 trap_set() {
     # Function to set the trap value.
     case ${1:-cleanup} in
-        cleanup) trap pkg_clean EXIT INT ;;
+        cleanup)
+            trap pkg_clean EXIT
+            trap 'pkg_clean; exit 1' INT
+            ;;
         block)   trap '' INT ;;
         unset)   trap - EXIT INT ;;
     esac
@@ -1041,7 +1044,7 @@ pkg_build() {
     log "Building: $*"
 
     # Only ask for confirmation if more than one package needs to be built.
-    [ $# -gt 1 ] || [ "$pkg_update" ] && { prompt || exit 0 ;}
+    [ $# -gt 1 ] || [ "$pkg_update" ] && prompt
 
     log "Checking for pre-built dependencies"
 
@@ -1792,8 +1795,8 @@ pkg_updates(){
 
         # Read version and release information from the installed packages
         # and repository.
-        read -r db_ver db_rel < "$pkg/version" || exit 1
-        read -r re_ver re_rel < "$(pkg_find "$pkg_name")/version" || exit 1
+        read -r db_ver db_rel < "$pkg/version"
+        read -r re_ver re_rel < "$(pkg_find "$pkg_name")/version"
 
         # Compare installed packages to repository packages.
         [ "$db_ver-$db_rel" != "$re_ver-$re_rel" ] && {
@@ -1809,7 +1812,7 @@ pkg_updates(){
     # shellcheck disable=2154
     [ "$download_only" = 1 ] && {
         log "Only sources for the packages will be acquired"
-        prompt || exit 0
+        prompt
 
         for pkg in $outdated; do
             pkg_sources "$pkg"
@@ -1822,7 +1825,7 @@ pkg_updates(){
         log "Detected package manager update"
         log "The package manager will be updated first"
 
-        prompt || exit 0
+        prompt
 
         pkg_build cpt
         cpt-install cpt
