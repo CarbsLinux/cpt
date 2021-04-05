@@ -1,4 +1,4 @@
-<title>Home</title>
+# Home
 
 CPT is the package management toolset written for Carbs Linux. Its aim is to
 provide a stable, powerful, and easily used library for package management that
