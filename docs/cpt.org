@@ -482,9 +482,6 @@ the following =depends= file:
 #+END_EXAMPLE
 
 ** meta
-:PROPERTIES:
-:DESCRIPTION: File containing more information on packages
-:END:
 
 =meta= is a non-mandatory package file that can be used to provide information
 otherwise non-relevant to the functions of the package manager. This file can
