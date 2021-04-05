@@ -1,5 +1,5 @@
 # Carbs Packaging Tools
-VERSION = 6.0.0
+VERSION = dev
 
 # Installation paths
 PREFIX    = /usr/local
