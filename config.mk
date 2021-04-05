@@ -28,7 +28,7 @@ DISTFILES = \
     CHANGELOG.md \
     LICENSE \
     Makefile \
-    README.md \
+    README \
     config.mk \
     contrib \
     cpt-base \
