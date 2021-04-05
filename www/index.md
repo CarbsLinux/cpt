@@ -27,8 +27,8 @@ complements the tools that come with it. It has the following features:
   users with the `$PATH` variable.
   
 - **Serve repositories with your method** - Package repositories can be served
-  in a variety of formats, they can be either local, served with Git, or through
-  the `rsync` method, with Fossil integration to be added soon.
+  in a variety of formats, they can be either local, served with Git, Mercurial,
+  or through the `rsync` method, with Fossil integration to be added soon.
 
 <hr>
 
