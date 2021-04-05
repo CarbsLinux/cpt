@@ -16,25 +16,3 @@ MAKEINFO  = makeinfo
 
 # Comment or change if you don't want to build/install the documentation
 DOCS = yes
-
-# Files to be added into the distribution tarball
-DISTFILES = \
-    .build.yml \
-    .dir-locals.el \
-    .editorconfig \
-    .fossil-settings \
-    .gitignore \
-    .shellspec \
-    CHANGELOG.md \
-    LICENSE \
-    Makefile \
-    README \
-    config.mk \
-    contrib \
-    cpt-base \
-    docs \
-    man \
-    spec \
-    src \
-    tests \
-    tools

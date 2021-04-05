@@ -24,11 +24,7 @@ tests/etc/cpt-hook:
 	ln -s ../hook-file $@
 
 dist: docs/cpt.info
-	mkdir "cpt-${VERSION}"
-	cp -r ${DISTFILES} "cpt-${VERSION}"
-	tar cf "cpt-${VERSION}.tar" "cpt-${VERSION}"
-	xz -z "cpt-${VERSION}.tar"
-	rm -rf -- "cpt-${VERSION}"
+	./tools/mkdist.sh "${VERSION}"
 
 install: all
 	test "${DOCS}" != yes || ${MAKE} -C docs install
