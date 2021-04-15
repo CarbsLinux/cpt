@@ -23,7 +23,10 @@ test: all tests/etc/cpt-hook
 tests/etc/cpt-hook:
 	ln -s ../hook-file $@
 
-dist: docs/cpt.info
+CHANGELOG.md:
+	fossil wiki export Changelog | sed '1cCHANGELOG\n=========' > CHANGELOG.md
+
+dist: docs/cpt.info CHANGELOG.md
 	./tools/mkdist.sh "${VERSION}"
 
 install: all

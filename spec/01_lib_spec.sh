@@ -186,15 +186,11 @@ Describe 'CPT Library'
                 The variable CPT_HOOK should eq "$PWD/tests/hook-file"
             End
         End
-        Describe 'create_cache()'
+        Describe 'create_tmp()'
             After pkg_clean
             It 'creates cache directories'
-                When call create_cache
+                When call create_tmp
                 The variable mak_dir should be a directory
-            End
-            It "doesn't create build directories if an argument is passed"
-                When call create_cache nobuild
-                The variable mak_dir should be undefined
             End
         End
         Describe 'pkg_get_base()'

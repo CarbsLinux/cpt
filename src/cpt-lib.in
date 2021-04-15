@@ -1952,23 +1952,19 @@ pkg_clean() {
     rm -rf -- "${CPT_TMPDIR:=$cac_dir/proc}/$pid"
 }
 
+create_tmp() {
+    # Create the required temporary directories and set the variables which
+    # point to them.
+    mkdir -p "${mak_dir:=$tmp_dir/build}" \
+             "${pkg_dir:=$tmp_dir/pkg}" \
+             "${tar_dir:=$tmp_dir/export}"
+}
+
 create_cache() {
-    # A temporary directory can be specified apart from the cache
-    # directory in order to build in a user specified directory.
-    # /tmp could be used in order to build on ram, useful on SSDs.
-    # The user can specify CPT_TMPDIR for this.
+    # DEPRECATED, use create_tmp() instead.
     #
-    # Create the required temporary directories and set the variables
-    # which point to them.
-    mkdir -p "${tmp_dir:=${CPT_TMPDIR:=$cac_dir/proc}/$pid}"
-
     # If an argument is given, skip the creation of other cache directories.
-    # This here makes shellcheck extremely angry, so I am globally disabling
-    # SC2119.
-    [ "$1" ] || mkdir -p "${mak_dir:=$tmp_dir/build}" \
-                         "${pkg_dir:=$tmp_dir/pkg}" \
-                         "${tar_dir:=$tmp_dir/export}"
-
+    [ "$1" ] || create_tmp
 }
 
 # main()
@@ -1987,7 +1983,14 @@ create_cache() {
     # to them. This is seperate from temporary directories created in
     # create_cache(). That's because we need these variables set on most
     # occasions.
+    #
+    # A temporary directory can be specified apart from the cache directory in
+    # order to build in a user specified directory. /tmp could be used in order
+    # to build on ram, useful on SSDs. The user can specify CPT_TMPDIR for this.
+    # We create the temporary directory here to avoid permission issues that can
+    # arise from functions that call as_root().
     mkdir -p "${cac_dir:=${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}" \
+             "${tmp_dir:=${CPT_TMPDIR:=$cac_dir/proc}/$pid}" \
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
