@@ -1656,7 +1656,7 @@ pkg_repository_info() {
         # Mercurial repository
         backend=hg
 
-    elif rootdir=$(fossil info 2>/dev/null | grep local-root:); then
+    elif rootdir=$(fossil info 2>/dev/null | grep ^local-root:); then
         # Fossil repository
         backend=fossil
 
