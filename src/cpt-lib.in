@@ -1643,6 +1643,49 @@ pkg_install() {
     log "$pkg_name" "Installed successfully"
 }
 
+pkg_repository_info() {
+    # Finds and returns repository information for the current directory. It
+    # will return current directory, repository root, and the type of repository
+    # in a colon separated format.
+
+    if rootdir=$(git rev-parse --show-toplevel 2>/dev/null); then
+        # Git repository
+        backend=git
+
+    elif rootdir=$(hg root 2>/dev/null); then
+        # Mercurial repository
+        backend=hg
+
+    elif rootdir=$(fossil info 2>/dev/null | grep local-root:); then
+        # Fossil repository
+        backend=fossil
+
+        # We want to remove the initial spacing before the root directory.
+        read -r _ rootdir <<EOF
+$rootdir
+EOF
+        rootdir=${rootdir%/}
+
+    elif [ -f .rsync ]; then
+        backend=rsync
+        rootdir=$PWD
+
+        # If an .rsync_root file exists, we check that the repository root
+        # exists. If it does, we change to that directory to do the fetch.
+        # This way, we allow for partial repositories while making sure that
+        # we can fetch the repository in a single operation.
+        [ -f .rsync_root ] && {
+            read -r rsync_root < .rsync_root
+            [ -f "$rsync_root/.rsync" ] && rootdir=$(_readlinkf "$rsync_root")
+        }
+    else
+        # Local repository
+        backend=local
+        rootdir=$PWD
+    fi
+    printf '%s:%s:%s\n' "$PWD" "$rootdir" "$backend"
+}
+
 pkg_fetch() {
     log "Updating repositories"
 
