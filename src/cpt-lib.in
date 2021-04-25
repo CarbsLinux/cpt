@@ -1648,14 +1648,18 @@ pkg_repository_info() {
     # will return current directory, repository root, and the type of repository
     # in a colon separated format.
 
-    if rootdir=$(git rev-parse --show-toplevel 2>/dev/null); then
+    : "${repo_file:=$cac_dir/repository-cache}"
+
+    if information=$(grep "^$PWD:" "$repo_file" 2>/dev/null); then
+        # Repository information is already cached.
+        printf '%s\n' "$information" | sed 1q
+        return
+    elif rootdir=$(git rev-parse --show-toplevel 2>/dev/null); then
         # Git repository
         backend=git
-
     elif rootdir=$(hg root 2>/dev/null); then
         # Mercurial repository
         backend=hg
-
     elif rootdir=$(fossil info 2>/dev/null | grep ^local-root:); then
         # Fossil repository
         backend=fossil
@@ -1665,7 +1669,6 @@ pkg_repository_info() {
 $rootdir
 EOF
         rootdir=${rootdir%/}
-
     elif [ -f .rsync ]; then
         backend=rsync
         rootdir=$PWD
@@ -1683,7 +1686,7 @@ EOF
         backend=local
         rootdir=$PWD
     fi
-    printf '%s:%s:%s\n' "$PWD" "$rootdir" "$backend"
+    printf '%s:%s:%s\n' "$PWD" "$rootdir" "$backend" | tee -a "$repo_file"
 }
 
 pkg_fetch() {
