@@ -293,6 +293,8 @@ If set to 1, @samp{cpt} will keep logs regardless of operation success.
 Set the temporary build directory name.
 @item @code{CPT_PROMPT}
 If set to 0, @samp{cpt} will not prompt you for anything.
+@item @code{CPT_REPO_CACHE}
+If set to 0, @samp{cpt} will not use or write repository information cache.
 @item @code{CPT_ROOT}
 If this variable is set, @samp{cpt} will assume the given path as the system root.
 @item @code{CPT_TEST}

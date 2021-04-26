@@ -249,6 +249,9 @@ development manual for *Carbs Packaging Tools*. For development logs see
         Set the temporary build directory name.
   `CPT_PROMPT'
         If set to 0, `cpt' will not prompt you for anything.
+  `CPT_REPO_CACHE'
+        If set to 0, `cpt' will not use or write repository information
+        cache.
   `CPT_ROOT'
         If this variable is set, `cpt' will assume the given path as the
         system root.
