@@ -1663,7 +1663,7 @@ pkg_install() {
     log "$pkg_name" "Installed successfully"
 }
 
-pkg_repository_pull_fossil() {
+pkg_vcs_pull_fossil() {
     # Pull function for Fossil.
     [ "$(fossil remote 2>/dev/null)" != off ] || {
         log "$repo" " "
@@ -1675,11 +1675,11 @@ pkg_repository_pull_fossil() {
     if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
         fossil update
     else
-        pkg_repository_as_root "fossil update"
+        pkg_vcs_as_root "fossil update"
     fi
 }
 
-pkg_repository_pull_git() {
+pkg_vcs_pull_git() {
     # Pull function for Git.
     [ "$(git remote 2>/dev/null)" ] || {
         log "$repo" " "
@@ -1699,12 +1699,12 @@ pkg_repository_pull_git() {
         git merge
         git submodule update --remote --init -f
     else
-        pkg_repository_as_root \
+        pkg_vcs_as_root \
             "git fetch && git merge && git submodule update --remote --init -f"
     fi
 }
 
-pkg_repository_pull_hg() {
+pkg_vcs_pull_hg() {
     # Pull function for Mercurial.
     [ "$(hg showconfig paths 2>/dev/null)" ] || {
         log "$repo" " "
@@ -1716,11 +1716,11 @@ pkg_repository_pull_hg() {
         hg pull
         hg update
     else
-        pkg_repository_as_root "hg pull && hg update"
+        pkg_vcs_as_root "hg pull && hg update"
     fi
 }
 
-pkg_repository_pull_rsync() {
+pkg_vcs_pull_rsync() {
     # Pull function for rsync repositories. The details of our rsync
     # repositories are explained in the user manual.
 
@@ -1729,19 +1729,19 @@ pkg_repository_pull_rsync() {
     if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
         rsync -acvzzC --include=core --delete "$remote/" "$PWD"
     else
-        pkg_repository_as_root "rsync -acvzzC --include=core --delete \"$remote/\" \"$PWD\""
+        pkg_vcs_as_root "rsync -acvzzC --include=core --delete \"$remote/\" \"$PWD\""
     fi
 }
 
-pkg_repository_pull_local() {
+pkg_vcs_pull_local() {
     # Local repository. We don't do a "pull" here, we just notify the user that
     # this is the case.
     log "$repo" " "
     printf '%s\n' "Not a remote repository, skipping."
 }
 
-pkg_repository_as_root() (
-    # Helper function for pkg_repository_pull* functions used for proper
+pkg_vcs_as_root() (
+    # Helper function for pkg_vcs_pull* functions used for proper
     # privilege escalation.
     [ "$uid" = 0 ] || log "$PWD" "Need root to update"
 
@@ -1761,7 +1761,7 @@ pkg_repository_as_root() (
     as_root sh -c "$@"
 )
 
-pkg_repository_info() {
+pkg_vcs_info() {
     # Finds and returns repository information for the current directory. It
     # will return current directory, repository root, and the type of repository
     # in a colon separated format.
@@ -1827,14 +1827,14 @@ pkg_fetch() {
     for repo; do
         # Go to the root of the repository.
         cd "$repo"
-        repo_type=$(pkg_repository_info)
+        repo_type=$(pkg_vcs_info)
         repo_root=${repo_type#$PWD:}
         repo_type=${repo_type##*:} repo_root=${repo_root%:*}
         contains "$repos" "$repo_root" || {
             repos="$repos $repo_root "
             cd "$repo_root"
 
-            "pkg_repository_pull_$repo_type"
+            "pkg_vcs_pull_$repo_type"
         }
     done
 
