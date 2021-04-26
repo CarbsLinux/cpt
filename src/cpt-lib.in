@@ -1643,14 +1643,113 @@ pkg_install() {
     log "$pkg_name" "Installed successfully"
 }
 
+pkg_repository_pull_fossil() {
+    # Pull function for Fossil.
+    [ "$(fossil remote 2>/dev/null)" != off ] || {
+        log "$repo" " "
+        printf '%s\n' "No remote, skipping."
+        return 0
+    }
+
+    # Ensure we have proper permissions to do the pull operation.
+    if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+        fossil update
+    else
+        pkg_repository_as_root "fossil update"
+    fi
+}
+
+pkg_repository_pull_git() {
+    # Pull function for Git.
+    [ "$(git remote 2>/dev/null)" ] || {
+        log "$repo" " "
+        printf '%s\n' "No remote, skipping."
+        return 0
+    }
+
+    # Display a message if signing is enabled for this repository.
+    case $(git config merge.verifySignatures) in
+        true) log "$PWD" "[signed] " ;;
+        *)    log "$PWD" " " ;;
+    esac
+
+    # Ensure we have proper permissions to do the pull operation.
+    if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+        git fetch
+        git merge
+        git submodule update --remote --init -f
+    else
+        pkg_repository_as_root \
+            "git fetch && git merge && git submodule update --remote --init -f"
+    fi
+}
+
+pkg_repository_pull_hg() {
+    # Pull function for Mercurial.
+    [ "$(hg showconfig paths 2>/dev/null)" ] || {
+        log "$repo" " "
+        printf '%s\n' "No remote, skipping."
+        return 0
+    }
+
+    if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+        hg pull
+        hg update
+    else
+        pkg_repository_as_root "hg pull && hg update"
+    fi
+}
+
+pkg_repository_pull_rsync() {
+    # Pull function for rsync repositories. The details of our rsync
+    # repositories are explained in the user manual.
+
+    # Read remote repository address from the '.rsync' file.
+    read -r remote < .rsync
+    if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+        rsync -acvzzC --include=core --delete "$remote/" "$PWD"
+    else
+        pkg_repository_as_root "rsync -acvzzC --include=core --delete \"$remote/\" \"$PWD\""
+    fi
+}
+
+pkg_repository_pull_local() {
+    # Local repository. We don't do a "pull" here, we just notify the user that
+    # this is the case.
+    log "$repo" " "
+    printf '%s\n' "Not a remote repository, skipping."
+}
+
+pkg_repository_as_root() (
+    # Helper function for pkg_repository_pull* functions used for proper
+    # privilege escalation.
+    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
+
+    # Find out the owner of the repository and spawn the operation as the user
+    # below.
+    #
+    # This prevents the VCS from changing the original ownership of files and
+    # directories in the rare case that the repository is owned by a third user.
+    user=$(_stat "$PWD")
+
+    [ "$user" = root ] || log "Dropping permissions to $user for pull"
+    case ${su##*/} in su) set -- "'$1'"; esac
+
+    # Spawn a subhsell to run multiple commands as root at once. This makes
+    # things easier on users who aren't using persist/timestamps for auth
+    # caching.
+    as_root sh -c "$@"
+)
+
 pkg_repository_info() {
     # Finds and returns repository information for the current directory. It
     # will return current directory, repository root, and the type of repository
     # in a colon separated format.
 
     : "${repo_file:=$cac_dir/repository-cache}"
+    set --
 
-    if information=$(grep "^$PWD:" "$repo_file" 2>/dev/null); then
+    if [ "$CPT_REPO_CACHE" != 0 ] && information=$(grep "^$PWD:" "$repo_file" 2>/dev/null); then
         # Repository information is already cached.
         printf '%s\n' "$information" | sed 1q
         return
@@ -1685,7 +1784,12 @@ pkg_repository_info() {
         backend=local
         rootdir=$PWD
     fi
-    printf '%s:%s:%s\n' "$PWD" "$rootdir" "$backend" | tee -a "$repo_file"
+
+    # We cache all these information, so that we don't have to spend much time
+    # looking these up the next time we are doing it. If CPT_REPO_CACHE is set
+    # to 0, we will not write this cache.
+    [ "$CPT_REPO_CACHE" = 0 ] || set -- "$repo_file"
+    printf '%s:%s:%s\n' "$PWD" "$rootdir" "$backend" | tee -a "$@"
 }
 
 pkg_fetch() {
@@ -1701,125 +1805,17 @@ pkg_fetch() {
     # Update each repository in '$CPT_PATH'. It is assumed that
     # each repository is 'git' tracked.
     for repo; do
-        # Go to the root of the repository (if it exists).
+        # Go to the root of the repository.
         cd "$repo"
-        cd "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null ||
-            cd "$(hg root 2>/dev/null)" 2>/dev/null ||:
+        repo_type=$(pkg_repository_info)
+        repo_root=${repo_type#$PWD:}
+        repo_type=${repo_type##*:} repo_root=${repo_root%:*}
+        contains "$repos" "$repo_root" || {
+            repos="$repos $repo_root "
+            cd "$repo_root"
 
-        if [ -d .git ]; then
-
-            [ "$(git remote 2>/dev/null)" ] || {
-                log "$repo" " "
-                printf '%s\n' "No remote, skipping."
-                continue
-            }
-
-            contains "$repos" "$PWD" || {
-                repos="$repos $PWD "
-
-                # Display a tick if signing is enabled for this
-                # repository.
-                case $(git config merge.verifySignatures) in
-                    true) log "$PWD" "[signed] " ;;
-                    *)    log "$PWD" " " ;;
-                esac
-
-                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
-                    git fetch
-                    git merge
-                    git submodule update --remote --init -f
-
-                else
-                    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
-
-                    # Find out the owner of the repository and spawn
-                    # git as this user below.
-                    #
-                    # This prevents 'git' from changing the original
-                    # ownership of files and directories in the rare
-                    # case that the repository is owned by a 3rd user.
-                    (
-                        user=$(_stat "$PWD")
-
-                        [ "$user" = root ] ||
-                            log "Dropping permissions to $user for pull"
-
-                        git_cmd="git fetch && git merge && git submodule update --remote --init -f"
-                        case $su in *su) git_cmd="'$git_cmd'"; esac
-
-                        # Spawn a subshell to run multiple commands as
-                        # root at once. This makes things easier on users
-                        # who aren't using persist/timestamps for auth
-                        # caching.
-                        user=$user as_root sh -c "$git_cmd"
-                    )
-                fi
-            }
-        elif [ -d .hg ]; then
-
-            [ "$(hg showconfig paths 2>/dev/null)" ] || {
-                log "$repo" " "
-                printf '%s\n' "No remote, skipping."
-                continue
-            }
-
-            contains "$repos $PWD" || {
-                repos="$repos $PWD"
-
-                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
-                    hg pull
-                    hg update
-                else
-                    [ "$uid" ] || log "$PWD" "Need root to update"
-
-                    # We are going to do the same operation as above, to
-                    # find the owner of the repository.
-                    (
-                        user=$(_stat "$PWD")
-
-                        [ "$user" = root ] ||
-                            log "Dropping permissions to $user for pull"
-
-                        hg_cmd="hg pull && hg update"
-
-                        case $su in *su) hg_cmd="'$hg_cmd'"; esac
-                        user=$user as_root sh -c "$hg_cmd"
-                    )
-                fi
-            }
-        elif [ -f .rsync ]; then
-            # If an .rsync_root file exists, we check that the repository root
-            # exists. If it does, we change to that directory to do the fetch.
-            # This way, we allow for partial repositories while making sure that
-            # we can fetch the repository in a single operation.
-            [ -f .rsync_root ] && {
-                read -r rsync_root < .rsync_root
-                [ -f "$rsync_root/.rsync" ] && cd "$rsync_root"
-            }
-            contains "$repos" "$PWD" || {
-                repos="$repos $PWD"
-                read -r remote < .rsync
-                if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
-                    rsync -acvzzC --include=core --delete "$remote/" "$PWD"
-                else
-                    [ "$uid" = 0 ] || log "$PWD" "Need root to update"
-
-                    # Similar to the git update, we find the owner of
-                    # the repository and spawn rsync as that user.
-                    (
-                        user=$(_stat "$PWD")
-
-                        [ "$user" = root ] ||
-                            log "Dropping permissions to $user for pull"
-
-                        user=$user as_root rsync -acvzzC --include=core --delete "$remote/" "$PWD"
-                    )
-                fi
-            }
-        else
-            log "$repo" " "
-            printf '%s\n' "Not a remote repository, skipping."
-        fi
+            "pkg_repository_pull_$repo_type"
+        }
     done
 
     run_hook post-fetch
