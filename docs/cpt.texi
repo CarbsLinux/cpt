@@ -14,7 +14,7 @@ Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, with no
 Front-Cover Texts and no Back-Cover Texts. A copy of the license is included in
-the section entitled "GNU Free Documentation License."
+the section entitled ``GNU Free Documentation License.''
 
 @end quotation
 @end copying
@@ -52,6 +52,8 @@ manual for @strong{Carbs Packaging Tools}. For development logs see @uref{https:
 * Rsync Repositories::           Information on using or creating rsync repositories
 * Comparison Between CPT and KISS::
 * CPT Library::                  Documentation of the Library
+* Concept Index::                Concepts mentioned in this manual
+* Variable Index::               Variables mentioned in this manual
 
 @detailmenu
 --- The Detailed Node Listing ---
@@ -161,45 +163,45 @@ tools and their explanations. Here is an example call with extra scripts on my
 system:
 
 @example
--> Carbs Packaging Tool
--> add               Commit the current directory as a new package
--> alternatives      List and swap to alternatives
--> build             Build a package
--> bump              Commit the current directory as a version bump
--> cargo-urlgen      Create static cargo sources for Rust packages
--> cargolock-urlgen  Convert the given Cargo.lock file to sources
--> cat               Concatanate package files in the installed package database
--> changelog         Print the git log of the specific package
--> chbuild           Create/destroy temporary chroots
--> checkmissing      Verify package manifests
--> checksum          Generate checksums
--> chroot            Enter a chroot
--> commit            Commit a package without the prefix of 'package:'
--> depends           Display a package's dependencies
--> download          Download sources for the given package
--> exec              Execute a command inside the alternatives system
--> export            Turn an installed package into a CPT tarball
--> fork              Fork a package to the current directory
--> getchoice         Prints the full path to a file in the alternatives system.
--> install           Install a package
--> link              Link a forked package's files to the other repository
--> list              List installed packages
--> maintainer        Find the maintainer of a package
--> manifest          Display all files owned by a package
--> manifest-tree     Display all files owned by a package with a tree view
--> new               Create a boilerplate CPT package
--> orphans           List orphaned packages
--> owns              Check which package owns a file
--> rel               Bump the release number of a package
--> remove            Remove a package
--> repodepends       Display a package's dependencies in the repository
--> reporevdepends    Display packages on the repository which depend on package
--> reset             Remove all packages except for the base
--> revdepends        Display packages which depend on package
--> search            Search for a package
--> size              Show the size on disk for a package
--> source            Extract sources of a given package to the current directory
--> update            Check for updates
+  -> Carbs Packaging Tool
+  -> add               Commit the current directory as a new package
+  -> alternatives      List and swap to alternatives
+  -> build             Build a package
+  -> bump              Commit the current directory as a version bump
+  -> cargo-urlgen      Create static cargo sources for Rust packages
+  -> cargolock-urlgen  Convert the given Cargo.lock file to sources
+  -> cat               Concatanate package files in the installed package database
+  -> changelog         Print the git log of the specific package
+  -> chbuild           Create/destroy temporary chroots
+  -> checkmissing      Verify package manifests
+  -> checksum          Generate checksums
+  -> chroot            Enter a chroot
+  -> commit            Commit a package without the prefix of 'package:'
+  -> depends           Display a package's dependencies
+  -> download          Download sources for the given package
+  -> exec              Execute a command inside the alternatives system
+  -> export            Turn an installed package into a CPT tarball
+  -> fork              Fork a package to the current directory
+  -> getchoice         Prints the full path to a file in the alternatives system.
+  -> install           Install a package
+  -> link              Link a forked package's files to the other repository
+  -> list              List installed packages
+  -> maintainer        Find the maintainer of a package
+  -> manifest          Display all files owned by a package
+  -> manifest-tree     Display all files owned by a package with a tree view
+  -> new               Create a boilerplate CPT package
+  -> orphans           List orphaned packages
+  -> owns              Check which package owns a file
+  -> rel               Bump the release number of a package
+  -> remove            Remove a package
+  -> repodepends       Display a package's dependencies in the repository
+  -> reporevdepends    Display packages on the repository which depend on package
+  -> reset             Remove all packages except for the base
+  -> revdepends        Display packages which depend on package
+  -> search            Search for a package
+  -> size              Show the size on disk for a package
+  -> source            Extract sources of a given package to the current directory
+  -> update            Check for updates
 @end example
 
 The documentation of @samp{cpt} aims to keep tool flags and related usage information
@@ -270,36 +272,51 @@ to provide detailed information.
 
 @table @asis
 @item @code{CPT_PATH}
+@vindex CPT_PATH
 Set the locations of your repositories. It is similar to the @code{PATH} variable.
 @item @code{CPT_CACHE} 
+@vindex CPT_CACHE
 The cache directory for @samp{cpt}. Default: @code{$XDG_CACHE_HOME/cpt}.
 @item @code{CPT_CHOICE}
+@vindex CPT_CHOICE
 If this is set to 0, a package installation will be aborted on conflicts.
 @item @code{CPT_COLOR}
+@vindex CPT_COLOR
 If this is set to 1, @samp{cpt} tools will be forced to display coloured output. If
 set to 0, they will be forced to display them without colours. Otherwise,
 @samp{cpt} will output colour as long as it is outputting to a terminal.
 @item @code{CPT_DEBUG}
+@vindex CPT_DEBUG
 If set to 1, temporary directories will not be removed after the operation.
 @item @code{CPT_FETCH}
+@vindex CPT_FETCH
 If set to 0, @code{cpt-update} will not fetch repositories.
 @item @code{CPT_FORCE}
+@vindex CPT_FORCE
 If set to 1, @samp{cpt} tools will force operation.
 @item @code{CPT_HOOK}
+@vindex CPT_HOOK
 Absolute path to the package manager hook file.
 @item @code{CPT_KEEPLOG}
+@vindex CPT_KEEPLOG
 If set to 1, @samp{cpt} will keep logs regardless of operation success.
 @item @code{CPT_PID}
+@vindex CPT_PID
 Set the temporary build directory name.
 @item @code{CPT_PROMPT}
+@vindex CPT_PROMPT
 If set to 0, @samp{cpt} will not prompt you for anything.
 @item @code{CPT_REPO_CACHE}
+@vindex CPT_REPO_CACHE
 If set to 0, @samp{cpt} will not use or write repository information cache.
 @item @code{CPT_ROOT}
+@vindex CPT_ROOT
 If this variable is set, @samp{cpt} will assume the given path as the system root.
 @item @code{CPT_TEST}
+@vindex CPT_TEST
 If set to 1, @code{cpt-build} will run tests whenever available.
 @item @code{CPT_TMPDIR}
+@vindex CPT_TMPDIR
 The directory to create the temporary directories.
 @end table
 
@@ -313,11 +330,12 @@ The directory to create the temporary directories.
 @node @samp{CPT_PATH}
 @subsection @samp{CPT_PATH}
 
+@cindex Setting up repositories
 Similar to the @samp{PATH} variable, @samp{cpt} find repositories from the @samp{CPT_PATH}
 variable. Here is an example:
 
 @example
-CPT_PATH=$HOME/repos/repo1:$HOME/repos/repo2:$HOME/repos/repo3
+  CPT_PATH=$HOME/repos/repo1:$HOME/repos/repo2:$HOME/repos/repo3
 @end example
 
 This is a simplistic and a structured example for repository locations, but it
@@ -325,7 +343,7 @@ doesn't necessarily need to be as tidy as the example above. Here is an example
 for something a little more complex.
 
 @example
-CPT_PATH=$HOME/repos/overrides:/var/db/cpt/repo/core:/var/db/cpt/repo/extra:$HOME/repos/personal
+  CPT_PATH=$HOME/repos/overrides:/var/db/cpt/repo/core:/var/db/cpt/repo/extra:$HOME/repos/personal
 @end example
 
 This example brings us to the next section of this document.
@@ -335,6 +353,7 @@ This example brings us to the next section of this document.
 Repository preferences
 
 
+@cindex package conflicts
 When you are using multiple repositories from multiple vendors, you will find
 out that some repositories have the same packages. @samp{cpt} doesn't care about
 conflicting packages. If you want to build a package that exists on multiple
@@ -345,7 +364,7 @@ to install from your personal repository, you must set @samp{CPT_PATH} so that y
 personal repository is listed before the @samp{extra} repository.
 
 @example
-CPT_PATH=$HOME/repos/personal:$HOME/repos/carbs/extra
+  CPT_PATH=$HOME/repos/personal:$HOME/repos/carbs/extra
 @end example
 
 @item
@@ -359,12 +378,12 @@ The below example sets @samp{CPT_PATH} in a way that is easy to understand which
 repository comes first:
 
 @example
-CPT_PATH=$HOME/repos/overrides
-CPT_PATH=$CPT_PATH:$HOME/repos/carbs/core
-CPT_PATH=$CPT_PATH:$HOME/repos/carbs/extra
-CPT_PATH=$CPT_PATH:$HOME/repos/carbs/xorg
-CPT_PATH=$CPT_PATH:$HOME/repos/personal
-export CPT_PATH
+  CPT_PATH=$HOME/repos/overrides
+  CPT_PATH=$CPT_PATH:$HOME/repos/carbs/core
+  CPT_PATH=$CPT_PATH:$HOME/repos/carbs/extra
+  CPT_PATH=$CPT_PATH:$HOME/repos/carbs/xorg
+  CPT_PATH=$CPT_PATH:$HOME/repos/personal
+  export CPT_PATH
 @end example
 @end enumerate
 
@@ -417,7 +436,7 @@ disadvantage is that there will be issues with multiple operations at the same
 time. So the best way to use this variable is during one-time @samp{cpt} calls.
 
 @example
-CPT_PID=mesa cpt b mesa
+  CPT_PID=mesa cpt b mesa
 @end example
 
 By running the above, you will know that the created build directories will end
@@ -566,10 +585,10 @@ parameter is optional. It is the directory that the source will be placed in.
 Here is the @samp{sources} file for the @samp{gst-plugins} package:
 
 @example
-https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.16.2.tar.xz good
-https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.16.2.tar.xz   bad
-https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.16.2.tar.xz ugly
-https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.16.2.tar.xz               libav
+  https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.16.2.tar.xz good
+  https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.16.2.tar.xz   bad
+  https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.16.2.tar.xz ugly
+  https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-1.16.2.tar.xz               libav
 @end example
 
 This file is read from the package manager as space seperated. Files that begin
@@ -585,11 +604,11 @@ history pointer, git will checkout the relevant revision. So,
 
 @table @asis
 @item @samp{git+git://example.com/pub/repo@@v1.2.3}
-will checkout the tag named "v1.2.3"
+will checkout the tag named ``v1.2.3''
 @item @samp{git+git://example.com/pub/repo#development}
-will checkout the branch named "development"
+will checkout the branch named ``development''
 @item @samp{git+git://example.com/pub/repo#1a314s87}
-will checkout the commit named "1a314s87"
+will checkout the commit named ``1a314s87''
 @end table
 
 Other files are assumed to be residing in the package directory. They should be
@@ -611,24 +630,24 @@ of the package on a space seperated format. The contents of the file should look
 like below.
 
 @example
-1.3.2 1
+  1.3.2 1
 @end example
 
 @node depends
 @section depends
 
 This is a list of dependencies that must be installed before a package build. You
-can append "make" after a dependency to mark a package is only required during
+can append ``make'' after a dependency to mark a package is only required during
 the build process of a package. Packages marked as a make dependency can be
-removed after the build. There are also "test" dependencies. These dependencies
+removed after the build. There are also ``test'' dependencies. These dependencies
 are only installed if either the @samp{CPT_TEST} is set to 1, or the build is run
 with the @samp{-t} or @samp{--test} options. So, a package package could have
 the following @samp{depends} file:
 
 @example
-linux-headers make
-python        test
-zlib
+  linux-headers make
+  python        test
+  zlib
 @end example
 
 @node meta
@@ -662,6 +681,7 @@ installed.
 @node test
 @section test
 
+@vindex CPT_TEST
 Test files are mainly for the repository maintainer to test the packages, and
 will only run if the user has the @samp{CPT_TEST} variable set, or the build is
 run with the @samp{-t} or @samp{--test} options. This script is run on the
@@ -676,33 +696,33 @@ repository. This is used in order to fetch changes from the upstream. @samp{.rsy
 file looks like this for the core repository:
 
 @example
-rsync://carbslinux.org/repo/core
+  rsync://carbslinux.org/repo/core
 @end example
 
 Rsync repositories have some few distinctions when it comes to fetching them.
-They can be either synced individually or as a "root". There are 2 important
+They can be either synced individually or as a ``root''. There are 2 important
 files, those are @samp{.rsync} and @samp{.rsync_root}. Here is the Carbs Linux
 rsync repository structure.
 
 @example
-           /
-   -----------------
-  |                |
-.rsync           core/
-          ----------------
-          |              |
-        .rsync      .rsync_root
+             /
+     -----------------
+    |                |
+  .rsync           core/
+            ----------------
+            |              |
+          .rsync      .rsync_root
 @end example
 
-Unlike git repositories, they don't have a defined "root" directory. This is
+Unlike git repositories, they don't have a defined ``root'' directory. This is
 both an advantage and a disadvantage. This way, we can sync individual
 repositories, but that also means we need extra files to define root directories
 and repository locations. Here is the content for each of these files:
 
 @example
-/.rsync:           rsync://carbslinux.org/repo
-/core/.rsync:      rsync://carbslinux.org/repo/core
-/core/.rsync_root: ..
+  /.rsync:           rsync://carbslinux.org/repo
+  /core/.rsync:      rsync://carbslinux.org/repo/core
+  /core/.rsync_root: ..
 @end example
 
 The @samp{.rsync_root} file on the core repository points to the upper directory.
@@ -724,48 +744,48 @@ it through the rsync daemon. Here is a sample shell script that I use in order t
 sync repositories. Feel free to customize for your own use.
 
 @example
-#!/bin/sh
-HOSTNAME="rsync://carbslinux.org/repo"
-GITDIR="/pub/git/repo"
-SHAREDIR="/pub/share/repo"
-git -C "$GITDIR" pull
+  #!/bin/sh
+  HOSTNAME="rsync://carbslinux.org/repo"
+  GITDIR="/pub/git/repo"
+  SHAREDIR="/pub/share/repo"
+  git -C "$GITDIR" pull
 
-rsync -avcC --delete --include=core --exclude=.rsync,.rsync_root "$GITDIR/." "$SHAREDIR"
+  rsync -avcC --delete --include=core --exclude=.rsync,.rsync_root "$GITDIR/." "$SHAREDIR"
 
-printf '%s\n' "$HOSTNAME" > "$GITDIR/.rsync"
-for dir in "$GITDIR/"*; do
-    [ -d "$dir" ] || continue
-    [ -f "$dir/.rsync" ] ||
-    printf '%s/%s\n' "$HOSTNAME" "$@{dir##*/@}" > "$dir/.rsync"
-    printf '..\n' > "$dir/.rsync_root"
-done
+  printf '%s\n' "$HOSTNAME" > "$GITDIR/.rsync"
+  for dir in "$GITDIR/"*; do
+      [ -d "$dir" ] || continue
+      [ -f "$dir/.rsync" ] ||
+      printf '%s/%s\n' "$HOSTNAME" "$@{dir##*/@}" > "$dir/.rsync"
+      printf '..\n' > "$dir/.rsync_root"
+  done
 @end example
 
 You can then create an @strong{rsync} user for serving the repositories.
 
 @example
-$ adduser -SD rsync
+  $ adduser -SD rsync
 @end example
 
 Create @samp{/etc/rsyncd.conf} and a service configuration as well.
 
 @example
-uid = rsync
-gid = rsync
-address = example.com
-max connections = 10
-use chroot = yes
+  uid = rsync
+  gid = rsync
+  address = example.com
+  max connections = 10
+  use chroot = yes
 
-[repo]
-    path = /pub/share/repo
-    comment = My repository
+  [repo]
+      path = /pub/share/repo
+      comment = My repository
 @end example
 
 Create a service file at @samp{/etc/sv/rsync/run} (runit):
 
 @example
-#!/bin/sh -e
-exec rsync --daemon --no-detach
+  #!/bin/sh -e
+  exec rsync --daemon --no-detach
 @end example
 
 @node Comparison Between CPT and KISS
@@ -835,8 +855,8 @@ You can call the library on your scripts by adding the following line to your
 files:
 
 @example
-#!/bin/sh -e
-. cpt-lib
+  #!/bin/sh -e
+  . cpt-lib
 @end example
 
 This will load the library inside your script, and will set some environment
@@ -867,18 +887,18 @@ cpt-lib will handle the option parsing itself by calling @samp{getoptions}
 inside. Here is the proper way of doing it.
 
 @example
-#!/bin/sh -e
+  #!/bin/sh -e
 
-parser_definition() @{
-    # The rest arguments MUST be defined as 'REST'
-    setup REST help:usage                  -- "usage: $@{0##*/@} [options] [pkg...]"
-    msg                                    -- '' 'Options:'
-    flag CPT_TEST -t export:1 init:@@export -- "Enable tests"
+  parser_definition() @{
+      # The rest arguments MUST be defined as 'REST'
+      setup REST help:usage                  -- "usage: $@{0##*/@} [options] [pkg...]"
+      msg                                    -- '' 'Options:'
+      flag CPT_TEST -t export:1 init:@@export -- "Enable tests"
 
-    global_options
-@}
+      global_options
+  @}
 
-. cpt-lib
+  . cpt-lib
 @end example
 
 @node @samp{global_options()}
@@ -930,9 +950,9 @@ with the user, it just exists to have a simple function to interact with other
 functions.
 
 @example
-$ out "This is an example call" "How are you?"
-This is an example call
-How are you?
+  $ out "This is an example call" "How are you?"
+  This is an example call
+  How are you?
 @end example
 
 @node @samp{log()}
@@ -1015,7 +1035,7 @@ regesc '^[$\'  # Returns \^\[\$\\
 @node @samp{pop()}
 @subsection @samp{pop()}
 
-@samp{pop()} can be used to remove a word from a "string list" without a @samp{sed}
+@samp{pop()} can be used to remove a word from a ``string list'' without a @samp{sed}
 call. Word splitting is intentional when using this function.
 
 @example
@@ -1293,5 +1313,15 @@ with 1.
 $ pkg_query_meta cpt description
 Carbs Packaging Tools
 @end example
+
+@node Concept Index
+@chapter Concept Index
+
+@printindex cp
+
+@node Variable Index
+@chapter Variable Index
+
+@printindex vr
 
 @bye
