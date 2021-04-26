@@ -1664,10 +1664,9 @@ pkg_repository_info() {
         # Fossil repository
         backend=fossil
 
-        # We want to remove the initial spacing before the root directory.
-        read -r _ rootdir <<EOF
-$rootdir
-EOF
+        # We want to remove the initial spacing before the root directory, and
+        # the leading dash on the root directory.
+        rootdir=$(printf '%s\n' "$rootdir" | cut -d ' ' -f2-)
         rootdir=${rootdir%/}
     elif [ -f .rsync ]; then
         backend=rsync
