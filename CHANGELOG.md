@@ -9,6 +9,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+6.0.3 - 2021-05-10
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed interrupt behaviour when downloading package sources.
+- Fixed `cpt --help` output when inside a directory prefixed with `cpt-`
+
+
 6.0.2 - 2021-04-05
 --------------------------------------------------------------------------------
 
