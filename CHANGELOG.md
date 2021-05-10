@@ -9,7 +9,21 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-6.0.0
+6.0.2 - 2021-04-05
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed `make dist` target.
+
+
+6.0.1 - 2021-04-05
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed inconsistencies of the `Ctrl+C` interrupt behaviour
+
+
+6.0.0 - 2021-04-03
 --------------------------------------------------------------------------------
 
 ### Added
