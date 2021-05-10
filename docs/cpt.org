@@ -562,6 +562,10 @@ will only run if the user has the =CPT_TEST= variable set, or the build is
 run with the =-t= or =--test= options. This script is run on the
 build directory. It is run right after the build script is finished.
 
+* TODO Package Repositories :noexport:
+
+Repositories are
+
 * Rsync Repositories
 :PROPERTIES:
 :DESCRIPTION: Information on using or creating rsync repositories
