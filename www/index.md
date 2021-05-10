@@ -32,8 +32,8 @@ complements the tools that come with it. It has the following features:
 
 <hr>
 
-### Latest Release: 6.0.2 ([2021-04-05](/timeline?c=6.0.2))
+### Latest Release: 6.0.3 ([2021-05-10](/timeline?c=6.0.3))
 
 - [Download](/uvlist?byage=1)
-- [Changelog](/wiki?name=Changelog)
+- [Changelog](/docs/trunk/CHANGELOG.md)
 - [User Manual](https://carbslinux.org/docs/cpt)
