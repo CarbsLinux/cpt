@@ -43,8 +43,11 @@ trap_set() {
             trap pkg_clean EXIT
             trap 'pkg_clean; exit 1' INT
             ;;
-        block)   trap '' INT ;;
-        unset)   trap - EXIT INT ;;
+        handle-int)
+            trap pkg_clean INT
+            ;;
+        block) trap '' INT ;;
+        unset) trap - EXIT INT ;;
     esac
 }
 
@@ -703,10 +706,17 @@ pkg_sources() {
         elif [ -z "${src##*://*}" ]; then
             log "$1" "Downloading $src"
 
+            # We don't want our trap to exit immediately here if we receive an
+            # interrupt, we handle this ourselves.
+            trap_set handle-int
+
             curl "$src" -fLo "${src##*/}" || {
                 rm -f "${src##*/}"
                 die "$1" "Failed to download $src"
             }
+
+            # Restore original trap value.
+            trap_set cleanup
 
         # Local source.
         elif [ -f "$repo_dir/$src" ]; then
