@@ -2,15 +2,15 @@ THIS REPOSITORY IS ARCHIVED
 ===========================
 
 Development of cpt is no longer on Github. For more information see [here].
-Package manager is now being developed on <https://git.sr.ht/~carbslinux/cpt>.
+Package manager is now being developed on <https://fossil.carbslinux.org/cpt>.
 
-[here]: https://carbslinux.org/blog/20210303.html#switching-to-sourcehut
+[here]: https://carbslinux.org/blog/20210415.html#fossil
 
 Reporting issues
 ----------------
 
 If you are experiencing issues with the package manager, you can go to
-<https://todo.sr.ht/~carbslinux/cpt>, or send a mail to
+<https://fossil.carbslinux.org/cpt/ticket>, or send a mail to
 [~carbslinux/cpt-devel@lists.sr.ht].
 
 If you are experiencing issues with Carbs Linux packages, send a mail to
