@@ -1989,6 +1989,12 @@ create_cache() {
         eval set -- "$REST"
     }
 
+    # The PID of the current shell process is used to isolate directories
+    # to each specific CPT instance. This allows multiple package manager
+    # instances to be run at once. Store the value in another variable so
+    # that it doesn't change beneath us.
+    pid=${CPT_PID:-$$}
+
     # Create the cache directories for CPT and set the variables which point
     # to them. This is seperate from temporary directories created in
     # create_cache(). That's because we need these variables set on most
@@ -2007,12 +2013,6 @@ create_cache() {
 
     # Set the location to the repository and package database.
     pkg_db=var/db/cpt/installed
-
-    # The PID of the current shell process is used to isolate directories
-    # to each specific CPT instance. This allows multiple package manager
-    # instances to be run at once. Store the value in another variable so
-    # that it doesn't change beneath us.
-    pid=${CPT_PID:-$$}
 
     # Force the C locale to speed up things like 'grep' which disable unicode
     # etc when this is set. We don't need unicode and a speed up is always
