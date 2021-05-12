@@ -9,6 +9,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+6.0.4 - 2021-05-12
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed the declaration place of the `$pid` variable
+
+
 6.0.3 - 2021-05-10
 --------------------------------------------------------------------------------
 
