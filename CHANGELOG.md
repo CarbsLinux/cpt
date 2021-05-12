@@ -9,6 +9,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+UNRELEASED
+--------------------------------------------------------------------------------
+
+### Added
+- Added fossil support
+
+
 6.0.3 - 2021-05-10
 --------------------------------------------------------------------------------
 
