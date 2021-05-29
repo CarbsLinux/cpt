@@ -590,7 +590,13 @@ pkg_lint() {
     read -r _ release 2>/dev/null < version || die "Version file not found"
     [ "$release" ] || die "Release field not found in version file"
 
-    [ "$2" ] || [ -f checksums ] || die "$pkg" "Checksums are missing"
+    # If we have a second argument, we are generating the checksums file,
+    # so we don't need to check whether there is one.
+    [ -z "$2" ] || return 0
+
+    # Check for a checksums file only if there is a sources file.
+    [ -f sources ]   || return 0
+    [ -f checksums ] || die "$pkg" "Checksums are missing"
 }
 
 pkg_find() {
