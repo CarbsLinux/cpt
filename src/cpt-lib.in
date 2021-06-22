@@ -1852,6 +1852,10 @@ pkg_fetch() {
             cd "$repo_root"
 
             "pkg_vcs_pull_$repo_type"
+
+            # Repositories can contain a "Message of the Day" file in order to
+            # relay important information to their users.
+            ! [ -r "$repo_root/motd" ] || cat "$repo_root/motd"
         }
     done
 
