@@ -1676,7 +1676,7 @@ pkg_vcs_clone_git() {
 pkg_vcs_clone_hg() {
     # $1: Clone URL
     # $2: Branch or Commit Object
-    hg clone -u "${2:-tip}" "${1%[#@]*}"
+    hg clone -u "${2:-tip}" "${1%[#@]*}" .
 }
 
 pkg_vcs_clone_fossil() {
