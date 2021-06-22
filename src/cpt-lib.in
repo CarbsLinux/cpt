@@ -66,6 +66,12 @@ sepchar() (
     printf '%s\n' "$@"
 )
 
+_re() {
+    # Check that the string supplied in $2 conforms to the regular expression
+    # of $1.
+    printf %s "${2:?}" | grep -Eq "$1"
+}
+
 _seq() (
     # Pure shell counter meant to be used in 'for' loops.
     i=0 buf=''
@@ -697,12 +703,8 @@ pkg_sources() {
     repo_dir=$(pkg_find "$1")
 
     while read -r src dest || [ "$src" ]; do
-        # Remote git/hg repository or comment.
-        if [ -z "${src##\#*}" ]   ||
-           [ -z "${src##git+*}" ] ||
-           [ -z "${src##hg+*}" ]
-
-        then :
+        # Remote repository or comment.
+        if _re "$re_vcs_or_com" "$src"; then :
 
         # Remote source (cached).
         elif [ -f "${src##*/}" ]; then
@@ -748,32 +750,14 @@ pkg_extract() {
         mkdir -p "$mak_dir/$1/$dest" && cd "$mak_dir/$1/$dest"
 
         case $src in
-            # Git repository.
-            git+*)
-                # Split the source into URL + OBJECT (branch or commit).
-                url=${src##git+} com=${url##*[@#]} com=${com#${url%[@#]*}}
 
-                log "$1" "Cloning ${url%[@#]*}"; {
-                    git init
-                    git remote add origin "${url%[@#]*}"
-                    case "$url" in
-                        # Tags are specified via '@'
-                        *@*) git fetch -t --depth=1 origin "$com" || git fetch ;;
-                        *)   git fetch --depth=1 origin "$com" || git fetch
-                    esac
-                    git checkout "${com:-FETCH_HEAD}"
-                } || die "$1" "Failed to clone $src"
-            ;;
+            # VCS Repository
+            git+*|hg+*|fossil+*)
+                backend=${src%%+*}
+                url=${src##${backend}+} com=${url##*[@#]} com=${com#${url%[@#]*}}
 
-            # Mercurial repository.
-            hg+*)
-                # Split the source into URL + OBJECT (branch or commit).
-                url=${src##hg+} com=${url##*[@#]} com=${com#${url%[@#]*}}
-
-                # Unfortunately, there is no shallow cloning with Mercurial.
-                log "$1" "Cloning ${url%[@#]*}"
-                hg clone -u "${com:-tip}"
-
+                log "$1" "Cloning ${url%[#@]*}"
+                "pkg_vcs_clone_$backend" "${url%[#@]*}" "$com"
             ;;
 
             # Comment or blank line.
@@ -1242,12 +1226,10 @@ pkg_checksums() {
     while read -r src _ || [ "$src" ]; do
 
         # Skip checksums if it's a comment, or a VCS repository.
-        case $src in
-            \#*|git+*|hg+*|fossil+*) continue ;;
-        esac
+        if _re "$re_vcs_or_com" "$src"; then continue
 
         # File is local to the package.
-        if [ -f "$repo_dir/$src" ]; then
+        elif [ -f "$repo_dir/$src" ]; then
             src_path=$repo_dir/${src%/*}
 
         # File is remote and was downloaded.
@@ -1677,6 +1659,30 @@ pkg_install() {
     run_hook post-install "$pkg_name" "$sys_db/$pkg_name" root
 
     log "$pkg_name" "Installed successfully"
+}
+
+pkg_vcs_clone_git() {
+    # $1: Clone URL
+    # $2: Branch or Commit Object
+    git init
+    git remote add origin "${1%[#@]*}"
+    case $2 in
+        @*) git fetch -t --depth=1 origin "${2#@}" || git fetch ;;
+        *)  git fetch --depth=1 origin "$2"        || git fetch
+    esac
+    git checkout "${2:-FETCH_HEAD}"
+}
+
+pkg_vcs_clone_hg() {
+    # $1: Clone URL
+    # $2: Branch or Commit Object
+    hg clone -u "${2:-tip}" "${1%[#@]*}"
+}
+
+pkg_vcs_clone_fossil() {
+    # $1: Clone URL
+    # $2: Branch or Commit Object
+    fossil open -f "${1%[#@]*}" "${2:-trunk}"
 }
 
 pkg_vcs_pull_fossil() {
@@ -2150,6 +2156,10 @@ create_cache() {
     # Define this variable but don't create its directory structure from
     # the get go. It will be created as needed by package installation.
     sys_db=$CPT_ROOT/$pkg_db
+
+    # Regular expression used in pkg_checksums() and pkg_sources() in order to
+    # identify VCS and comments
+    re_vcs_or_com='^(#|(fossil|git|hg)\+)'
 
     # This allows for automatic setup of a CPT chroot and will
     # do nothing on a normal system.
