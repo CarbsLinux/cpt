@@ -1320,8 +1320,6 @@ pkg_conflicts() {
     # information multiple times. Storing it in the cache dir allows us
     # to be lazy as they'll be automatically removed on script end.
     sed '/\/$/d' "$@" | sort "$CPT_TMPDIR/$pid/manifest" - | uniq -d > "$CPT_TMPDIR/$pid/conflict" ||:
-    "$grep" -Fxf "$CPT_TMPDIR/$pid/manifest" -- "$@" > "$CPT_TMPDIR/$pid/conflict" ||:
-
 
     # Enable alternatives automatically if it is safe to do so.
     # This checks to see that the package that is about to be installed
