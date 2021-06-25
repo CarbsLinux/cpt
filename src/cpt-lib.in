@@ -2081,10 +2081,14 @@ create_cache() {
     # We create the temporary directory here to avoid permission issues that can
     # arise from functions that call as_root().
     mkdir -p "${cac_dir:=${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}" \
-             "${tmp_dir:=${CPT_TMPDIR:=$cac_dir/proc}/$pid}" \
+             "${CPT_TMPDIR:=$cac_dir/proc}" \
              "${src_dir:=$cac_dir/sources}" \
              "${log_dir:=$cac_dir/logs}" \
              "${bin_dir:=$cac_dir/bin}"
+
+    # We don't create the temporary $pid directory until `create_tmp()` is
+    # called, but we still declare its variable here.
+    : "${tmp_dir:=${CPT_TMPDIR:=$cac_dir/proc}/$pid}"
 
     # Set the location to the repository and package database.
     pkg_db=var/db/cpt/installed
