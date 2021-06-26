@@ -1659,6 +1659,24 @@ pkg_install() {
     log "$pkg_name" "Installed successfully"
 }
 
+pkg_repository_update() {
+    # Function to update the given package repository.
+    cd "$1"
+    repo_type=$(pkg_vcs_info)
+    repo_root=${repo_type#$PWD:}
+    repo_type=${repo_type##*:} repo_root=${repo_root%:*}
+    contains "$repos" "$repo_root" || {
+        repos="$repos $repo_root "
+        cd "$repo_root"
+
+        "pkg_vcs_pull_$repo_type"
+
+        # Repositories can contain a "Message of the Day" file in order to
+        # relay important information to their users.
+        ! [ -r "$repo_root/motd" ] || cat "$repo_root/motd"
+    }
+}
+
 pkg_vcs_clone_git() {
     # $1: Clone URL
     # $2: Branch or Commit Object
@@ -1844,23 +1862,7 @@ pkg_fetch() {
 
     # Update each repository in '$CPT_PATH'. It is assumed that
     # each repository is 'git' tracked.
-    for repo; do
-        # Go to the root of the repository.
-        cd "$repo"
-        repo_type=$(pkg_vcs_info)
-        repo_root=${repo_type#$PWD:}
-        repo_type=${repo_type##*:} repo_root=${repo_root%:*}
-        contains "$repos" "$repo_root" || {
-            repos="$repos $repo_root "
-            cd "$repo_root"
-
-            "pkg_vcs_pull_$repo_type"
-
-            # Repositories can contain a "Message of the Day" file in order to
-            # relay important information to their users.
-            ! [ -r "$repo_root/motd" ] || cat "$repo_root/motd"
-        }
-    done
+    for repo; do pkg_repository_update "$repo"; done
 
     run_hook post-fetch
 }
