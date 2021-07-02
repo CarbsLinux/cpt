@@ -472,12 +472,12 @@ run_hook() {
 
 decompress() {
     case $1 in
-        *.tar)      cat       ;;
-        *.bz2)      bzip2 -cd ;;
-        *.lz)       lzip  -cd ;;
-        *.xz|*.txz) xz -dcT 0 ;;
-        *.tgz|*.gz) gzip -cd  ;;
-        *.zst)      zstd -cd  ;;
+        *.tar|*.cpio) cat       ;;
+        *.bz2)        bzip2 -cd ;;
+        *.lz)         lzip  -cd ;;
+        *.xz|*.txz)   xz -dcT 0 ;;
+        *.tgz|*.gz)   gzip -cd  ;;
+        *.zst)        zstd -cd  ;;
     esac < "$1"
 }
 
@@ -493,69 +493,6 @@ sh256() {
       die "No sha256 program could be run." ;} |
 
         while read -r hash _; do printf '%s  %s\n' "$hash" "$1"; done
-}
-
-tar_extract() {
-    # Tarball extraction function that prefers pax(1) over tar(1). The reason we
-    # are preferring pax is that we can strip components without relying on
-    # ugly hacks such as the ones we are doing for 'tar'. Using 'tar' means that
-    # we either have to sacrifice speed or portability, and we are choosing to
-    # sacrifice speed. Fortunately, we don't have to make such a choice when
-    # using pax.
-    case "${extract##*/}" in
-        pax)         decompress "$1" | pax -r -s '/[^\/]*/./' ;;
-        gtar|bsdtar) decompress "$1" | "$tar" xf - --strip-components 1 ;;
-        tar) decompress "$1" > .ktar
-
-            "$tar" xf .ktar || return
-
-            # We now list the contents of the tarball so we can do our
-            # version of 'strip-components'.
-            "$tar" tf .ktar |
-                while read -r file; do printf '%s\n' "${file%%/*}"; done |
-
-                # Do not repeat files.
-                uniq |
-
-                # For every directory in the base we move each file
-                # inside it to the upper directory.
-                while read -r dir ; do
-
-                    # Skip if we are not dealing with a directory here.
-                    # This way we don't remove files on the upper directory
-                    # if a tar archive doesn't need directory stripping.
-                    [ -d "${dir#.}" ] || continue
-
-                    # Change into the directory in a subshell so we don't
-                    # need to cd back to the upper directory.
-                    (
-                        cd "$dir"
-
-                        # We use find because we want to move hidden files
-                        # as well.
-                        #
-                        # Skip the file if it has the same name as the directory.
-                        # We will deal with it later.
-                        #
-                        # Word splitting is intentional here.
-                        # shellcheck disable=2046
-                        find . \( ! -name . -prune \) ! -name "$dir" \
-                            -exec mv -f {} .. \;
-
-                        # If a file/directory with the same name as the directory
-                        # exists, append a '.cptbak' to it and move it to the
-                        # upper directory.
-                        ! [ -e "$dir" ] || mv "$dir" "../${dir}.cptbak"
-                    )
-                    rmdir "$dir"
-
-                    # If a backup file exists, move it into the original location.
-                    ! [ -e "${dir}.cptbak" ] || mv "${dir}.cptbak" "$dir"
-                done
-
-            # Clean up the temporary tarball.
-            rm -f .ktar
-    esac
 }
 
 pkg_owner() {
@@ -766,10 +703,8 @@ pkg_extract() {
             # Only 'tar', 'cpio', and 'zip' archives are currently supported for
             # extraction. Other filetypes are simply copied to '$mak_dir'
             # which allows for manual extraction.
-            *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|*://*.txz)
-                tar_extract "$src_dir/$1/${src##*/}" ;;
-
-            *://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
+            *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|\
+            *://*.txz|*://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
                 decompress "$src_dir/$1/${src##*/}" | pax -r ;;
 
             *://*.zip)
@@ -1015,7 +950,7 @@ pkg_tar() {
     read -r version release < "$(pkg_find "$1")/version"
 
     # Create a tarball from the contents of the built package.
-    "$tar" cf - -C "$pkg_dir/$1" . |
+    pax -w . |
         case $CPT_COMPRESS in
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
@@ -1550,12 +1485,14 @@ pkg_install() {
     fi
 
     mkdir -p "$tar_dir/$pkg_name"
+    cd       "$tar_dir/$pkg_name"
+
     log "$pkg_name" "Extracting $tar_file"
 
     # Extract the tarball to catch any errors before installation begins.
-    decompress "$tar_file" | "$tar" xf - -C "$tar_dir/$pkg_name"
+    decompress "$tar_file" | pax -r
 
-    [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest" ] ||
+    [ -f "./$pkg_db/$pkg_name/manifest" ] ||
         die "'${tar_file##*/}' is not a valid CPT package"
 
     # Ensure that the tarball's manifest is correct by checking that
@@ -1563,13 +1500,13 @@ pkg_install() {
     [ "$CPT_FORCE" != 1 ] && log "$pkg_name" "Checking package manifest" &&
         while read -r line; do
             # Skip symbolic links
-            [ -h "$tar_dir/$pkg_name/$line" ] ||
-            [ -e "$tar_dir/$pkg_name/$line" ] || {
-        log "File $line missing from tarball but mentioned in manifest" "" "!>"
-        TARBALL_FAIL=1
-        }
-    done < "$tar_dir/$pkg_name/$pkg_db/$pkg_name/manifest"
-    [ "$TARBALL_FAIL" ] && {
+            [ -h "./$line" ] ||
+            [ -e "./$line" ] || {
+                log "File $line missing from tarball but mentioned in manifest" "" "!>"
+                tarball_fail=1
+            }
+    done < "$pkg_db/$pkg_name/manifest"
+    [ "$tarball_fail" ] && {
         log "You can still install this package by setting CPT_FORCE variable"
         die "$pkg_name" "Missing files in manifest"
     }
@@ -1578,18 +1515,17 @@ pkg_install() {
 
     # Make sure that all run-time dependencies are installed prior to
     # installing the package.
-    [ -f "$tar_dir/$pkg_name/$pkg_db/$pkg_name/depends" ] &&
+    [ -f "$pkg_db/$pkg_name/depends" ] &&
     [ "$CPT_FORCE" != 1 ] &&
         while read -r dep dep_type || [ "$dep" ]; do
             [ "${dep##\#*}" ] || continue
             [ "$dep_type" ]   || pkg_list "$dep" >/dev/null ||
                 install_dep="$install_dep'$dep', "
-        done < "$tar_dir/$pkg_name/$pkg_db/$pkg_name/depends"
+        done < "$pkg_db/$pkg_name/depends"
 
     [ "$install_dep" ] && die "$1" "Package requires ${install_dep%, }"
 
     run_hook pre-install "$pkg_name" "$tar_dir/$pkg_name" root
-
     pkg_conflicts "$pkg_name"
 
     log "$pkg_name" "Installing package incrementally"
@@ -1608,7 +1544,7 @@ pkg_install() {
     pkg_rsync() {
         rsync "--chown=$USER:$USER" --chmod=Du-s,Dg-s,Do-s \
               -WhHKa --no-compress --exclude /etc "${1:---}" \
-              "$tar_dir/$pkg_name/" "$CPT_ROOT/"
+              "$tar_dir/$pkg_name" "$CPT_ROOT/"
     }
 
     # Install the package by using 'rsync' and overwrite any existing files
@@ -2108,17 +2044,6 @@ create_cache() {
     # implementation. Very much worth it if you value performance over
     # POSIX correctness (grep quoted to avoid shellcheck false-positive).
     grep=$(command -v ggrep) || grep='grep'
-
-    # Prefer libarchive tar or GNU tar if installed as they are  much
-    # much faster than busybox's implementation. Very much worth it if
-    # you value performance.
-    tar=$(command -v bsdtar || command -v gtar) || tar=tar
-
-    # Prefer libarchive tar, GNU tar, or the POSIX defined pax for tarball
-    # extraction, as they can strip components, which is much much faster than
-    # our portability function. Our first preference is pax, because it is
-    # actually slightly faster than bsdtar and GNU tar.
-    extract=$(command -v pax || command -v "$tar")
 
     # Figure out which 'sudo' command to use based on the user's choice or
     # what is available on the system.
