@@ -1618,7 +1618,13 @@ pkg_repository_update() {
 
         # Repositories can contain a "Message of the Day" file in order to
         # relay important information to their users.
-        ! [ -r "$repo_root/motd" ] || cat "$repo_root/motd"
+        ! [ -r "$repo_root/motd" ] || {
+            printf '%s\n%s\n%s\n\n' \
+                "$(_multiply_char '=' 60)" \
+                "Message of the Day [$PWD]" \
+                "$(_multiply_char '=' 60)"
+            cat "$repo_root/motd"
+        }
     }
 }
 
