@@ -34,7 +34,7 @@ die() {
 case "$(uname -m)" in i*86) arch=i686; esac
 url="https://dl.carbslinux.org/releases/${arch:-$(uname -m)}/carbs-rootfs.tar.xz"
 
-cd "$cac_dir"
+cd "${cac_dir:?}"
 
 [ -f carbs-rootfs.tar.xz ] || {
     log "Downloading chroot tarball"
@@ -55,10 +55,10 @@ sh256 carbs-rootfs.tar.xz | diff - carbs-rootfs.tar.xz.sum ||
 [ -d carbs-chroot ] || {
     log "Extracting chroot"
     mkdir -p carbs-chroot
-    ( cd carbs-chroot; tar xf ../carbs-rootfs.tar.xz )
+    (cd carbs-chroot; xz -cd ../carbs-rootfs.tar.xz | pax -r)
 }
 
-create_cache empty
+mkdir -p "${tmp_dir:?}"
 
 log "Creating temporary chroot"
 cp -a carbs-chroot "${chr_dir:=$tmp_dir/chroot}"
