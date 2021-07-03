@@ -950,7 +950,8 @@ pkg_tar() {
     read -r version release < "$(pkg_find "$1")/version"
 
     # Create a tarball from the contents of the built package.
-    pax -w . |
+    cd "$pkg_dir/$1"
+    pax -w .  |
         case $CPT_COMPRESS in
             bz2) bzip2 -z ;;
             xz)  xz -zT 0 ;;
@@ -1544,7 +1545,7 @@ pkg_install() {
     pkg_rsync() {
         rsync "--chown=$USER:$USER" --chmod=Du-s,Dg-s,Do-s \
               -WhHKa --no-compress --exclude /etc "${1:---}" \
-              "$tar_dir/$pkg_name" "$CPT_ROOT/"
+              "$tar_dir/$pkg_name/" "$CPT_ROOT/"
     }
 
     # Install the package by using 'rsync' and overwrite any existing files
