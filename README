@@ -14,7 +14,7 @@ To build and use cpt, you need the following software:
 - rsync
 - curl
 - POSIX base utilities  [coreutils, busybox, sbase, etc.]
-- pax or tar            [GNU tar, busybox, toybox, libarchive, etc.]
+- pax
 - Common compression utilities such as `gzip`, `bzip2`, `xz`, etc.
 
 
