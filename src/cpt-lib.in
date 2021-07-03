@@ -1640,9 +1640,9 @@ pkg_vcs_clone_fossil() {
 
 pkg_vcs_pull_fossil() {
     # Pull function for Fossil.
+    log "$PWD" " "
     [ "$(fossil remote 2>/dev/null)" != off ] || {
-        log "$repo" " "
-        printf '%s\n' "No remote, skipping."
+        out "No remote, skipping."
         return 0
     }
 
@@ -1689,9 +1689,9 @@ pkg_vcs_pull_git() {
 
 pkg_vcs_pull_hg() {
     # Pull function for Mercurial.
+    log "$PWD" " "
     [ "$(hg showconfig paths 2>/dev/null)" ] || {
-        log "$repo" " "
-        printf '%s\n' "No remote, skipping."
+        out "No remote, skipping."
         return 0
     }
 
@@ -1706,6 +1706,7 @@ pkg_vcs_pull_hg() {
 pkg_vcs_pull_rsync() {
     # Pull function for rsync repositories. The details of our rsync
     # repositories are explained in the user manual.
+    log "$PWD" " "
 
     # Read remote repository address from the '.rsync' file.
     read -r remote < .rsync
@@ -1719,8 +1720,8 @@ pkg_vcs_pull_rsync() {
 pkg_vcs_pull_local() {
     # Local repository. We don't do a "pull" here, we just notify the user that
     # this is the case.
-    log "$repo" " "
-    printf '%s\n' "Not a remote repository, skipping."
+    log "$PWD" " "
+    out "Not a remote repository, skipping."
 }
 
 pkg_vcs_as_root() (
