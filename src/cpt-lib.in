@@ -713,7 +713,7 @@ pkg_extract() {
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|\
             *://*.txz|*://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
-                decompress "$src_dir/$1/${src##*/}" | pax -rs '|[^/]*/|.|' ;;
+                decompress "$src_dir/$1/${src##*/}" | pax -rs '|[^/]*|.|' ;;
 
             *://*.zip)
                 unzip "$src_dir/$1/${src##*/}" ||
