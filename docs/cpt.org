@@ -405,8 +405,8 @@ EOF
 :DESCRIPTION: More detail on creating packages
 :END:
 
-A package is formed of several files, from these files, only ~build~,
-~checksums~, and ~version~ files are mandatory.
+A package is a directory formed of several files, from these files, only
+~build~, ~checksums~, and ~version~ files are mandatory.
 
 This section talks about files that are interpreted specially by the package
 manager. Any other file can be added to the package directory at the discretion
@@ -562,11 +562,24 @@ will only run if the user has the =CPT_TEST= variable set, or the build is
 run with the =-t= or =--test= options. This script is run on the
 build directory. It is run right after the build script is finished.
 
-* TODO Package Repositories :noexport:
+* Package Repositories
+:PROPERTIES:
+:DESCRIPTION: Ways of distributing packages
+:END:
 
-Repositories are
+*cpt* has backends to support the use of a variety of distribution methods. You
+can currently use Git, Mercurial, Fossil, and Rsync to distribute a package
+repository. That, however, does not mean that you need to setup either of those,
+if you are simply going for a local repository on your system.
 
-* Rsync Repositories
+#+CINDEX: Setting up repositories
+In the broad sense, a package repository is any directory that contains packages
+that were described in [[Packaging System]]. This means that as long as you can
+serve them, there is not much needed to do in order to distribute a repository.
+The following subsections aim to detail the notes and the caveats of certain
+distribution methods.
+
+** Rsync Repositories
 :PROPERTIES:
 :DESCRIPTION: Information on using or creating rsync repositories
 :END:
@@ -613,7 +626,7 @@ repository and will sync the entire repository instead of each individual reposi
 If the upper directory doesn't have this =.rsync= file, this means that this
 is an individual repository, and the package manager will fetch accordingly.
 
-** Setting up an Rsync repository
+*** Setting up an Rsync repository
 :PROPERTIES:
 :DESCRIPTION: Set up a repository for distribution
 :END:
@@ -667,6 +680,36 @@ Create a service file at =/etc/sv/rsync/run= (runit):
   exec rsync --daemon --no-detach
 #+END_SRC
 
+** Fossil repositories
+:PROPERTIES:
+:DESCRIPTION: Advantages and disadvantages of Fossil
+:END:
+
+Setting up a Fossil repository is no different than setting up any other
+repository. There are certainly many advantages of using Fossil as a means of
+distributing packages. You can create a Linux distribution and have your
+website, forum, documentation, and your package repository entirely contained
+inside a single Fossil repository. Fossil's built-in wiki and forum features
+make it the ultimate single-tool distribution software.
+
+However, the biggest caveat of Fossil is that it doesn't allow symlinks by
+default unless it's manually set by the user, and this feature cannot even be
+set globally. Symbolic links aren't quite common within distribution
+repositories, but they come in handy where there are two packages that use the
+same source files (=emacs= and =emacs-nox=, or =libelf= and =libdw= from
+elfutils). If symbolic links are too big of a deal for your repository, this can
+be a huge issue for you.
+
+** Message of the Day
+:PROPERTIES:
+:DESCRIPTION: Communicate with the users using your repository
+:END:
+
+If a file named =motd= is found on the root directory of the package repository,
+its contents will be printed to the standard output when the users are updating
+their repositories. This method can be used to communicate messages to the
+users, such as package removals or otherwise important information.
+
 * Comparison Between CPT and KISS
 
 Lots of things have changed since ~cpt~ was forked from ~kiss~ in terms of
@@ -690,12 +733,13 @@ this is the ~cpt~ documentation, so it may be biased regardless.
 
 - Package Repositories ::
 
-  In addition to git repositories, ~cpt~ also makes use of [[Rsync Repositories][rsync repositories]].
+  In addition to git repositories, ~cpt~ also supports Rsync, Fossil, and
+  Mercurial repositories.
 
 - Package Sources ::
 
-  In addition to git repositories for sources, ~cpt~ also supports mercurial
-  repositories.
+  In addition to git repositories for sources, ~cpt~ also supports Mercurial and
+  Fossil repositories.
 
 - Post-Installation Messages ::
 

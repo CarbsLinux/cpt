@@ -49,7 +49,7 @@ manual for @strong{Carbs Packaging Tools}. For development logs see @uref{https:
 * Usage::                        Basic usage of Carbs Packaging Tools
 * Configuration::                Configuring the package manager
 * Packaging System::             More detail on creating packages
-* Rsync Repositories::           Information on using or creating rsync repositories
+* Package Repositories::         Ways of distributing packages
 * Comparison Between CPT and KISS::
 * CPT Library::                  Documentation of the Library
 * Concept Index::                Concepts mentioned in this manual
@@ -83,6 +83,12 @@ Packaging System
 * post-install::                 The post-installation script
 * message::                      The post-installation message to be displayed
 * test::                         The test script for a package
+
+Package Repositories
+
+* Rsync Repositories::           Information on using or creating rsync repositories
+* Fossil repositories::          Advantages and disadvantages of Fossil
+* Message of the Day::           Communicate with the users using your repository
 
 Rsync Repositories
 
@@ -526,8 +532,8 @@ EOF
 @node Packaging System
 @chapter Packaging System
 
-A package is formed of several files, from these files, only @code{build},
-@code{checksums}, and @code{version} files are mandatory.
+A package is a directory formed of several files, from these files, only
+@code{build}, @code{checksums}, and @code{version} files are mandatory.
 
 This section talks about files that are interpreted specially by the package
 manager. Any other file can be added to the package directory at the discretion
@@ -687,8 +693,29 @@ will only run if the user has the @samp{CPT_TEST} variable set, or the build is
 run with the @samp{-t} or @samp{--test} options. This script is run on the
 build directory. It is run right after the build script is finished.
 
+@node Package Repositories
+@chapter Package Repositories
+
+@strong{cpt} has backends to support the use of a variety of distribution methods. You
+can currently use Git, Mercurial, Fossil, and Rsync to distribute a package
+repository. That, however, does not mean that you need to setup either of those,
+if you are simply going for a local repository on your system.
+
+@cindex Setting up repositories
+In the broad sense, a package repository is any directory that contains packages
+that were described in @ref{Packaging System}. This means that as long as you can
+serve them, there is not much needed to do in order to distribute a repository.
+The following subsections aim to detail the notes and the caveats of certain
+distribution methods.
+
+@menu
+* Rsync Repositories::           Information on using or creating rsync repositories
+* Fossil repositories::          Advantages and disadvantages of Fossil
+* Message of the Day::           Communicate with the users using your repository
+@end menu
+
 @node Rsync Repositories
-@chapter Rsync Repositories
+@section Rsync Repositories
 
 Rsync repositories are simple to serve and simple to use. In the repository
 directory, there needs to be a @samp{.rsync} file that points to the remote of the
@@ -737,7 +764,7 @@ is an individual repository, and the package manager will fetch accordingly.
 @end menu
 
 @node Setting up an Rsync repository
-@section Setting up an Rsync repository
+@subsection Setting up an Rsync repository
 
 Carbs Linux repositories automatically sync from the git repostitories and serve
 it through the rsync daemon. Here is a sample shell script that I use in order to
@@ -788,6 +815,32 @@ Create a service file at @samp{/etc/sv/rsync/run} (runit):
 exec rsync --daemon --no-detach
 @end example
 
+@node Fossil repositories
+@section Fossil repositories
+
+Setting up a Fossil repository is no different than setting up any other
+repository. There are certainly many advantages of using Fossil as a means of
+distributing packages. You can create a Linux distribution and have your
+website, forum, documentation, and your package repository entirely contained
+inside a single Fossil repository. Fossil's built-in wiki and forum features
+make it the ultimate single-tool distribution software.
+
+However, the biggest caveat of Fossil is that it doesn't allow symlinks by
+default unless it's manually set by the user, and this feature cannot even be
+set globally. Symbolic links aren't quite common within distribution
+repositories, but they come in handy where there are two packages that use the
+same source files (@samp{emacs} and @samp{emacs-nox}, or @samp{libelf} and @samp{libdw} from
+elfutils). If symbolic links are too big of a deal for your repository, this can
+be a huge issue for you.
+
+@node Message of the Day
+@section Message of the Day
+
+If a file named @samp{motd} is found on the root directory of the package repository,
+its contents will be printed to the standard output when the users are updating
+their repositories. This method can be used to communicate messages to the
+users, such as package removals or otherwise important information.
+
 @node Comparison Between CPT and KISS
 @chapter Comparison Between CPT and KISS
 
@@ -810,11 +863,12 @@ through environment variables. Additionally, all @code{cpt} tools can receive fl
 that alter their functionality. @code{kiss} does not accept flags.
 
 @item Package Repositories
-In addition to git repositories, @code{cpt} also makes use of @ref{Rsync Repositories, , rsync repositories}.
+In addition to git repositories, @code{cpt} also supports Rsync, Fossil, and
+Mercurial repositories.
 
 @item Package Sources
-In addition to git repositories for sources, @code{cpt} also supports mercurial
-repositories.
+In addition to git repositories for sources, @code{cpt} also supports Mercurial and
+Fossil repositories.
 
 @item Post-Installation Messages
 @code{kiss} and @code{cpt} interact with @samp{post-install} messages differently. @code{kiss}
