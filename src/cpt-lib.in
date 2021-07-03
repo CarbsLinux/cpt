@@ -713,7 +713,7 @@ pkg_extract() {
             # which allows for manual extraction.
             *://*.tar|*://*.tar.??|*://*.tar.???|*://*.tar.????|*://*.tgz|\
             *://*.txz|*://*.cpio|*://*.cpio.??|*://*.cpio.???|*://*.cpio.????)
-                decompress "$src_dir/$1/${src##*/}" | pax -r ;;
+                decompress "$src_dir/$1/${src##*/}" | pax -rs '|[^/]*/|.|' ;;
 
             *://*.zip)
                 unzip "$src_dir/$1/${src##*/}" ||
@@ -1624,6 +1624,7 @@ pkg_repository_update() {
                 "Message of the Day [$PWD]" \
                 "$(_multiply_char '=' 60)"
             cat "$repo_root/motd"
+            printf '\n%s\n' "$(_multiply_char '=' 60)"
         }
     }
 }
