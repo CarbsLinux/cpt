@@ -1,5 +1,8 @@
 image: alpine/edge
 packages:
+  - musl-dev
+  - gcc
+  - bison
   - curl
   - rsync
   - shellcheck
@@ -9,6 +12,11 @@ tasks:
   - build: |
       cd cpt
       make
+  - install-pax: |
+      git clone https://github.com/carbslinux/otools
+      cd otools
+      make pax
+      sudo install -Dm755 pax /usr/bin/pax
   - test: |
       cd cpt
       curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
