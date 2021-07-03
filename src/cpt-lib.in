@@ -1656,9 +1656,10 @@ pkg_vcs_pull_fossil() {
 
     # Ensure we have proper permissions to do the pull operation.
     if [ -w "$PWD" ] && [ "$uid" != 0 ]; then
+        fossil pull
         fossil update
     else
-        pkg_vcs_as_root "fossil update"
+        pkg_vcs_as_root "fossil pull && fossil update"
     fi
 }
 
@@ -1777,8 +1778,7 @@ pkg_vcs_info() {
 
         # We want to remove the initial spacing before the root directory, and
         # the leading dash on the root directory.
-        rootdir=$(printf '%s\n' "$rootdir" | cut -d ' ' -f2-)
-        rootdir=${rootdir%/}
+        rootdir=${rootdir#local-root: *} rootdir=${rootdir%/}
     elif [ -f .rsync ]; then
         backend=rsync
         rootdir=$PWD
