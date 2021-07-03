@@ -81,6 +81,14 @@ _seq() (
     printf '%s' "$buf"
 )
 
+_multiply_char() (
+    buf=
+    for i in $(_seq "$2"); do
+        buf="$buf$1"
+    done
+    out "$buf"
+)
+
 _stat() (
     _user=; eval set -- "$(ls -ld "$1")"
     id -u "${_user:=$3}" >/dev/null 2>&1 || _user=root
