@@ -45,7 +45,7 @@ eval set -- "$(sed '/\/$/d;s|^|".|;s|$|"|' \
 
 # Turn the list of files back into a package.
 cd "$CPT_ROOT/"
-tar cf - -- "$@" |
+pax -w -- "$@" |
 
 case "$CPT_COMPRESS" in
     bz2) bzip2 -z ;;
