@@ -20,11 +20,12 @@ case "$1" in
     '') set -- "${PWD##*/}"
 esac
 
-cpt-list "${1:-null}" >/dev/null
+cpt-list "$1" >/dev/null
+db=$CPT_ROOT/var/db/cpt/installed
 
 # Grab the package's version..
-read -r ver rel 2>/dev/null < \
-    "$CPT_ROOT/var/db/cpt/installed/$1/version"
+read -r ver rel 2>/dev/null < "$db/$1/version"
+
 
 ### Environment variables:
 ### The compression method can be changed while creating a tarball, using the
@@ -35,17 +36,12 @@ read -r ver rel 2>/dev/null < \
 case "$CPT_COMPRESS" in bz2|gz|xz|zst|lz) ;; *) CPT_COMPRESS=gz; esac
 
 # Reset the argument list.
-pkg=$1
 tarball="$PWD/$1#$ver-$rel.tar.$CPT_COMPRESS"
-set --
-
-# Construct the argument list using each file.
-eval set -- "$(sed '/\/$/d;s|^|".|;s|$|"|' \
-    "$CPT_ROOT/var/db/cpt/installed/$pkg/manifest" | tr '\n' ' ')"
 
 # Turn the list of files back into a package.
 cd "$CPT_ROOT/"
-pax -w -- "$@" |
+sed 's/^/./' "$db/$1/manifest" |
+pax -wd |
 
 case "$CPT_COMPRESS" in
     bz2) bzip2 -z ;;
