@@ -26,12 +26,10 @@ db=$CPT_ROOT/var/db/cpt/installed
 # Grab the package's version..
 read -r ver rel 2>/dev/null < "$db/$1/version"
 
-
 ### Environment variables:
 ### The compression method can be changed while creating a tarball, using the
 ### .Ev CPT_COMPRESS
 ### environment variable.
-
 # Fallback to gzip if there is a typo
 case "$CPT_COMPRESS" in bz2|gz|xz|zst|lz) ;; *) CPT_COMPRESS=gz; esac
 
