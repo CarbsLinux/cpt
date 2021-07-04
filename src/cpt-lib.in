@@ -1499,7 +1499,7 @@ pkg_install() {
     log "$pkg_name" "Extracting $tar_file"
 
     # Extract the tarball to catch any errors before installation begins.
-    decompress "$tar_file" | pax -r
+    decompress "$tar_file" | pax -rpp
 
     [ -f "./$pkg_db/$pkg_name/manifest" ] ||
         die "'${tar_file##*/}' is not a valid CPT package"
