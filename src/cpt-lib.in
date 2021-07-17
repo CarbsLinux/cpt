@@ -404,6 +404,7 @@ global_options() {
     param CPT_ROOT      --root                 init:@export -- "Use an alternate root directory"
     disp :usage      -h --help                              -- "Show this help message"
     disp :version    -v --version                           -- "Print version information"
+    flag CPT_VERBOSE    --verbose              init:@export -- "Be more verbose"
 }
 
 contains() {
