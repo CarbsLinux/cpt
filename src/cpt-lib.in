@@ -30,6 +30,29 @@ log() {
            "$colory" "${3:-->}" "$colre" "${2:+$colorb}" "$1" "$colre" "$2" >&2
 }
 
+warn() {
+    # Print a warning message
+    log "$1" "$2" "${3:-WARNING}"
+}
+
+outv() {
+    # Call `out()` when CPT_VERBOSE is set.
+    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    out "$@"
+}
+
+logv() {
+    # Call `log()` when CPT_VERBOSE is set.
+    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    log "$@"
+}
+
+warnv() {
+    # Call `warn()` when CPT_VERBOSE is set.
+    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    warn "$@"
+}
+
 die() {
     # Print a message and exit with '1' (error).
     log "$1" "$2" "!>"
@@ -383,11 +406,6 @@ global_options() {
     disp :version    -v --version                           -- "Print version information"
 }
 
-warn() {
-    # Print a warning message
-    log "$1" "$2" "${3:-WARNING}"
-}
-
 contains() {
     # Check if a "string list" contains a word.
     case " $1 " in *" $2 "*) return 0; esac; return 1
@@ -472,7 +490,11 @@ run_hook() {
 
     [ -f "$CPT_HOOK" ] || { CPT_HOOK=$oldCPT_HOOK; return 0 ;}
 
-    [ "$2" ] && log "$2" "Running $1 hook"
+    if [ "$2" ]; then
+        logv "$2" "Running $1 hook"
+    else
+        logv "Running $1 hook"
+    fi
 
     TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$CPT_HOOK"
     CPT_HOOK=$oldCPT_HOOK
@@ -534,7 +556,7 @@ pkg_lint() {
     repo_dir=$(pkg_find "$1")
 
     cd "$repo_dir" || die "'$repo_dir' not accessible"
-    [ -f sources ] || warn "$1" "Sources file not found"
+    [ -f sources ] || warnv "$1" "Sources file not found"
     [ -x build ]   || die "$1" "Build file not found or not executable"
     [ -s version ] || die "$1" "Version file not found or empty"
 
@@ -1386,17 +1408,17 @@ pkg_etc() {
           sum_sys=$(cd "$CPT_ROOT/"; sh256 "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
-        log "$pkg_name" "Doing 3-way handshake for $file"
-        printf '%s\n' "Previous: ${sum_old:-null}"
-        printf '%s\n' "System:   ${sum_sys:-null}"
-        printf '%s\n' "New:      ${sum_new:-null}"
+        logv "$pkg_name" "Doing 3-way handshake for $file"
+        outv "Previous: ${sum_old:-null}"
+        outv "System:   ${sum_sys:-null}"
+        outv "New:      ${sum_new:-null}"
 
         # Use a case statement to easily compare three strings at
         # the same time. Pretty nifty.
         case ${sum_old:-null}${sum_sys:-null}${sum_new} in
             # old = Y, sys = X, new = Y
             "${sum_new}${sum_sys}${sum_old}")
-                log "Skipping $file"
+                logv "Skipping $file"
                 continue
             ;;
 
@@ -1406,7 +1428,7 @@ pkg_etc() {
             "${sum_old}${sum_old}${sum_old}"|\
             "${sum_old:-null}${sum_sys}${sum_sys}"|\
             "${sum_sys}${sum_old}"*)
-                log "Installing $file"
+                logv "Installing $file"
                 new=
             ;;
 
