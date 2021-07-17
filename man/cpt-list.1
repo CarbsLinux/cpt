@@ -5,7 +5,7 @@
 .Nd list packages
 .Sh SYNOPSIS
 .Nm
-.Op Fl c
+.Op Fl cq
 .Ar pkg...
 .Nm
 .Fl C
@@ -20,7 +20,7 @@ list the given packages. If any of the given packages are not installed on the
 system,
 .Nm
 will exit with an error. However,
-.Fl c
+.Fl C
 and
 .Fl -check
 flags can be used in order to change the behaviour of the utility:
@@ -28,6 +28,8 @@ flags can be used in order to change the behaviour of the utility:
 .It Fl c , -current
 Assumes that the current directory is a package and will use it instead of
 arguments.
+.It Fl q , -quiet
+Make the operation quiet, only reporting exit status.
 .It Fl C , -check Ar package true_statement false_statement
 Checks whether the
 .Em package
