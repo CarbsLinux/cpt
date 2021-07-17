@@ -3,7 +3,7 @@
 
 parser_definition() {
     setup REST help:usage -- \
-        "usage: ${0##*/} [-c] pkg..." \
+        "usage: ${0##*/} [-cq] pkg..." \
         "or:    ${0##*/} -C pkg true-statement false-statement"
     msg -- '' 'Options:'
     flag CURRENT -c --current -- "Use the current directory as a package"
