@@ -7,7 +7,7 @@ parser_definition() {
         "or:    ${0##*/} -C pkg true-statement false-statement"
     msg -- '' 'Options:'
     flag CURRENT -c --current -- "Use the current directory as a package"
-    flag quiet   -q           -- "Make the operation quiet"
+    flag quiet   -q --quiet   -- "Make the operation quiet"
     param PKG    -C --check label:"    -C,--check PKG TRUE FALSE" -- \
           "Check if PKG exists and return the string of TRUE if"\
           "it exists, and the string of FALSE if it doesn't." \
