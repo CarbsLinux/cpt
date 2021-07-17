@@ -724,10 +724,11 @@ be a huge issue for you.
 :DESCRIPTION: Communicate with the users using your repository
 :END:
 
-If a file named =motd= is found on the root directory of the package repository,
-its contents will be printed to the standard output when the users are updating
-their repositories. This method can be used to communicate messages to the
-users, such as package removals or otherwise important information.
+If a file named =MOTD= (all uppercase) is found on the root directory of the
+package repository, its contents will be printed to the standard output when the
+users are updating their repositories. This method can be used to communicate
+messages to the users, such as package removals or otherwise important
+information.
 
 * Comparison Between CPT and KISS
 

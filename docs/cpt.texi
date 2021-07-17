@@ -280,50 +280,68 @@ to provide detailed information.
 @item @code{CPT_PATH}
 @vindex CPT_PATH
 Set the locations of your repositories. It is similar to the @code{PATH} variable.
+
 @item @code{CPT_CACHE} 
 @vindex CPT_CACHE
 The cache directory for @samp{cpt}. Default: @code{$XDG_CACHE_HOME/cpt}.
+
 @item @code{CPT_CHOICE}
 @vindex CPT_CHOICE
 If this is set to 0, a package installation will be aborted on conflicts.
+
 @item @code{CPT_COLOR}
 @vindex CPT_COLOR
 If this is set to 1, @samp{cpt} tools will be forced to display coloured output. If
 set to 0, they will be forced to display them without colours. Otherwise,
 @samp{cpt} will output colour as long as it is outputting to a terminal.
+
 @item @code{CPT_DEBUG}
 @vindex CPT_DEBUG
 If set to 1, temporary directories will not be removed after the operation.
+
 @item @code{CPT_FETCH}
 @vindex CPT_FETCH
 If set to 0, @code{cpt-update} will not fetch repositories.
+
 @item @code{CPT_FORCE}
 @vindex CPT_FORCE
 If set to 1, @samp{cpt} tools will force operation.
+
 @item @code{CPT_HOOK}
 @vindex CPT_HOOK
 Absolute path to the package manager hook file.
+
 @item @code{CPT_KEEPLOG}
 @vindex CPT_KEEPLOG
 If set to 1, @samp{cpt} will keep logs regardless of operation success.
+
 @item @code{CPT_PID}
 @vindex CPT_PID
 Set the temporary build directory name.
+
 @item @code{CPT_PROMPT}
 @vindex CPT_PROMPT
 If set to 0, @samp{cpt} will not prompt you for anything.
+
 @item @code{CPT_REPO_CACHE}
 @vindex CPT_REPO_CACHE
 If set to 0, @samp{cpt} will not use or write repository information cache.
+
 @item @code{CPT_ROOT}
 @vindex CPT_ROOT
 If this variable is set, @samp{cpt} will assume the given path as the system root.
+
 @item @code{CPT_TEST}
 @vindex CPT_TEST
 If set to 1, @code{cpt-build} will run tests whenever available.
+
 @item @code{CPT_TMPDIR}
 @vindex CPT_TMPDIR
 The directory to create the temporary directories.
+
+@item @code{CPT_VERBOSE}
+@vindex CPT_VERBOSE
+If this variable is set to 1, the package manager will print more information.
 @end table
 
 @menu
@@ -836,10 +854,11 @@ be a huge issue for you.
 @node Message of the Day
 @section Message of the Day
 
-If a file named @samp{motd} is found on the root directory of the package repository,
-its contents will be printed to the standard output when the users are updating
-their repositories. This method can be used to communicate messages to the
-users, such as package removals or otherwise important information.
+If a file named @samp{MOTD} (all uppercase) is found on the root directory of the
+package repository, its contents will be printed to the standard output when the
+users are updating their repositories. This method can be used to communicate
+messages to the users, such as package removals or otherwise important
+information.
 
 @node Comparison Between CPT and KISS
 @chapter Comparison Between CPT and KISS
