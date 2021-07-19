@@ -2000,8 +2000,11 @@ pkg_gentree() (
 pkg_query_meta() {
     # Query the 'meta' file of the given meta package. If there is no meta file,
     # or the key being queried is unavailable, the function will return with
-    # error.
-    repo_dir=$(pkg_find "$1")
+    # error. Full path can be specified instead of package names.
+    case $1 in
+        */*) repo_dir=$1 ;;
+        *)   repo_dir=$(pkg_find "$1")
+    esac
     [ -f "$repo_dir/meta" ] || return
     while IFS=': ' read -r key val; do
         case $key in
