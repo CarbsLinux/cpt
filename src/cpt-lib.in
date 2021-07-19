@@ -457,8 +457,10 @@ as_root() {
            CPT_PATH="$CPT_PATH" \
            CPT_PID="$CPT_PID" \
            CPT_PROMPT="$CPT_PROMPT" \
+           CPT_REPO_CACHE="$CPT_REPO_CACHE" \
            CPT_ROOT="$CPT_ROOT" \
            CPT_TMPDIR="$CPT_TMPDIR" \
+           CPT_VERBOSE="$CPT_VERBOSE" \
            "$@"
 
     case ${su##*/} in
