@@ -37,19 +37,19 @@ warn() {
 
 outv() {
     # Call `out()` when CPT_VERBOSE is set.
-    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    [ "$CPT_VERBOSE" = 1 ] || return 0
     out "$@"
 }
 
 logv() {
     # Call `log()` when CPT_VERBOSE is set.
-    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    [ "$CPT_VERBOSE" = 1 ] || return 0
     log "$@"
 }
 
 warnv() {
     # Call `warn()` when CPT_VERBOSE is set.
-    [ "$CPT_VERBOSE" -eq 1 ] || return 0
+    [ "$CPT_VERBOSE" = 1 ] || return 0
     warn "$@"
 }
 
