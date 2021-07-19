@@ -1215,14 +1215,17 @@ rsync curl zlib ca-certificates bearssl
 
 This function is used to query the [[meta][meta file]] inside package directories. It can
 be used to retrieve information on a package that is otherwise irrelevant to the
-package manager itself. It takes two arguments, first being the package and the
-second being the key to be retrieved. If the package does not have a =meta=
-file or the file does not contain the requested key, the function will return
-with 1.
+package manager itself. It takes two arguments, first being the package (or the
+full path to a package directory) and the second being the key to be retrieved.
+If the package does not have a =meta= file or the file does not contain the
+requested key, the function will return with 1.
 
 #+begin_src sh
 $ pkg_query_meta cpt description
 Carbs Packaging Tools
+
+$ pkg_query_meta /path/to/cpt license
+MIT
 #+end_src
 
 * {{{index(Concept, cp)}}}
