@@ -41,11 +41,11 @@ parser_definition() {
 cd "$sys_db"
 
 get_revdep() {
-    query="^$1\$"
+    pkg=$1; set -- "^$pkg\$"
     # Defined by parser.
     # shellcheck disable=2154
-    [ "$make" ] && query="$query\\|^$1 *make\$"
-    grep "$query" -- */depends | while read -r pkg _; do
+    [ "$make" ] && set -- -e "$1" -e "^$pkg "
+    grep "$@" -- */depends | while read -r pkg _; do
         printf '%s\n' "${pkg%%/*}"
     done
 }
@@ -53,7 +53,7 @@ get_revdep() {
 # Defined by parser.
 # shellcheck disable=2154
 if [ "$tree" ]; then
-    create_cache nobuild
+    mkdir -p "$tmp_dir"
     :> "$tmp_dir/processed"
     get_revdep "$1" > "$tmp_dir/dep"
     while ! diff -q "$tmp_dir/dep" "$tmp_dir/processed" >/dev/null 2>&1; do
