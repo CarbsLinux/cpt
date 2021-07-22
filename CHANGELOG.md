@@ -1,7 +1,7 @@
 CHANGELOG
 ================================================================================
 
-This is the CHANGELOG for the Carbs Packaging Tools, initially a customized fork
+This is the CHANGELOG for the Carbs Packaging Tools, initially a customised fork
 of the `kiss` package manager. The format is based on [Keep a Changelog], and
 this project _somewhat_ adheres to [Semantic Versioning].
 
@@ -12,8 +12,28 @@ this project _somewhat_ adheres to [Semantic Versioning].
 UNRELEASED
 --------------------------------------------------------------------------------
 
+### IMPORTANT
+- The package manager now enforces the usage of `pax` instead of `tar`.
+
+### Repository Backend
+
+`cpt` now has a faster and modular repository backend. `fossil` is now supported
+by the package manager. During the repository fetch process, the repository
+backend is stored in the cache directory so that the update takes less time on
+the next pull. The usage of the repository cache can be disabled by setting
+`$CPT_REPO_CACHE` to 0.
+
 ### Added
-- Added fossil support
+- Added `-q, --quiet` flags to `cpt-list`.
+- Re-added `cpt-maintainer`. It now supports `meta` and repository backends
+  other than `git`.
+- The package manager now prints out `MOTD` files found on the repository root.
+- Added the `$CPT_VERBOSE` variable and the `--verbose` flags to some utilities.
+  With the addition of these, some parts of the package manager will be more
+  quiet unless verbosity is explicitly requested.
+
+### Changed
+- Reworked the package repository backend.
 
 
 6.0.4 - 2021-05-12
