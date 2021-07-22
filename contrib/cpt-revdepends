@@ -22,7 +22,7 @@
 ## .El
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [options...] [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [options...] [pkg]"
     flag tree -t --tree   -- "Also print indirect reverse dependencies"
     flag make -m --make   -- "Include make dependencies"
     global_options
