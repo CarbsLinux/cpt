@@ -603,6 +603,9 @@ development manual for *Carbs Packaging Tools*. For development logs see
   | maintainer: Linux User <linux-user@example.com>
   `----
 
+  Even though `meta' is not mandatory by the packaging system, it is a
+  mandatory file for submitting packages to Carbs Linux repositories.
+
 
 [pkg_query_meta()] See section 8.7.10
 
