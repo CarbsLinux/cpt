@@ -25,6 +25,8 @@ fossil ls | while read -r file; do
     cp "$file" "$basedir/$file"
 done
 
+cp docs/cpt.info "$basedir/docs/cpt.info"
+
 tar cf "$basedir.tar" "$basedir"
 xz -z "$basedir.tar"
 rm -rf -- "$basedir"
