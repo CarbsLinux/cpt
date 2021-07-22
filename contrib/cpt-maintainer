@@ -1,0 +1,49 @@
+#!/bin/sh -e
+# Find the maintainer of a package
+
+## SYNOPSIS:
+## .Nm
+## .Op Ar pkg...
+
+## DESCRIPTION:
+## .Nm
+## finds the maintainer of the given pacage. If no package name is given,
+## .Nm
+## will use the name of the current directory as the package.
+
+# shellcheck disable=1091
+. cpt-lib
+
+usage() {
+    out "usage: ${0##*/} [pkg...]"
+    exit
+}
+
+case $1 in
+    --help|-h) usage ;;
+    '') set -- "${PWD##*/}"
+esac
+
+for pkgname; do
+    cpt-search -d "$pkgname" | while read -r pkg; do
+        # Default to the 'meta' file of the package instead of jumping through
+        # VCS hoops to find out.
+        log "$pkg" " "
+        pkg_query_meta "$pkg" maintainer && continue
+
+        cd "$pkg"
+        # Use pkg_vcs_info to find out the repository type, but don't save
+        # repository information to the repository cache file.
+        repo_type=$(CPT_REPO_CACHE=0 pkg_vcs_info)
+        repo_type=${repo_type##*:}
+
+        # We use the latest author who made a change to the version file to
+        # identify the maintainer of a package.
+        case $repo_type in
+            git) git log -1 --format='%an <%ae>' version ;;
+            fossil) fossil time par cur -n 1 -p version -F "%a" | sed \$d ;;
+            hg) hg log -l1 -T '{user}\n' -- version ;;
+            *) out "Maintainer information not available"
+        esac
+    done
+done
