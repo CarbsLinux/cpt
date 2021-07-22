@@ -32,7 +32,7 @@ complements the tools that come with it. It has the following features:
 
 <hr>
 
-### Latest Release: 6.0.4 ([2021-05-12](/timeline?c=6.0.4))
+### Latest Release: 6.1.0 ([2021-07-22](/timeline?c=6.1.0))
 
 - [Download](/uvlist?byage=1)
 - [Changelog](/doc/trunk/CHANGELOG.md)
