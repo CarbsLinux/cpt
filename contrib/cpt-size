@@ -16,7 +16,7 @@ parser_definition() {
     disp :usage -h --help hidden:1
 }
 
-# shellcheck source=/bin/cpt-lib
+# shellcheck source=../src/cpt-lib
 # shellcheck disable=1091
 . cpt-lib
 
