@@ -1,0 +1,112 @@
+#!/bin/sh -e
+
+version=dev
+
+die() {
+    printf '%s: %s\n' "${0##*/}" "$*" >&2
+    exit 1
+}
+
+out() { printf '%s\n' "$@" ;}
+
+_check() {
+    for arg; do
+        printf 'checking for %s... ' "$arg"
+        command -v "$arg" || { out no; die "'$arg' not found" ;}
+    done
+}
+
+_check_multi() {
+    c=$1; shift
+    printf 'checking for %s... ' "$c"
+    for arg; do command -v "$arg" && return 0; done
+    out no; die "no $c was found"
+}
+
+usage() {
+    out "usage: $0 [options]" \
+        "Options:" \
+        "  --prefix=dir        Set prefix directory" \
+        "  --bindir=dir        User executables [PREFIX/bin]" \
+        "  --datarootdir=dir   Data root directory [PREFIX/share]" \
+        "  --mandir=dir        Manual pages [DATAROOTDIR/man]" \
+        "  --infodir=dir       info documentation [DATAROOTDIR/info]" \
+        "  --docdir=dir        Documentation directory [DATAROOTDIR/doc/cpt]" \
+        "  --with-docs=opt     Whether to build the texinfo documentation [auto]" "" \
+        "  MAKEINFO            Name of the 'makeinfo' executable" \
+        "  EMACS               Name of the 'emacs' executable" "" \
+        "Use these variables to override the behaviour of '$0'."
+    exit 1
+}
+
+prefix=/usr/local
+# We don't want expansion
+# shellcheck disable=2016
+{
+bindir='$(PREFIX)/bin'
+datarootdir='$(PREFIX)/share'
+mandir='$(DATAROOTDIR)/man'
+infodir='$(DATAROOTDIR)/info'
+docdir='$(DATAROOTDIR)/doc/cpt'
+}
+docs=auto
+
+for arg; do
+    case $arg in
+        -h|--help) usage ;;
+        --prefix=*) prefix=${arg#*=}   ;;
+        --bindir=*) bindir=${arg#*=}   ;;
+        --mandir=*) mandir=${arg#*=}   ;;
+        --infodir=*) infodir=${arg#*=} ;;
+        --docdir=*) docdir=${arg#*=}   ;;
+        --without-docs) docs=no        ;;
+        --with-docs)    docs=yes       ;;
+        --with-docs=*)  docs=${arg#*=} ;;
+        *-*) die "Unknown option: '$arg'" ;;
+        *=*) export "${arg:?}" ;;
+        *) die "Unknown argument: '$arg'"
+    esac
+done
+
+trap 'rm -f config.mk' EXIT
+trap 'rm -f config.mk; exit 1' INT
+
+: "${EMACS:=emacs}" "${MAKEINFO:=makeinfo}"
+
+out "starting configuration..."
+
+cat <<EOF > config.mk
+PREFIX = $prefix
+BINDIR = $bindir
+DATAROOTDIR = $datarootdir
+MANDIR  = $mandir
+INFODIR = $infodir
+DOCDIR  = $docdir
+MAN1    = \$(MANDIR)/man1
+
+VERSION = $version
+EMACS   = $EMACS
+EOF
+
+case $docs in
+    auto|yes)
+        printf 'checking for makeinfo... '
+        if makeinfo=$(command -v "$MAKEINFO"); then
+            out "$makeinfo"
+            docs=yes
+            out "MAKEINFO = $makeinfo" >>config.mk
+        else
+            out no
+            [ "$docs" = yes ] && die "'$MAKEINFO' not found"
+            docs=no
+        fi
+esac
+[ "$docs" = no ] && out "not building documentation"
+out "DOCS = $docs" >>config.mk
+
+out "checking runtime dependencies"
+_check pax rsync sed awk grep
+_check_multi "sha256 provider" sha256sum sha256 openssl
+
+trap - EXIT INT
+out "written config.mk" "Run 'make' to build cpt"

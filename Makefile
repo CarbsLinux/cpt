@@ -32,6 +32,10 @@ dist: docs/cpt.info
 
 install: all
 	test "${DOCS}" != yes || ${MAKE} -C docs install
+	[ -f docs/cpt.info ] && \
+		${INSTALL_SH} -Dm644 docs/cpt.info -t ${DESTDIR}${INFODIR}
+	[ -f docs/cpt.txt ] && \
+		${INSTALL_SH} -Dm644 docs/cpt.txt -t ${DESTDIR}${DOCDIR}
 	${INSTALL_SH} -Dm755 -t ${DESTDIR}${BINDIR} ${BIN}
 	${INSTALL_SH} -Dm644 -t ${DESTDIR}${MAN1} man/*.1
 	for man in ${CONTRIB}; do \
@@ -40,14 +44,15 @@ install: all
 	done
 
 uninstall:
-	test "${DOCS}" != yes || ${MAKE} -C docs uninstall
 	for bin in ${BIN}; do \
 		rm -f ${DESTDIR}${BINDIR}/$${bin##*/}; done
 	for man in man/*.1; do rm -f ${DESTDIR}${MAN1}/$${man##*/}; done
 	for man in ${CONTRIB}; do rm -f ${DESTDIR}${MAN1}/$${man##*/}.1; done
+	rm -rf ${DESTDIR}${DOCDIR}
+	rm -f  ${DESTDIR}${INFODIR}/cpt.info
 
 clean:
-	test "${DOCS}" != yes || ${MAKE} -C docs clean
+	${MAKE} -C docs clean
 	rm -rf src/cpt-lib "cpt-${VERSION}.tar.xz" coverage report
 	rm -f tests/etc/cpt-hook
 
