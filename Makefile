@@ -1,5 +1,5 @@
 # Carbs Packaging Tools
-include config.mk
+-include config.mk
 
 INSTALL_SH = ./tools/install.sh
 CONTRIB = `find contrib -name 'cpt*' ! -name '*.*'`
@@ -9,7 +9,8 @@ LIB        = src/cpt-lib
 LIB_IN     = ${LIB:=.in}
 
 all: src/cpt-lib
-	test "${DOCS}" != yes || ${MAKE} -C docs all
+	@if ! [ -e config.mk ]; then echo "Please run './configure'"; exit 1; fi
+	@test "${DOCS}" != yes || ${MAKE} -C docs all
 
 src/cpt-lib: src/cpt-lib.in
 	sed -e "s|@VERSION@|${VERSION}|g" \
@@ -56,4 +57,7 @@ clean:
 	rm -rf src/cpt-lib "cpt-${VERSION}.tar.xz" coverage report
 	rm -f tests/etc/cpt-hook
 
-.PHONY: all dist clean install uninstall shellspec shellcheck test
+allclean: clean
+	rm -f config.mk
+
+.PHONY: all dist allclean clean install uninstall shellspec shellcheck test

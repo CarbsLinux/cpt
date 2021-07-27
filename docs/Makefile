@@ -1,5 +1,5 @@
 # Carbs Packaging Tools Documentation
-include ../config.mk
+-include ../config.mk
 INSTALL_SH = ../tools/install.sh
 
 all: cpt.txt cpt.texi cpt.info
