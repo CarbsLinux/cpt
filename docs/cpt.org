@@ -161,64 +161,83 @@ to provide detailed information.
 
   #+VINDEX: CPT_PATH
   Set the locations of your repositories. It is similar to the ~PATH~ variable.
+
 - ~CPT_CACHE~  ::
 
   #+VINDEX: CPT_CACHE
   The cache directory for =cpt=. Default: ~$XDG_CACHE_HOME/cpt~.
+
 - ~CPT_CHOICE~ ::
 
   #+VINDEX: CPT_CHOICE
   If this is set to 0, a package installation will be aborted on conflicts.
+
 - ~CPT_COLOR~ ::
 
   #+VINDEX: CPT_COLOR
   If this is set to 1, =cpt= tools will be forced to display coloured output. If
   set to 0, they will be forced to display them without colours. Otherwise,
   =cpt= will output colour as long as it is outputting to a terminal.
+
 - ~CPT_DEBUG~ ::
 
   #+VINDEX: CPT_DEBUG
   If set to 1, temporary directories will not be removed after the operation.
+
 - ~CPT_FETCH~ ::
 
   #+VINDEX: CPT_FETCH
   If set to 0, ~cpt-update~ will not fetch repositories.
+
 - ~CPT_FORCE~ ::
 
   #+VINDEX: CPT_FORCE
   If set to 1, =cpt= tools will force operation.
+
 - ~CPT_HOOK~ ::
 
   #+VINDEX: CPT_HOOK
   Absolute path to the package manager hook file.
+
 - ~CPT_KEEPLOG~ ::
 
   #+VINDEX: CPT_KEEPLOG
   If set to 1, =cpt= will keep logs regardless of operation success.
+
 - ~CPT_PID~ ::
 
   #+VINDEX: CPT_PID
   Set the temporary build directory name.
+
 - ~CPT_PROMPT~ ::
 
   #+VINDEX: CPT_PROMPT
   If set to 0, =cpt= will not prompt you for anything.
+
 - ~CPT_REPO_CACHE~ ::
 
   #+VINDEX: CPT_REPO_CACHE
   If set to 0, =cpt= will not use or write repository information cache.
+
 - ~CPT_ROOT~ ::
 
   #+VINDEX: CPT_ROOT
   If this variable is set, =cpt= will assume the given path as the system root.
+
 - ~CPT_TEST~ ::
 
   #+VINDEX: CPT_TEST
   If set to 1, ~cpt-build~ will run tests whenever available.
+
 - ~CPT_TMPDIR~ ::
 
   #+VINDEX: CPT_TMPDIR
   The directory to create the temporary directories.
+
+- ~CPT_VERBOSE~ ::
+
+  #+VINDEX: CPT_VERBOSE
+  If this variable is set to 1, the package manager will print more information.
 
 *** =CPT_PATH=
 :PROPERTIES:
@@ -534,6 +553,9 @@ license: MIT
 maintainer: Linux User <linux-user@example.com>
 #+end_example
 
+Even though =meta= is not mandatory by the packaging system, it is a mandatory
+file for submitting packages to Carbs Linux repositories.
+
 ** post-install
 :PROPERTIES:
 :DESCRIPTION: The post-installation script
@@ -705,10 +727,11 @@ be a huge issue for you.
 :DESCRIPTION: Communicate with the users using your repository
 :END:
 
-If a file named =motd= is found on the root directory of the package repository,
-its contents will be printed to the standard output when the users are updating
-their repositories. This method can be used to communicate messages to the
-users, such as package removals or otherwise important information.
+If a file named =MOTD= (all uppercase) is found on the root directory of the
+package repository, its contents will be printed to the standard output when the
+users are updating their repositories. This method can be used to communicate
+messages to the users, such as package removals or otherwise important
+information.
 
 * Comparison Between CPT and KISS
 
@@ -1195,14 +1218,17 @@ rsync curl zlib ca-certificates bearssl
 
 This function is used to query the [[meta][meta file]] inside package directories. It can
 be used to retrieve information on a package that is otherwise irrelevant to the
-package manager itself. It takes two arguments, first being the package and the
-second being the key to be retrieved. If the package does not have a =meta=
-file or the file does not contain the requested key, the function will return
-with 1.
+package manager itself. It takes two arguments, first being the package (or the
+full path to a package directory) and the second being the key to be retrieved.
+If the package does not have a =meta= file or the file does not contain the
+requested key, the function will return with 1.
 
 #+begin_src sh
 $ pkg_query_meta cpt description
 Carbs Packaging Tools
+
+$ pkg_query_meta /path/to/cpt license
+MIT
 #+end_src
 
 * {{{index(Concept, cp)}}}

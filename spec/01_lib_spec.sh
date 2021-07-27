@@ -1,4 +1,5 @@
 # shellcheck disable=2091,2034
+CPT_VERBOSE=1
 
 Describe 'CPT Library'
     export CPT_COLOR=0
@@ -161,7 +162,7 @@ Describe 'CPT Library'
             End
             It "doesn't log 'running hook' if no package is given"
                 When call run_hook 2 '' destination
-                The stderr should eq ""
+                The stderr should eq "-> Running 2 hook "
                 The output should eq "$CPT_HOOK 2 null destination"
             End
             It "uses the /etc/cpt-hook file of the root when called with a fourth arg"

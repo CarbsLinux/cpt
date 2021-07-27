@@ -13,8 +13,9 @@ tasks:
       cd cpt
       make
   - install-pax: |
-      git clone https://github.com/carbslinux/otools
+      git clone --quiet https://github.com/carbslinux/otools
       cd otools
+      ./configure
       make pax
       sudo install -Dm755 pax /usr/bin/pax
   - test: |

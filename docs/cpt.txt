@@ -226,42 +226,60 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `CPT_PATH'
         Set the locations of your repositories. It is similar to the
         `PATH' variable.
+
   `CPT_CACHE' 
         The cache directory for `cpt'. Default: `$XDG_CACHE_HOME/cpt'.
+
   `CPT_CHOICE'
         If this is set to 0, a package installation will be aborted on
         conflicts.
+
   `CPT_COLOR'
         If this is set to 1, `cpt' tools will be forced to display
         coloured output. If set to 0, they will be forced to display
         them without colours. Otherwise, `cpt' will output colour as
         long as it is outputting to a terminal.
+
   `CPT_DEBUG'
         If set to 1, temporary directories will not be removed after the
         operation.
+
   `CPT_FETCH'
         If set to 0, `cpt-update' will not fetch repositories.
+
   `CPT_FORCE'
         If set to 1, `cpt' tools will force operation.
+
   `CPT_HOOK'
         Absolute path to the package manager hook file.
+
   `CPT_KEEPLOG'
         If set to 1, `cpt' will keep logs regardless of operation
         success.
+
   `CPT_PID'
         Set the temporary build directory name.
+
   `CPT_PROMPT'
         If set to 0, `cpt' will not prompt you for anything.
+
   `CPT_REPO_CACHE'
         If set to 0, `cpt' will not use or write repository information
         cache.
+
   `CPT_ROOT'
         If this variable is set, `cpt' will assume the given path as the
         system root.
+
   `CPT_TEST'
         If set to 1, `cpt-build' will run tests whenever available.
+
   `CPT_TMPDIR'
         The directory to create the temporary directories.
+
+  `CPT_VERBOSE'
+        If this variable is set to 1, the package manager will print
+        more information.
 
 
 4.2.1 `CPT_PATH'
@@ -585,6 +603,9 @@ development manual for *Carbs Packaging Tools*. For development logs see
   | maintainer: Linux User <linux-user@example.com>
   `----
 
+  Even though `meta' is not mandatory by the packaging system, it is a
+  mandatory file for submitting packages to Carbs Linux repositories.
+
 
 [pkg_query_meta()] See section 8.7.10
 
@@ -758,11 +779,11 @@ development manual for *Carbs Packaging Tools*. For development logs see
 6.3 Message of the Day
 ~~~~~~~~~~~~~~~~~~~~~~
 
-  If a file named `motd' is found on the root directory of the package
-  repository, its contents will be printed to the standard output when
-  the users are updating their repositories. This method can be used to
-  communicate messages to the users, such as package removals or
-  otherwise important information.
+  If a file named `MOTD' (all uppercase) is found on the root directory
+  of the package repository, its contents will be printed to the
+  standard output when the users are updating their repositories. This
+  method can be used to communicate messages to the users, such as
+  package removals or otherwise important information.
 
 
 7 Comparison Between CPT and KISS
@@ -1264,13 +1285,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
   This function is used to query the [meta file] inside package
   directories. It can be used to retrieve information on a package that
   is otherwise irrelevant to the package manager itself. It takes two
-  arguments, first being the package and the second being the key to be
-  retrieved. If the package does not have a `meta' file or the file does
-  not contain the requested key, the function will return with 1.
+  arguments, first being the package (or the full path to a package
+  directory) and the second being the key to be retrieved.  If the
+  package does not have a `meta' file or the file does not contain the
+  requested key, the function will return with 1.
 
   ,----
   | $ pkg_query_meta cpt description
   | Carbs Packaging Tools
+  | 
+  | $ pkg_query_meta /path/to/cpt license
+  | MIT
   `----
 
 

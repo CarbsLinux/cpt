@@ -11,40 +11,41 @@
 ## .Ar packages
 ## using the files from the package manifest and outputs a total size of the
 ## packages along with all the files associated with them.
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/} [pkg...]"
+    disp :usage -h --help hidden:1
+}
 
-## CAVEATS:
-## .Nm
-## uses the non-POSIX
-## .Fl h
-## and
-## .Fl c
-## flags for
-## .Xr du 1 ,
-## which will not work with
-## .Em sbase ,
-## but it is a major performance improvement compared to calculating
-## total and human-readable sizes by hand.
+# shellcheck source=/bin/cpt-lib
+# shellcheck disable=1091
+. cpt-lib
 
-case "$1" in
-    --help|-h)
-        printf '%s\n' "usage: ${0##*/} [pkg...]"
-        exit 0
-        ;;
-    '') set -- "${PWD##*/}"
-esac
+# Ensure that all the packages given as arguments are installed.
+pkg_list "$@" >/dev/null
 
-for pkg; do cpt-list "$pkg" >/dev/null; done
+mkdir -p "$tmp_dir"
 
-files=
-for pkg; do
-    while read -r file; do
-        # Filter directories from manifest and leave only files.
-        # Directories in the manifest end in a trailing '/'.
-        case $file in */) continue; esac
-        files="$files '$file'"
-    done < "$CPT_ROOT/var/db/cpt/installed/$pkg/manifest"
-done
-eval "set -- $files"
+# We don't immediately pipe into awk as we want to exit in an error.
+for pkg; do sed '/\/$/d;s/./\\&/g' "$sys_db/$pkg/manifest"; done |
+    xargs du -k > "$tmp_dir/size"
 
-# Send the file list to 'du'.
-du -shc -- "$@" 2>/dev/null
+# This awk function formats the `du` output similar to the '-hc' flags. We
+# could have used a shell `while read` loop to do the exact same thing, but that
+# would be much much slower.
+awk 'function fmtsize(s) {
+         if (s==0) f=""
+         else if (s<1024) f="K"
+         else if (s<(1048576)){f="M";s=s/1024;}
+         else if (s<(1073741824)){f="G";s=s/1048576;}
+         else f=""
+         return int(s) f
+     }
+     {
+         sc = $1
+         size += $1
+         sub(sprintf("^%s\s*", $1), "")
+         printf("%-6s %s\n", fmtsize(sc), $0)
+     }
+     END {
+         printf("%-6s total\n", fmtsize(size))
+     }' "$tmp_dir/size"

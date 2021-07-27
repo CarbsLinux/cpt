@@ -69,8 +69,8 @@ while read -r line; do
     esac
 done < "$file"
 
-out ".Sh AUTHOR" ".An Cem Keylan Aq Mt cem@ckyln.com"
-out ".Sh LICENSE" "See LICENSE for copyright information."
+out ".Sh AUTHOR" ".An Cem Keylan Aq Mt cem@carbslinux.org"
+out ".Sh COPYING" "See LICENSE for copyright information."
 out ".Sh SEE ALSO" ".Xr cpt 1"
 [ "$see" ] &&
     for man in $see; do
@@ -79,6 +79,6 @@ out ".Sh SEE ALSO" ".Xr cpt 1"
 out ".Pp"
 out "The full documentation of cpt is available as an info page."
 out "If either" ".Ic info" or ".Ic texinfo"
-out "package is installed on your system, you can run"
-out ".Bd -literal -offset indent" "info cpt" ".Ed"
-out .Pp "to learn more about the package manager."
+out "package is installed on your system, you can learn more about the package"
+out "manager by running"
+out ".Sq Sy info cpt ."
