@@ -9,7 +9,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-6.1.0 - 2021-07-22
+[6.1.0] - 2021-07-22
 --------------------------------------------------------------------------------
 
 ### IMPORTANT
@@ -36,14 +36,14 @@ the next pull. The usage of the repository cache can be disabled by setting
 - Reworked the package repository backend.
 
 
-6.0.4 - 2021-05-12
+[6.0.4] - 2021-05-12
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed the declaration place of the `$pid` variable
 
 
-6.0.3 - 2021-05-10
+[6.0.3] - 2021-05-10
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -51,21 +51,21 @@ the next pull. The usage of the repository cache can be disabled by setting
 - Fixed `cpt --help` output when inside a directory prefixed with `cpt-`
 
 
-6.0.2 - 2021-04-05
+[6.0.2] - 2021-04-05
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed `make dist` target.
 
 
-6.0.1 - 2021-04-05
+[6.0.1] - 2021-04-05
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed inconsistencies of the `Ctrl+C` interrupt behaviour
 
 
-6.0.0 - 2021-04-03
+[6.0.0] - 2021-04-03
 --------------------------------------------------------------------------------
 
 ### Added
@@ -95,7 +95,7 @@ the next pull. The usage of the repository cache can be disabled by setting
 
 [ssu]: https://github.com/illiliti/ssu
 
-5.1.2 - 2021-01-04
+[5.1.2] - 2021-01-04
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -104,7 +104,7 @@ the next pull. The usage of the repository cache can be disabled by setting
   file locations on the manifest as well.
 
 
-5.1.1 - 2020-12-20
+[5.1.1] - 2020-12-20
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -112,7 +112,7 @@ the next pull. The usage of the repository cache can be disabled by setting
   `$CPT_DEBUG` was set
 
 
-5.1.0 - 2020-11-25
+[5.1.0] - 2020-11-25
 --------------------------------------------------------------------------------
 
 ### IMPORTANT
@@ -134,7 +134,7 @@ the next pull. The usage of the repository cache can be disabled by setting
   defined.
 
 
-5.0.0 - 2020-10-06
+[5.0.0] - 2020-10-06
 --------------------------------------------------------------------------------
 
 ### IMPORTANT
@@ -162,7 +162,7 @@ the next pull. The usage of the repository cache can be disabled by setting
   done in a `test` script can be done from the build itself.
 
 
-4.1.1 - 2020-09-25
+[4.1.1] - 2020-09-25
 --------------------------------------------------------------------------------
 
 ### Changed
@@ -176,7 +176,7 @@ the next pull. The usage of the repository cache can be disabled by setting
 - Fixed the `as_root()` function when using `su`.
 
 
-4.1.0 - 2020-09-11
+[4.1.0] - 2020-09-11
 --------------------------------------------------------------------------------
 
 ### Added
@@ -186,14 +186,14 @@ the next pull. The usage of the repository cache can be disabled by setting
 - Fixed `as_root()` call on `cpt-chbuild`.
 
 
-4.0.1 - 2020-09-10
+[4.0.1] - 2020-09-10
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed flags starting with `--no-`
 
 
-4.0.0 - 2020-09-09
+[4.0.0] - 2020-09-09
 --------------------------------------------------------------------------------
 
 With this update, all the documentation was moved to the `docs` repository,
@@ -221,14 +221,14 @@ which can be accessed from the following sources:
 - Fixed `getoptions` parsers while declaring initial variables.
 - Fixed build `cpt-stat` on the Makefile.
 
-3.3.1 - 2020-08-31
+[3.3.1] - 2020-08-31
 --------------------------------------------------------------------------------
 
 ### Changed
 - Reverted `sh256()` to the previous way.
 
 
-3.3.0 - 2020-08-31
+[3.3.0] - 2020-08-31
 --------------------------------------------------------------------------------
 
 ### Added
@@ -243,7 +243,7 @@ which can be accessed from the following sources:
 - Made `cpt` checksum method compatible with the KISS Community repository.
 
 
-3.2.0 - 2020-08-22
+[3.2.0] - 2020-08-22
 --------------------------------------------------------------------------------
 
 ### Added
@@ -260,14 +260,14 @@ which can be accessed from the following sources:
 - `cpt` programs no longer exit if `$CPT_PATH` is unset.
 
 
-3.1.1 - 2020-08-11
+[3.1.1] - 2020-08-11
 --------------------------------------------------------------------------------
 
 ### Changed
 - `as_root()` now sets package manager variables with env.
 
 
-3.1.0 - 2020-08-07
+[3.1.0] - 2020-08-07
 --------------------------------------------------------------------------------
 
 ### Changed
@@ -277,7 +277,7 @@ which can be accessed from the following sources:
 - Dropping libtool's `*.la` library files from packages.
 
 
-3.0.0 - 2020-07-24
+[3.0.0] - 2020-07-24
 --------------------------------------------------------------------------------
 
 This is the 3.0.0 release. This will make `kiss` (now renamed as `cpt`) a
@@ -315,7 +315,7 @@ comes with nice benefits such as:
 - Removed `kiss-outdated` and `kiss-which`.
 
 
-2.3.0 - 2020-07-16
+[2.3.0] - 2020-07-16
 --------------------------------------------------------------------------------
 
 ### Added
@@ -337,14 +337,14 @@ comes with nice benefits such as:
   package ownership.
 
 
-2.2.1 - 2020-06-11
+[2.2.1] - 2020-06-11
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed directory checking on package removal
 
 
-2.2.0 - 2020-06-10
+[2.2.0] - 2020-06-10
 --------------------------------------------------------------------------------
 
 ### Added
@@ -364,7 +364,7 @@ comes with nice benefits such as:
   characters (such as `/usr/bin/[`) would result in a manifest deletion.
 
 
-2.1.2 - 2020-06-03
+[2.1.2] - 2020-06-03
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -372,7 +372,7 @@ comes with nice benefits such as:
   the `passwd` database.
 
 
-2.1.1 - 2020-06-03
+[2.1.1] - 2020-06-03
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -381,7 +381,7 @@ comes with nice benefits such as:
 - Fixed setting binary packages as dependencies.
 
 
-2.1.0 - 2020-05-29
+[2.1.0] - 2020-05-29
 --------------------------------------------------------------------------------
 
 ### Added
@@ -396,7 +396,7 @@ comes with nice benefits such as:
 - Removed strip messages
 
 
-2.0.0 - 2020-05-28
+[2.0.0] - 2020-05-28
 --------------------------------------------------------------------------------
 
 ### Added
@@ -420,7 +420,7 @@ comes with nice benefits such as:
 [kiss-extra]: https://github.com/carbslinux/kiss-extra
 
 
-1.22.4 - 2020-05-26
+[1.22.4] - 2020-05-26
 --------------------------------------------------------------------------------
 
 **NOTE:** `1.22.x` is the last minor version before `2.0.0`, meaning I will not
@@ -437,7 +437,7 @@ before release, as binary repositories will need user feedback.
 - Enabled the usage of glob characters for `kiss-bin`.
 
 
-1.22.3 - 2020-05-18
+[1.22.3] - 2020-05-18
 --------------------------------------------------------------------------------
 
 ### SECURITY
@@ -449,7 +449,7 @@ before release, as binary repositories will need user feedback.
 [related proof-of-concept]: https://github.com/kisslinux/kiss/pull/157#issuecomment-629880775
 
 
-1.22.2 - 2020-05-16
+[1.22.2] - 2020-05-16
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -458,7 +458,7 @@ before release, as binary repositories will need user feedback.
 
 
 
-1.22.1 - 2020-05-15
+[1.22.1] - 2020-05-15
 --------------------------------------------------------------------------------
 
 ### REMOVED
@@ -484,7 +484,7 @@ before release, as binary repositories will need user feedback.
 [kiss-extra]: https://github.com/carbslinux/kiss-extra
 
 
-1.22.0 - 2020-05-14
+[1.22.0] - 2020-05-14
 --------------------------------------------------------------------------------
 
 ### Added
@@ -503,7 +503,7 @@ before release, as binary repositories will need user feedback.
   full file.
 
 
-1.21.1 - 2020-05-14
+[1.21.1] - 2020-05-14
 --------------------------------------------------------------------------------
 
 ### Changed
@@ -515,7 +515,7 @@ before release, as binary repositories will need user feedback.
 - Fixed a non-POSIX `find` call. Thanks to @illiliti.
 
 
-1.21.0 - 2020-05-12
+[1.21.0] - 2020-05-12
 --------------------------------------------------------------------------------
 
 ### Added
@@ -539,7 +539,7 @@ before release, as binary repositories will need user feedback.
   external utilities.
 
 
-1.20.3 - 2020-05-09
+[1.20.3] - 2020-05-09
 --------------------------------------------------------------------------------
 
 ### Fixed
@@ -547,14 +547,14 @@ before release, as binary repositories will need user feedback.
   moving to `/var/db/kiss/choices` would take the name of the preferred package.
 
 
-1.20.2 - 2020-05-09
+[1.20.2] - 2020-05-09
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed an issue regarding manifest format when using pkg_swap (alternatives).
 
 
-1.20.1 - 2020-05-08
+[1.20.1] - 2020-05-08
 --------------------------------------------------------------------------------
 
 ### Changed
@@ -562,14 +562,14 @@ before release, as binary repositories will need user feedback.
 - Standardised `kiss-readlink` usage output.
 
 
-1.20.0 - 2020-05-07
+[1.20.0] - 2020-05-07
 --------------------------------------------------------------------------------
 
 ### Added
 - `KISS_NOPROMPT` can be specified in order to skip prompts.
 
 
-1.19.1 - 2020-05-07
+[1.19.1] - 2020-05-07
 --------------------------------------------------------------------------------
 
 ### Added
@@ -585,7 +585,7 @@ before release, as binary repositories will need user feedback.
   globally.
 
 
-1.19.0 - 2020-05-06
+[1.19.0] - 2020-05-06
 --------------------------------------------------------------------------------
 
 ### Added
@@ -605,7 +605,7 @@ before release, as binary repositories will need user feedback.
   `kiss extensions`.
 
 
-1.18.0 - 2020-05-04
+[1.18.0] - 2020-05-04
 --------------------------------------------------------------------------------
 
 ### Added
@@ -623,7 +623,7 @@ before release, as binary repositories will need user feedback.
 - Dropped the usage of `readlink` in `kiss`.
 
 
-1.17.0 - 2020-05-03
+[1.17.0] - 2020-05-03
 --------------------------------------------------------------------------------
 
 ### Added
@@ -644,14 +644,14 @@ before release, as binary repositories will need user feedback.
   `ksh` compatibility.
 
 
-1.16.3 - 2020-05-03
+[1.16.3] - 2020-05-03
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed etcsum location.
 
 
-1.16.2 - 2020-05-03
+[1.16.2] - 2020-05-03
 --------------------------------------------------------------------------------
 
 ### Added
@@ -668,14 +668,14 @@ before release, as binary repositories will need user feedback.
   system.
 
 
-1.16.1 - 2020-05-01
+[1.16.1] - 2020-05-01
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed `ksh` Ctrl+C interrupt signals.
 
 
-1.16.0 - 2020-05-01
+[1.16.0] - 2020-05-01
 --------------------------------------------------------------------------------
 
 ### Added
@@ -691,7 +691,7 @@ before release, as binary repositories will need user feedback.
   `$KISS_ROOT` variable
 
 
-1.15.0 - 2020-04-30
+[1.15.0] - 2020-04-30
 --------------------------------------------------------------------------------
 
 I have decided to revert to rsync installation method as it is faster and safer.
@@ -707,14 +707,14 @@ at the trade-off.
 - `kiss` now accepts decompressed tar archives for package installation as well.
 
 
-1.14.2/1.14.3 - 2020-04-27
+[1.14.2/1.14.3] - 2020-04-27
 --------------------------------------------------------------------------------
 
 ### Fixed
 - The new installation method now complies to the `$KISS_ROOT` value.
 
 
-1.14.1 - 2020-04-27
+[1.14.1] - 2020-04-27
 --------------------------------------------------------------------------------
 
 ### Removed
@@ -728,7 +728,7 @@ at the trade-off.
 - Whitespace cleanup.
 
 
-1.14.0 - 2020-04-25
+[1.14.0] - 2020-04-25
 --------------------------------------------------------------------------------
 
 This release removes `rsync` from `kiss` and implements its own installation
@@ -746,14 +746,14 @@ method.
 - usage of `old_ifs`
 
 
-1.13.1 - 2020-04-19
+[1.13.1] - 2020-04-19
 --------------------------------------------------------------------------------
 
 ### Removed
 - Reverted and removed `kiss ss` changes.
 
 
-1.13.0 - 2020-04-19
+[1.13.0] - 2020-04-19
 --------------------------------------------------------------------------------
 
 ### Added
@@ -768,7 +768,7 @@ method.
 - Fixed a shellcheck error.
 
 
-1.12.3 - 2020-04-17
+[1.12.3] - 2020-04-17
 --------------------------------------------------------------------------------
 
 ### Changed
@@ -779,7 +779,7 @@ method.
 - `kiss-repodepends` now outputs the proper depends file.
 
 
-1.12.2 - 2020-04-15
+[1.12.2] - 2020-04-15
 --------------------------------------------------------------------------------
 
 ### Added
@@ -794,14 +794,14 @@ method.
 - `kiss-export` now honours your `KISS_COMPRESS` value
 
 
-1.12.1 - 2020-04-12
+[1.12.1] - 2020-04-12
 --------------------------------------------------------------------------------
 
 ### Fixed
 - Fixed printing empty arguments in `kiss-outdated`.
 
 
-1.12.0 - 2020-04-05
+[1.12.0] - 2020-04-05
 --------------------------------------------------------------------------------
 
 ### Added
@@ -821,7 +821,7 @@ method.
   it could lead to wrong url generation.
 
 
-1.9.0 - 1.11.2 - 2020-04-04
+[1.9.0 - 1.11.2] - 2020-04-04
 --------------------------------------------------------------------------------
 
 ### Added
