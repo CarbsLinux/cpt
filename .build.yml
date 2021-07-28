@@ -11,6 +11,7 @@ packages:
 tasks:
   - build: |
       cd cpt
+      ./configure
       make
   - install-pax: |
       git clone --quiet https://github.com/carbslinux/otools
