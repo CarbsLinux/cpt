@@ -27,6 +27,5 @@ done
 
 cp docs/cpt.info "$basedir/docs/cpt.info"
 
-tar cf "$basedir.tar" "$basedir"
-xz -z "$basedir.tar"
+pax -w "$basedir" | xz -zT 0 > "$basedir.tar.xz"
 rm -rf -- "$basedir"
