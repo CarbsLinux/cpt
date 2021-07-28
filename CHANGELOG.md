@@ -9,6 +9,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[Unreleased]
+--------------------------------------------------------------------------------
+
+### Changed
+- `cpt-size` has been rewritten to support POSIX `du`, and to support packages
+  with a file count of over 50,000.
+
+
 [6.1.0] - 2021-07-22
 --------------------------------------------------------------------------------
 
