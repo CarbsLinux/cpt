@@ -17,3 +17,4 @@ tests/etc/cpt-hook
 .shellspec-quick.log
 report
 coverage
+config.mk

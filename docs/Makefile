@@ -1,5 +1,5 @@
 # Carbs Packaging Tools Documentation
-include ../config.mk
+-include ../config.mk
 INSTALL_SH = ../tools/install.sh
 
 all: cpt.txt cpt.texi cpt.info
@@ -21,13 +21,5 @@ clean:
 
 all-clean: clean
 	rm -f cpt.texi cpt.txt
-
-install: all
-	${INSTALL_SH} -Dm644 cpt.txt ${DESTDIR}${CPTDOC}/cpt.txt
-	${INSTALL_SH} -Dm644 cpt.info ${DESTDIR}${INFODIR}/cpt.info
-
-uninstall:
-	rm -rf ${DESTDIR}${CPTDOC}
-	rm -f  ${DESTDIR}${INFODIR}/cpt.info
 
 .PHONY: all clean all-clean install uninstall
