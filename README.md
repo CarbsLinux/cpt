@@ -1,8 +1,8 @@
 Carbs Packaging Tools
 =====================
 
-Package management toolset for Carbs Linux. Forked from KISS[1]. All usage
-information can be obtained from the manual page. Refer to the ChangeLog[2] to
+Package management toolset for Carbs Linux. Forked from [KISS]. All usage
+information can be obtained from the manual page. Refer to the [ChangeLog] to
 learn what's new.
 
 
@@ -36,10 +36,11 @@ either passing `DOCS=no` to `make` or editing `config.mk` to disable it.
 Installation
 ------------
 
-In order to install CPT, you can run the following with `make`:
+In order to install CPT, you can run the following:
 
+    ./configure
     make
-    make PREFIX=/usr install
+    make install
 
 
 Documentation
@@ -47,12 +48,12 @@ Documentation
 
 The documentation for each tool along with some examples can be found on
 manpages installed with the package manager. User manual of CPT can be found
-online[3], or installed as both plain-text and as info pages. Without any
+[online], or installed as both plain-text and as info pages. Without any
 changes to the Makefile configuration those files can be found at:
 
 - /usr/local/share/docs/cpt/cpt.txt
 - /usr/local/share/info/cpt.info
 
-[1]: https://github.com/kisslinux/kiss
-[2]: https://fossil.carbslinux.org/cpt/log
-[3]: https://carbslinux.org/docs/cpt
+[KISS]: https://github.com/kisslinux/kiss
+[ChangeLog]: https://fossil.carbslinux.org/cpt/doc/trunk/CHANGELOG.md
+[online]: https://carbslinux.org/docs/cpt
