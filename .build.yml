@@ -9,16 +9,16 @@ packages:
   - texinfo
   - gzip
 tasks:
-  - build: |
-      cd cpt
-      ./configure
-      make
   - install-pax: |
       git clone --quiet https://github.com/carbslinux/otools
       cd otools
       ./configure
       make pax
       sudo install -Dm755 pax /usr/bin/pax
+  - build: |
+      cd cpt
+      ./configure
+      make
   - test: |
       cd cpt
       curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
