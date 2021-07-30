@@ -5,15 +5,27 @@
 .Nd generate checksums
 .Sh SYNOPSIS
 .Nm
+.Op Fl s
 .Op Ar package...
 .Sh DESCRIPTION
 .Nm
-lints a package, downloads the sources, and creates a checksum file
-including the SHA256 digests of the sources. If no
+lints a package, downloads the sources, and creates a file named
+.Sq checksums
+which includes the
+.Em BLAKE3
+digests of the sources. If no
 .Ar package
 is specified,
 .Nm
 will generate checksums assuming the working directory as the package.
+.Pp
+If the
+.Fl s
+flag is given,
+.Nm
+will generate checksums using the
+.Em SHA256
+algorithm.
 .Sh AUTHOR
 .An Cem Keylan Aq Mt cem@ckyln.com
 .Sh LICENSE

@@ -1,13 +1,14 @@
 #!/bin/sh -ef
 # Generate checksums
 
-if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/} [-s] [pkg...]"
+    msg         -- '' 'Options:'
+    flag sha -s --    "Generate checksums using the depracated sha256 algorithm"
+    global_options
+}
 
-case "$1" in
-    --help|-h) out "usage: ${0##*/} [pkg...]"; exit 0 ;;
-    --version|-v) version ;;
-    '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH ;;
-esac
+if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 create_cache
 
@@ -21,7 +22,10 @@ for pkg; do
         log "$pkg" "No 'sources' file, skipping checksums"
         continue
     }
-    pkg_checksums "$pkg" | {
+
+    # $sha is defined by the parser.
+    # shellcheck disable=2154
+    pkg_checksums "$pkg" "${sha:+sh256}" | {
 
         if [ -w "$repo_dir" ]; then
             tee "$repo_dir/checksums"
