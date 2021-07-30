@@ -12,6 +12,25 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Unreleased]
 --------------------------------------------------------------------------------
 
+### BLAKE3 checksums
+
+The package manager now uses `b3sum` for creating digests. The change is
+backwards compatible, which means that BLAKE3 will slowly replace the SHA256
+algorithm in packages. The `cpt` package in the repository will continue to use
+the sha256 until the end of 2021.
+
+The `checksums` files generated with BLAKE3 has the header `%BLAKE3` which is
+used to distinguish digest algorithms. If the file does not include such a
+header, it is assumed to be a file created using the SHA256 algorithm. This is
+especially handy for keeping the /etc checksums intact. If the package being
+built is already installed on the system `cpt` makes sure that the generated
+etcsums are also backwards compatible.
+
+
+### Added
+- `cpt-checksum` now has the `-s` flag to generate checksums using the SHA256
+  digest algorithm.
+
 ### Changed
 - `cpt-size` has been rewritten to support POSIX `du`, and to support packages
   with a file count of over 50,000.
