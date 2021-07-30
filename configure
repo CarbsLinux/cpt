@@ -105,7 +105,7 @@ esac
 out "DOCS = $docs" >>config.mk
 
 out "checking runtime dependencies"
-_check pax rsync sed awk grep
+_check pax rsync sed awk grep b3sum
 _check_multi "sha256 provider" sha256sum sha256 openssl
 
 trap - EXIT INT
