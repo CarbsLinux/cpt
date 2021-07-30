@@ -13,8 +13,13 @@ create_cache
 
 for pkg; do pkg_lint    "$pkg" c; done
 for pkg; do pkg_sources "$pkg" c; done
-
 for pkg; do
+    # Do not generate checksums if the 'sources' file is empty or it doesn't
+    # exist.
+    [ -s "$(pkg_find "$pkg")/sources" ] || {
+        log "$pkg" "No 'sources' file, skipping checksums"
+        continue
+    }
     pkg_checksums "$pkg" | {
         repo_dir=$(pkg_find "$pkg")
 
