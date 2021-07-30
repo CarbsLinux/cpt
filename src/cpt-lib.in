@@ -154,6 +154,22 @@ _readlinkf() (
     return 1
 )
 
+_get_digest() {
+    # Get digest algorithm from the given file. It looks for a header on the
+    # file declaring the digest algorithm. Currently only BLAKE3 is supported.
+    # If the file does not include a header, the function will assume that it is
+    # using sha256 as a digest algorithm. If the given file doesn't exist it will
+    # return 1.
+    [ -r "$1" ] || return 1
+    read -r chk < "$1"
+    case $chk in
+        %BLAKE3) chk=b3sum ;;
+        %*) die "Unknown digest algorithm: '${chk#\%}'" ;;
+        *) chk=sh256
+    esac
+    out "$chk"
+}
+
 # This is the public domain getoptions shell library. It also forms a usage
 # function.
 # URL: https://github.com/ko1nksm/getoptions (v2.5.0)
@@ -981,10 +997,16 @@ pkg_etcsums() (
     # /etc/ directory for use in "smart" handling of these files.
     log "$1" "Generating etcsums"
 
+    # Try to get the digest algorithm from the installed etcsums file. This
+    # makes sure that old packages continue to have the same digest algorithm
+    # and not a bunch of '.new' files are installed. It's not foolproof at all,
+    # but at least it keeps the /etc directory as clean as possible.
+    digest=$(_get_digest "$pkg_db/$1/etcsums") || digest=b3sum
 
+    case $digest in b3sum) out "%BLAKE3"; esac > "$pkg_dir/$1/$pkg_db/$1/etcsums"
     find etc -type f | while read -r file; do
-        sh256 "$file"
-    done > "$pkg_dir/$1/$pkg_db/$1/etcsums"
+        "$digest" "$file"
+    done >> "$pkg_dir/$1/$pkg_db/$1/etcsums"
 )
 
 pkg_tar() {
@@ -1205,6 +1227,8 @@ pkg_checksums() {
 
     [ -f "$repo_dir/sources" ] || return 0
 
+    case ${2:-b3sum} in b3sum) out "%BLAKE3"; esac
+
     while read -r src _ || [ "$src" ]; do
 
         # Skip checksums if it's a comment, or a VCS repository.
@@ -1223,9 +1247,9 @@ pkg_checksums() {
             die "$1" "Couldn't find source '$src'"
         fi
 
-        # An easy way to get 'sha256sum' to print with the 'basename'
+        # An easy way to get 'b3sum' to print with the 'basename'
         # of files is to 'cd' to the file's directory beforehand.
-        (cd "$src_path" && sh256 "${src##*/}") ||
+        (cd "$src_path" && "${2:-b3sum}" "${src##*/}") ||
             die "$1" "Failed to generate checksums"
     done < "$repo_dir/sources"
 }
@@ -1233,13 +1257,18 @@ pkg_checksums() {
 pkg_verify() {
     # Verify all package checksums. This is achieved by generating a new set of
     # checksums and then comparing those with the old set.
-    verify_cmd="NR==FNR{a[\$1];next}/^git  .*/{next}!((\$1)in a){exit 1}"
+    vcmd="NR==FNR{a[\$1];next}/^git  .*/{next}!((\$1)in a){exit 1}"
 
     for pkg; do
         repo_dir=$(pkg_find "$pkg")
+
         [ -f "$repo_dir/sources" ] || continue
 
-        pkg_checksums "$pkg" | awk "$verify_cmd" - "$repo_dir/checksums" || {
+        # Determine the type of digest algorithm from the checksums file to do
+        # verification with.
+        digest="$(_get_digest "$repo_dir/checksums")"
+
+        pkg_checksums "$pkg" "$digest" | awk "$vcmd" - "$repo_dir/checksums" || {
         log "$pkg" "Checksum mismatch"
 
         # Instead of dying above, log it to the terminal. Also define a
@@ -1418,10 +1447,12 @@ pkg_etc() {
         mkdir -p "$CPT_ROOT/$dir"
     done
 
+    digest=$(_get_digest "$mak_dir/c") || digest=b3sum
+
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
-        { sum_new=$(sh256 "$file")
-          sum_sys=$(cd "$CPT_ROOT/"; sh256 "$file")
+        { sum_new=$("$digest" "$file")
+          sum_sys=$(cd "$CPT_ROOT/"; "$digest" "$file")
           sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
 
         logv "$pkg_name" "Doing 3-way handshake for $file"
