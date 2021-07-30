@@ -30,6 +30,7 @@ etcsums are also backwards compatible.
 ### Added
 - `cpt-checksum` now has the `-s` flag to generate checksums using the SHA256
   digest algorithm.
+- This changelog is now installed by the `Makefile`
 
 ### Changed
 - `cpt-size` has been rewritten to support POSIX `du`, and to support packages
