@@ -29,6 +29,7 @@ tests/etc/cpt-hook:
 	ln -s ../hook-file $@
 
 dist: docs/cpt.info
+	@if ! [ -e config.mk ]; then echo "Please run './configure'"; exit 1; fi
 	./tools/mkdist.sh "${VERSION}"
 
 install: all
