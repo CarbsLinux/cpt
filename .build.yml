@@ -15,6 +15,10 @@ tasks:
       ./configure
       make pax
       sudo install -Dm755 pax /usr/bin/pax
+  - install-blake3: |
+      git clone --quiet https://git.sr.ht/~mcf/b3sum
+      cd b3sum
+      sudo make PREFIX=/usr install
   - build: |
       cd cpt
       ./configure
