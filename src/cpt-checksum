@@ -16,12 +16,12 @@ for pkg; do pkg_sources "$pkg" c; done
 for pkg; do
     # Do not generate checksums if the 'sources' file is empty or it doesn't
     # exist.
-    [ -s "$(pkg_find "$pkg")/sources" ] || {
+    repo_dir=$(pkg_find "$pkg")
+    [ -s "$repo_dir/sources" ] || {
         log "$pkg" "No 'sources' file, skipping checksums"
         continue
     }
     pkg_checksums "$pkg" | {
-        repo_dir=$(pkg_find "$pkg")
 
         if [ -w "$repo_dir" ]; then
             tee "$repo_dir/checksums"
