@@ -1,6 +1,13 @@
 Carbs Packaging Tools
 =====================
 
+    ##### ####  #####
+    #   # #   #   #
+    #     ####    #
+    #   # #       #
+    ##### #       #
+
+
 Package management toolset for Carbs Linux. Forked from [KISS]. All usage
 information can be obtained from the manual page. Refer to the [ChangeLog] to
 learn what's new.
