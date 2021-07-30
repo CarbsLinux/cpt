@@ -2,7 +2,7 @@
 # Build a package
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-tfy] [--root ROOT] [pkg...]"
     msg -- '' 'Options:'
     flag CPT_TEST   -t --test export:1 init:@export -- "Run tests (if they exist)"
     global_options
