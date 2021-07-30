@@ -34,6 +34,7 @@ etcsums are also backwards compatible.
 ### Changed
 - `cpt-size` has been rewritten to support POSIX `du`, and to support packages
   with a file count of over 50,000.
+- Installation now requires to run `./configure`
 
 
 [6.1.0] - 2021-07-22
