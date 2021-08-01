@@ -1,21 +1,87 @@
 #!/bin/sh -e
 # Enter a chroot
+# shellcheck disable=2004
 
 ## SYNOPSIS:
 ## .Nm cpt-chroot
+## .Op Fl m
 ## .Op Ar dir
 
 ## DESCRIPTION:
 ## .Nm
 ## is a wrapper script to chroot inside other root filesystems. It automatically
 ## mounts important filesystems in to the chroot directory, and unmounts them
-## when the user exits the chroot and cleans up leftover host files.
+## when the user exits the chroot and cleans up leftover host files. If the flag
+## .Fl m
+## is given,
+## .Nm
+## does not try to mount or unmount any filesystems.
+
+# We generate the parser into the script, because we don't want this script to
+# depend on cpt-lib.
+nomount=''
+REST=''
+parse() {
+    OPTIND=$(($#+1))
+    while OPTARG= && [ $# -gt 0 ]; do
+        case $1 in
+            --?*=*) OPTARG=$1; shift
+                    eval 'set -- "${OPTARG%%\=*}" "${OPTARG#*\=}"' ${1+'"$@"'}
+                    ;;
+            --no-*) unset OPTARG ;;
+            -[mh]?*) OPTARG=$1; shift
+                     eval 'set -- "${OPTARG%"${OPTARG#??}"}" -"${OPTARG#??}"' ${1+'"$@"'}
+                     OPTARG= ;;
+        esac
+        case $1 in
+            '-m')
+                [ "${OPTARG:-}" ] && OPTARG=${OPTARG#*\=} && set "noarg" "$1" && break
+                eval '[ ${OPTARG+x} ] &&:' && OPTARG='1' || OPTARG=''
+                nomount="$OPTARG"
+                ;;
+            '-h'|'--help')
+                usage
+                exit 0 ;;
+            --)
+                shift
+                while [ $# -gt 0 ]; do
+                    REST="${REST} \"\${$(($OPTIND-$#))}\""
+                    shift
+                done
+                break ;;
+            [-]?*)
+                set "unknown" "$1"; break ;;
+            *)
+                REST="${REST} \"\${$(($OPTIND-$#))}\""
+        esac
+        shift
+    done
+    [ $# -eq 0 ] && { OPTIND=1; unset OPTARG; return 0; }
+    case $1 in
+        unknown) set "Unrecognized option: $2" "$@" ;;
+        noarg) set "Does not allow an argument: $2" "$@" ;;
+        required) set "Requires an argument: $2" "$@" ;;
+        pattern:*) set "Does not match the pattern (${1#*:}): $2" "$@" ;;
+        notcmd) set "Not a command: $2" "$@" ;;
+        *) set "Validation error ($1): $2" "$@"
+    esac
+    echo "$1" >&2
+    exit 1
+}
+usage() { printf '%s\n' "usage: ${0##*/} [-m] [dir]" "" "Options:" \
+    "  -m                          Don't mount or unmount directories"
+}
+
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/} [-m] [dir]"
+    msg -- '' 'Options:'
+    flag nomount -m        -- "Don't mount or unmount directories"
+    disp :usage  -h --help hidden:1
+}
 
 log() {
     printf '\033[32m->\033[m %s.\n' "$*"
 }
-
-usage() { printf '%s [dir]\n' "${0##*/}"; exit 0;}
 
 die() {
     log "$*" >&2
@@ -35,7 +101,7 @@ clean() {
 }
 
 main() {
-    case "$1" in ''|--help|-h) usage; esac
+    parse "$@" && eval set -- "$REST"
     [ -d "$1" ]        || die Given path does not exist
     [ "$(id -u)" = 0 ] || die Script needs to be run as root
 
@@ -48,17 +114,19 @@ main() {
         esac
     }
 
-    trap 'clean "$1"' EXIT INT
+    [ -z "$nomount" ] && {
+        trap 'clean "$1"' EXIT INT
 
-    log Mounting /dev, /proc and /sys from host; {
-        mountpoint -q "$1/dev"  || mount -o bind /dev "$1/dev"
-        mountpoint -q "$1/proc" || mount -t proc proc "$1/proc"
-        mountpoint -q "$1/sys"  || mount -t sysfs sys "$1/sys"
+        log Mounting /dev, /proc and /sys from host; {
+            mountpoint -q "$1/dev"  || mount -o bind /dev "$1/dev"
+            mountpoint -q "$1/proc" || mount -t proc proc "$1/proc"
+            mountpoint -q "$1/sys"  || mount -t sysfs sys "$1/sys"
 
-    }
+        }
 
-    log Copying /etc/resolv.conf from host; {
-         [ -f "$1/etc/resolv.conf" ] || cp /etc/resolv.conf "$1/etc"
+        log Copying /etc/resolv.conf from host; {
+            [ -f "$1/etc/resolv.conf" ] || cp /etc/resolv.conf "$1/etc"
+        }
     }
 
     log Entering chroot; {
