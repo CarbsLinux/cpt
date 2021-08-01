@@ -30,12 +30,16 @@ etcsums are also backwards compatible.
 ### Added
 - `cpt-checksum` now has the `-s` flag to generate checksums using the SHA256
   digest algorithm.
-- This changelog is now installed by the `Makefile`
+- Added `CPT_DOWNLOADER` variable to change the download program. Available
+  options are: `curl`, `wget`, `wget2`, `aria2c`, and `axel`.
+- `cpt-chroot` now has the flag `-m` to disable mounting/unmounting pseudo
+  filesystems.
+- This changelog is now installed by the `Makefile`.
 
 ### Changed
 - `cpt-size` has been rewritten to support POSIX `du`, and to support packages
   with a file count of over 50,000.
-- Installation now requires to run `./configure`
+- Installation now requires to run `./configure`.
 
 
 [6.1.0] - 2021-07-22
