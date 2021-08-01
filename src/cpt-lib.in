@@ -9,7 +9,9 @@
 # Currently maintained by Cem Keylan.
 
 version() {
-    log "Carbs Packaging Tools" @VERSION@
+    out "Carbs Packaging Tools, version @VERSION@" \
+        @LICENSE@
+
     exit 0
 }
 
@@ -2161,11 +2163,13 @@ create_cache() {
                command -v llvm-readelf  ||
                command -v eu-readelf)"} || elf_prog=ldd
 
+    # Use one of the following programs to download package sources. Downloads
+    # are made using the `pkg_download()` function.
     dl_prog=${CPT_DOWNLOADER:="$(
-              command -v curl   ||
-              command -v wget   ||
-              command -v wget2  ||
-              command -v axel   ||
+              command -v curl      ||
+              command -v wget      ||
+              command -v wget2     ||
+              command -v axel      ||
               command -v aria2c)"} || dl_prog=curl
 
     # Make note of the user's current ID to do root checks later on.
