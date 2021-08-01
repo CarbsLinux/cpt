@@ -5,16 +5,17 @@ INSTALL_SH = ./tools/install.sh
 CONTRIB = `find contrib -name 'cpt*' ! -name '*.*'`
 SRC     = `find src -name 'cpt*' ! -name '*.*'`
 BIN     = ${SRC} ${CONTRIB}
-LIB        = src/cpt-lib
-LIB_IN     = ${LIB:=.in}
 
 all: src/cpt-lib
 	@if ! [ -e config.mk ]; then echo "Please run './configure'"; exit 1; fi
 	@test "${DOCS}" != yes || ${MAKE} -C docs all
 
 src/cpt-lib: src/cpt-lib.in
-	sed -e "s|@VERSION@|${VERSION}|g" \
-		-e "s|@DOCSTRING@|Call functions from the library|g" < src/cpt-lib.in > $@
+	sed -n '/^Copyright/{s,^,        ",;s,$$," \\,;p}' LICENSE | \
+	sed -e '/@LICENSE@/r /dev/stdin' \
+		-e '/@LICENSE@/d' \
+		-e "s|@VERSION@|${VERSION}|g" \
+		-e "s|@DOCSTRING@|Call functions from the library|g" src/cpt-lib.in > $@
 	chmod 755 $@
 
 shellspec: all tests/etc/cpt-hook
