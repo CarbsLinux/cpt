@@ -9,6 +9,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+6.1.1 - 2021-08-04
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed a rare bug during manifest generation that caused an empty line inside
+  the package manifest.
+
+
 6.1.0 - 2021-07-22
 --------------------------------------------------------------------------------
 
