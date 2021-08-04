@@ -42,6 +42,14 @@ etcsums are also backwards compatible.
 - Installation now requires to run `./configure`.
 
 
+6.1.1 - 2021-08-04
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed a rare bug during manifest generation that caused an empty line inside
+  the package manifest.
+
+
 [6.1.0] - 2021-07-22
 --------------------------------------------------------------------------------
 
