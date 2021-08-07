@@ -1058,8 +1058,16 @@ that can be used inside most @samp{cpt} tools. It defines the following flags:
 @tab @samp{CPT_VERBOSE}
 @end multitable
 
-If you don't want these options to be printed on the usage, you can disable it
-by calling @code{global_options silent} instead.
+This function can take two arguments:
+
+@table @asis
+@item @samp{silent}
+If this argument is specified, the function does not print the usage
+information defined by its flags.
+@item @samp{compact}
+If this argument is specified, the function only prints the help
+output of the @code{--help} and @code{--version} flags.
+@end table
 
 @node Message functions
 @section Message functions

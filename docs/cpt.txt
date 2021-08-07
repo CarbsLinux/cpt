@@ -933,8 +933,14 @@ development manual for *Carbs Packaging Tools*. For development logs see
    `-v'  `--version'    `version()'   
          `--verbose'    `CPT_VERBOSE' 
 
-  If you don't want these options to be printed on the usage, you can
-  disable it by calling `global_options silent' instead.
+  This function can take two arguments:
+
+  `silent'
+        If this argument is specified, the function does not print the
+        usage information defined by its flags.
+  `compact'
+        If this argument is specified, the function only prints the help
+        output of the `--help' and `--version' flags.
 
 
 8.3 Message functions
