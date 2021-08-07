@@ -924,13 +924,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
   include flags that can be used inside most `cpt' tools. It defines the
   following flags:
 
-   Flag  Long Option    Calls        
-  -----------------------------------
-   `-f'  `--force'      `CPT_FORCE'  
-   `-y'  `--no-prompt'  `CPT_PROMPT' 
-         `--root'       `CPT_ROOT'   
-   `-h'  `--help'       `usage()'    
-   `-v'  `--version'    `version()'  
+   Flag  Long Option    Calls         
+  ------------------------------------
+   `-f'  `--force'      `CPT_FORCE'   
+   `-y'  `--no-prompt'  `CPT_PROMPT'  
+         `--root'       `CPT_ROOT'    
+   `-h'  `--help'       `usage()'     
+   `-v'  `--version'    `version()'   
+         `--verbose'    `CPT_VERBOSE' 
+
+  If you don't want these options to be printed on the usage, you can
+  disable it by calling `global_options silent' instead.
 
 
 8.3 Message functions

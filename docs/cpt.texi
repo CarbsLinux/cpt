@@ -1034,7 +1034,7 @@ parser_definition() @{
 The @samp{global_options()} function is a simple convenience call to include flags
 that can be used inside most @samp{cpt} tools. It defines the following flags:
 
-@multitable {aaaa} {aaaaaaaaaaaaa} {aaaaaaaaaaaa}
+@multitable {aaaa} {aaaaaaaaaaaaa} {aaaaaaaaaaaaa}
 @headitem Flag
 @tab Long Option
 @tab Calls
@@ -1053,7 +1053,13 @@ that can be used inside most @samp{cpt} tools. It defines the following flags:
 @item @code{-v}
 @tab @code{--version}
 @tab @samp{version()}
+@item 
+@tab @code{--verbose}
+@tab @samp{CPT_VERBOSE}
 @end multitable
+
+If you don't want these options to be printed on the usage, you can disable it
+by calling @code{global_options silent} instead.
 
 @node Message functions
 @section Message functions
