@@ -3,7 +3,7 @@
 
 parser_definition() {
     setup REST help:usage -- "usage: ${0##*/} [-] [package file]"
-    global_options
+    global_options silent
 }
 
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
