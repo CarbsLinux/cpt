@@ -426,18 +426,22 @@ getoptions_help() {
 global_options() {
     # These are options that are supported by most utilities. If the optional
     # argument 'silent' is given, the usage will not print these options, but
-    # the arguments will still be accepted. Sometimes it doesn't make sense to
-    # pollute the screen with options that will be rarely ever used.
+    # the arguments will still be accepted. Alternatively, if the 'compact'
+    # argument is given, the function only prints the '--help' and '--version'
+    # flags. Sometimes it doesn't make sense to pollute the screen with options
+    # that will be rarely ever used.
+    _h=hidden:1
     case $1 in
-        silent) h=hidden:1 ;;
-        *) msg -- '' 'Global Options:'; h=''
+        silent)  _c=$_h ;;
+        compact) _c='' ;;
+        *) msg -- '' 'Global Options:'; _c='' _h=''
     esac
-    flag  CPT_FORCE  -f --force                $h init:@export -- "Force operation"
-    flag  CPT_PROMPT -y --no-prompt on:0 off:0 $h init:@export -- "Do not prompt for confirmation"
-    param CPT_ROOT      --root                 $h init:@export -- "Use an alternate root directory"
-    disp :usage      -h --help                 $h              -- "Show this help message"
-    disp :version    -v --version              $h              -- "Print version information"
-    flag CPT_VERBOSE    --verbose              $h init:@export -- "Be more verbose"
+    flag  CPT_FORCE  -f --force                $_h init:@export -- "Force operation"
+    flag  CPT_PROMPT -y --no-prompt on:0 off:0 $_h init:@export -- "Do not prompt for confirmation"
+    param CPT_ROOT      --root                 $_h init:@export -- "Use an alternate root directory"
+    disp :usage      -h --help                 $_c              -- "Show this help message"
+    disp :version    -v --version              $_c              -- "Print version information"
+    flag CPT_VERBOSE    --verbose              $_h init:@export -- "Be more verbose"
 }
 
 contains() {
