@@ -27,6 +27,18 @@ built is already installed on the system `cpt` makes sure that the generated
 etcsums are also backwards compatible.
 
 
+### Description searching
+
+`cpt-search` utility has a new mode for searching through the package names and
+descriptions, which is enabled by the `-q` flag. The output is really similar to
+how the `apt search` command works, but the output is not meant for scripting.
+Descriptions are defined by the `description` keys in the meta file.
+
+Instead of wildcards, the passed argument is expected to be a POSIX Basic
+Regular Expression, and is interpreted by `grep`. `cpt-search` also accepts the
+`-F` flag for passing literal expressions.
+
+
 ### Added
 - `cpt-checksum` now has the `-s` flag to generate checksums using the SHA256
   digest algorithm.
