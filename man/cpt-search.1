@@ -5,8 +5,15 @@
 .Nd search for cpt packages
 .Sh SYNOPSIS
 .Nm
-.Op Fl dso
-.Op Ar query
+.Op Fl ds
+.Ar package...
+.Nm
+.Fl o
+.Op Fl ds
+.Nm
+.Fl q
+.Op Fl Fds
+.Ar query
 .Sh DESCRIPTION
 .Nm
 can be used to search packages. Glob characters can also be used in the search.
@@ -17,6 +24,10 @@ The options are as follows:
 Do not search the installed package database.
 .It Fl s , -single
 Only show the first instance of a package.
+.It Fl q , -query
+Search packages making use of package descriptions.
+.It Fl F , -fixed
+Run query mode interpreting the given pattern as a fixed string
 .It Fl o , -others
 Use the current directory as the package and show other instances of that
 package.
@@ -24,9 +35,31 @@ package.
 Show help message
 .It Fl v , -version
 Print version information
-.It Fl -verbose
-Be more verbose
 .El
+.Pp
+The program has three modes of operations. The default operation is to search
+for the packages given as positional arguments.
+.Pp
+If the
+.Fl o
+flag is specified,
+.Nm
+will use the name of the current directory to search for instances of other
+packages with the same name.
+.Pp
+If the
+.Fl q
+flag is specified,
+.Nm
+will search through the name and description of packages using the given
+.Ar query ,
+and run a case-insensitive search through
+.Xr grep 1 .
+If additionally the
+.Fl F
+flag is given, the given
+.Ar query
+will be considered a fixed string.
 .Sh EXAMPLES
 Below are usage examples for
 .Nm ,

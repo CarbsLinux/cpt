@@ -2,26 +2,64 @@
 # Search for a package
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-dFoqs] [pkg...]"
     msg -- '' 'Options:'
     flag SEARCH_PATH -d "on:$CPT_PATH"    -- "Do not search the installed package database"
     flag all    -s --single init:=1 on:'' -- "Only show the first instance of a package"
-    flag others -o --others               -- "Use the current directory as the package" \
+    flag mode   -q --query  on:2          -- "Search packages making use of package descriptions"
+    flag fflag  -F --fixed                -- "Run query mode interpreting the given pattern as a" \
+                                             "fixed string"
+    flag mode   -o --others on:1          -- "Use the current directory as the package" \
                                              "and show other instances"
-    global_options
+    global_options compact
 }
 
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
-# The 'all' variable is set by the option parser.
-# shellcheck disable=2154
-case $others in
-    '') for pkg; do pkg_find "$pkg" "${all:+all}"; done ;;
-    *) pkg_find "${PWD##*/}" all |
-       while read -r pkg_dir; do case $pkg_dir in
-               "$PWD") ;;
-               *) printf '%s\n' "$pkg_dir"
-                  [ "$all" ] || exit 0
-           esac
-       done
+
+# The 'all' and 'mode' variables are set by the option parser, and are never
+# modified in the subshell.
+# shellcheck disable=2154,2030,2031
+case $mode in
+    '')
+        # Default mode of operation.
+        for pkg; do pkg_find "$pkg" "${all:+all}"; done
+        ;;
+    1)
+        # Use the current directory as the package and show other instances.
+        pkg_find "${PWD##*/}" all |
+            while read -r pkg_dir; do
+                case $pkg_dir in
+                    "$PWD") ;;
+                    *) printf '%s\n' "$pkg_dir"
+                       [ "$all" ] || exit 0
+                esac
+            done
+        ;;
+    2)
+        # Make a partial string search using the name and the description of all
+        # packages. This is a "pretty information" mode, and its output is not
+        # meant to be used in scripting. There is a whole library meant for
+        # scripting.
+        pkg_find \* all |
+            while read -r pkg_dir; do
+                name=${pkg_dir##*/}
+                desc=$(pkg_query_meta "$pkg_dir" description ||:)
+
+                # We pipe the name and description to the given query and
+                # continue if it's not a match
+                printf '%s %s\n' "$name" "$desc" |
+                "$grep" "-iq${fflag:+F}" -- "$1" || continue
+
+                read -r ver rel < "$pkg_dir/version"
+                printf '%b%s%b@%s %s-%s\n  %s\n\n' \
+                    "$colorb" "$name" "$colre" \
+                    "$pkg_dir" \
+                    "$ver" "$rel" \
+                    "$desc"
+
+                # I don't know why someone use the '-s' flag on this operation
+                # mode, but go ahead.
+                [ "$all" ] || exit 0
+            done
 esac
