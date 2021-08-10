@@ -35,6 +35,7 @@ etcsums are also backwards compatible.
 - `cpt-chroot` now has the flag `-m` to disable mounting/unmounting pseudo
   filesystems.
 - This changelog is now installed by the `Makefile`.
+- `cpt-chbuild` now has `-r` flag to redownload the chroot.
 
 ### Changed
 - `cpt-size` has been rewritten to support POSIX `du`, and to support packages
