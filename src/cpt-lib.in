@@ -570,6 +570,18 @@ run_hook() {
     CPT_HOOK=$oldCPT_HOOK
 }
 
+# An optional argument could be provided to enforce a compression algorithm.
+# shellcheck disable=2120
+compress() {
+    case ${1:-$CPT_COMPRESS} in
+        bz2) bzip2 -z ;;
+        gz)  gzip -6  ;;
+        xz)  xz -zT 0 ;;
+        zst) zstd -3  ;;
+        lz)  lzip -6  ;;
+    esac
+}
+
 decompress() {
     case $1 in
         *.tar|*.cpio) cat       ;;
@@ -1055,19 +1067,8 @@ pkg_tar() {
 
     # Create a tarball from the contents of the built package.
     cd "$pkg_dir/$1"
-    pax -w .  |
-        case $CPT_COMPRESS in
-            bz2) bzip2 -z ;;
-            xz)  xz -zT 0 ;;
-            gz)  gzip -6  ;;
-            zst) zstd -3  ;;
-            lz)  lzip -6  ;;
-            *)   gzip -6  ;;  # Fallback to gzip
-        esac \
-    > "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
-
+    pax -w . | compress > "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
     log "$1" "Successfully created tarball"
-
     run_hook post-package "$1" "$bin_dir/$1#$version-$release.tar.$CPT_COMPRESS"
 }
 
