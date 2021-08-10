@@ -2205,10 +2205,7 @@ create_cache() {
 
     # Make sure that the CPT_ROOT doesn't end with a '/'. This might
     # break some operations.
-    [ -z "$CPT_ROOT" ] || [ "${CPT_ROOT##*/}" ] || {
-        warn "" "Your CPT_ROOT variable shouldn't end with '/'"
-        CPT_ROOT=${CPT_ROOT%/}
-    }
+    CPT_ROOT=${CPT_ROOT%"${CPT_ROOT##*[!/]}"}
 
     # Define an optional sys_arch variable in order to provide
     # information to build files with architectural information.
