@@ -12,41 +12,29 @@
 ## .Nm
 ## will use the name of the current directory as the package.
 
-case "$1" in
-    --help|-h)
-        printf 'usage: %s [pkg]\n' "${0##*/}"
-        exit 0
-        ;;
-    '') set -- "${PWD##*/}"
-esac
-
-cpt-list "$1" >/dev/null
-db=$CPT_ROOT/var/db/cpt/installed
-
-# Grab the package's version..
-read -r ver rel 2>/dev/null < "$db/$1/version"
-
 ### Environment variables:
 ### The compression method can be changed while creating a tarball, using the
 ### .Ev CPT_COMPRESS
 ### environment variable.
-# Fallback to gzip if there is a typo
-case "$CPT_COMPRESS" in bz2|gz|xz|zst|lz) ;; *) CPT_COMPRESS=gz; esac
 
-# Reset the argument list.
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/} [pkg]"
+    global_options silent
+}
+
+# shellcheck disable=1091
+. cpt-lib
+
+[ "$1" ] || set -- "${PWD##*/}"
+
+(pkg_list "$1" >/dev/null)
+
+# Grab the package's version..
+read -r ver rel 2>/dev/null < "$sys_db/$1/version"
+
 tarball="$PWD/$1#$ver-$rel.tar.$CPT_COMPRESS"
 
 # Turn the list of files back into a package.
 cd "$CPT_ROOT/"
-sed 's/^/./' "$db/$1/manifest" |
-pax -wd |
-
-case "$CPT_COMPRESS" in
-    bz2) bzip2 -z ;;
-    gz)  gzip -6  ;;
-    xz)  xz -zT 0 ;;
-    zst) zstd -3  ;;
-    lz)  lzip -6  ;;
-esac > "$tarball"
-
-printf 'tarball created in %s\n' "$tarball"
+sed 's/^/./' "$sys_db/$1/manifest" | pax -wd | compress > "$tarball"
+out "tarball created in $tarball"
