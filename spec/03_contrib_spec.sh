@@ -17,13 +17,13 @@ Describe 'contrib scripts'
         It 'outputs the file contents in the given package directory'
             When run script ./contrib/cpt-cat "$firstpkg"
             The stdout should not eq ""
-            The line 1 of stderr should eq "$(printf '\033[1mbuild:\033[m\n')"
+            The line 1 of stderr should eq "build:"
         End
         It "uses the current directory for the package name if none is supplied (contrib-dummy-pkg)"
             cd "$CPT_PATH/contrib-dummy-pkg" || return 1
             When run script "$(command -v cpt-cat)"
             The stdout should not eq ""
-            The line 1 of stderr should eq "$(printf '\033[1mbuild:\033[m\n')"
+            The line 1 of stderr should eq "build:"
         End
         It "exits with error if the package isn't installed"
             When run script ./contrib/cpt-cat somerandompackage
@@ -44,13 +44,13 @@ Describe 'contrib scripts'
         It "outputs the given file contents in the given package directory ($1)"
             When run script ./contrib/cpt-cat "$firstpkg" "$1"
             The stdout should eq "$(cat "$CPT_ROOT/var/db/cpt/installed/$firstpkg/$1")"
-            The stderr should eq "$(printf '\033[1m%s:\033[m\n' "$1")"
+            The stderr should eq "$1:"
         End
         It "outputs the given file contents for the name of the current directory (contrib-dummy-pkg - $1)"
             cd "$CPT_PATH/contrib-dummy-pkg" || return 1
             When run script "$(command -v cpt-cat)" "" "$1"
             The stdout should eq "$(cat "$CPT_ROOT/var/db/cpt/installed/${PWD##*/}/$1")"
-            The stderr should eq "$(printf '\033[1m%s:\033[m\n' "$1")"
+            The stderr should eq "$1:"
         End
     End
     Describe 'cpt-depends'
@@ -94,6 +94,7 @@ Describe 'contrib scripts'
             export CPT_COMPRESS=typo
             When run script "$(command -v cpt-export)" contrib-dummy-pkg
             The stdout should eq "tarball created in $CPT_ROOT/tmp/contrib-dummy-pkg#1-1.tar.gz"
+            The stderr should eq "WARNING 'typo' is not a valid CPT_COMPRESS value, falling back to 'gz' "
         End
         Parameters
             bz2 bzip2
