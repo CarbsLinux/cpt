@@ -2233,8 +2233,13 @@ create_cache() {
     # do nothing on a normal system.
     mkdir -p "$CPT_ROOT/" 2>/dev/null ||:
 
-    # Set a value for CPT_COMPRESS if it isn't set.
-    : "${CPT_COMPRESS:=gz}"
+    # Set the default compression to gzip, and warn the user if the value is
+    # invalid.
+    case ${CPT_COMPRESS:=gz} in
+        bz2|gz|xz|zst|lz) ;;
+        *) warn "'$CPT_COMPRESS' is not a valid CPT_COMPRESS value, falling back to 'gz'"
+           CPT_COMPRESS=gz
+    esac
 
     # Set colors if they are to be enabled.
     # shellcheck disable=2034
