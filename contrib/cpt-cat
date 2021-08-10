@@ -47,10 +47,10 @@ pkg_list "$pkg" >/dev/null
 
 [ "$1" ] || set -- build depends sources version
 
+# $sys_db and color variables are defined by cpt-lib
+# shellcheck disable=2154
 for file; do
-    # $sys_db is defined by cpt-lib
-    # shellcheck disable=2154
     [ -f "$sys_db/$pkg/$file" ] || continue
-    printf '\033[1m%s:\033[m\n' "$file" >&2
+    printf '%b%s:%b\n' "$colbold" "$file" "$colre" >&2
     cat "$sys_db/$pkg/$file"
 done
