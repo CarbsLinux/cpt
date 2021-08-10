@@ -55,6 +55,11 @@ warnv() {
     warn "$@"
 }
 
+execv() {
+    # Redirect the output to /dev/null unless CPT_VERBOSE is set.
+    if [ "$CPT_VERBOSE" = 1 ]; then "$@"; else "$@" >/dev/null 2>&1; fi
+}
+
 die() {
     # Print a message and exit with '1' (error).
     log "$1" "$2" "!>"
@@ -984,7 +989,7 @@ pkg_fix_deps() {
     sort -uk1,1 -o depends depends 2>/dev/null ||:
 
     # Display a diff of the new dependencies against the old ones.
-    diff -U 3 "$dep_file" depends 2>/dev/null ||:
+    execv diff -U 3 "$dep_file" depends 2>/dev/null ||:
 
     # Remove the depends file if it is empty.
     [ -s depends ] || rm -f depends
