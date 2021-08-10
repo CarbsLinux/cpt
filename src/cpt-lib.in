@@ -66,6 +66,15 @@ die() {
     exit 1
 }
 
+colors_enabled() {
+    case ${CPT_COLOR:=auto} in
+        auto) [ -t 1 ] ;;
+        1|always) return 0 ;;
+        0|never) return 1 ;;
+        *) die "Unknown color value: '$CPT_COLOR'"
+    esac
+}
+
 trap_set() {
     # Function to set the trap value.
     case ${1:-cleanup} in
@@ -444,6 +453,7 @@ global_options() {
     flag  CPT_FORCE  -f --force                $_h init:@export -- "Force operation"
     flag  CPT_PROMPT -y --no-prompt on:0 off:0 $_h init:@export -- "Do not prompt for confirmation"
     param CPT_ROOT      --root                 $_h init:@export -- "Use an alternate root directory"
+    param CPT_COLOR     --color                $_h init:@export -- "Colorize the output [default:auto]"
     disp :usage      -h --help                 $_c              -- "Show this help message"
     disp :version    -v --version              $_c              -- "Print version information"
     flag CPT_VERBOSE    --verbose              $_h init:@export -- "Be more verbose"
@@ -2226,13 +2236,9 @@ create_cache() {
     # Set a value for CPT_COMPRESS if it isn't set.
     : "${CPT_COMPRESS:=gz}"
 
-    # Unless being piped or the user specifically doesn't want colors, set
-    # colors. This can of course be overriden if the user specifically want
-    # colors during piping.
-    if { [ "$CPT_COLOR" != 0 ] && [ -t 1 ] ;} || [ "$CPT_COLOR" = 1 ]; then
-        colory="\033[1;33m" colorb="\033[1;34m" colre="\033[m"
-    fi
-
+    # Set colors if they are to be enabled.
+    # shellcheck disable=2034
+    colors_enabled && colory="\033[1;33m" colorb="\033[1;34m" colre="\033[m" colbold="\033[1m"
 }
 
 # If the library is being called with its own name, run arguments.
