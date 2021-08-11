@@ -1,5 +1,5 @@
 # Carbs Packaging Tools
--include config.mk
+include config.mk
 
 INSTALL_SH = ./tools/install.sh
 CONTRIB = `find contrib -name 'cpt*' ! -name '*.*'`
@@ -7,7 +7,6 @@ SRC     = `find src -name 'cpt*' ! -name '*.*'`
 BIN     = ${SRC} ${CONTRIB}
 
 all: src/cpt-lib
-	@if ! [ -e config.mk ]; then echo "Please run './configure'"; exit 1; fi
 	@test "${DOCS}" != yes || ${MAKE} -C docs all
 
 src/cpt-lib: src/cpt-lib.in
@@ -30,7 +29,6 @@ tests/etc/cpt-hook:
 	ln -s ../hook-file $@
 
 dist: docs/cpt.info
-	@if ! [ -e config.mk ]; then echo "Please run './configure'"; exit 1; fi
 	./tools/mkdist.sh "${VERSION}"
 
 install: all
