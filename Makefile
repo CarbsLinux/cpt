@@ -34,9 +34,9 @@ dist: docs/cpt.info
 install: all
 	test "${DOCS}" != yes || ${MAKE} -C docs install
 	[ -f docs/cpt.info ] && \
-		${INSTALL_SH} -Dm644 docs/cpt.info ${DESTDIR}${INFODIR}/cpt.info
+		${INSTALL_SH} -Dm644 docs/cpt.info ${DESTDIR}${INFODIR}/cpt.info ||:
 	[ -f docs/cpt.txt ] && \
-		${INSTALL_SH} -Dm644 docs/cpt.txt  ${DESTDIR}${DOCDIR}/cpt.txt
+		${INSTALL_SH} -Dm644 docs/cpt.txt  ${DESTDIR}${DOCDIR}/cpt.txt ||:
 	${INSTALL_SH} -Dm644 CHANGELOG.md  ${DESTDIR}${DOCDIR}/CHANGELOG
 	${INSTALL_SH} -Dm755 -t ${DESTDIR}${BINDIR} ${BIN}
 	${INSTALL_SH} -Dm644 -t ${DESTDIR}${MAN1} man/*.1
