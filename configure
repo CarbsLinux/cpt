@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-version=Fossil
+version=6.2.0
 
 die() {
     printf '%s: %s\n' "${0##*/}" "$*" >&2
