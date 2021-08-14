@@ -107,6 +107,7 @@ out "DOCS = $docs" >>config.mk
 out "checking runtime dependencies"
 _check pax rsync sed awk grep b3sum
 _check_multi "sha256 provider" sha256sum sha256 openssl
+_check_multi "download utility" curl wget wget2 aria2c axel
 
 trap - EXIT INT
 out "written config.mk" "Run 'make' to build cpt"

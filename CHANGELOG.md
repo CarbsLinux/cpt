@@ -9,7 +9,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-[Unreleased]
+[6.2.0] - 2021-08-14
 --------------------------------------------------------------------------------
 
 ### BLAKE3 checksums
@@ -55,7 +55,7 @@ Regular Expression, and is interpreted by `grep`. `cpt-search` also accepts the
 - Installation now requires to run `./configure`.
 
 
-6.1.1 - 2021-08-04
+[6.1.1] - 2021-08-04
 --------------------------------------------------------------------------------
 
 ### Fixed
