@@ -28,8 +28,12 @@ log() {
     #
     # '${3:-->}':         If the 3rd argument is missing, set prefix to '->'.
     # '${2:+colorb}':     If the 2nd argument exists, set text style of '$1'.
-    printf '%b%s %b%b%s%b %s\n' \
-           "$colory" "${3:-->}" "$colre" "${2:+$colorb}" "$1" "$colre" "$2" >&2
+    case $# in
+        1) printf '%b->%b %s\n' "$colory" "$colre" "$1" ;;
+        2) printf '%b->%b %b%s%b %s\n' "$colory" "$colre" "$colorb" "$1" "$colre" "$2" ;;
+        3) printf '%b%s%b %b%s%b %s\n' "$colory" "${3:-->}" "$colre" "$colorb" "$1" "$colre" "$2" ;;
+        *) return 1
+    esac >&2
 }
 
 warn() {

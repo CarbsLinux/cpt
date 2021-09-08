@@ -20,7 +20,7 @@ Describe 'Main toolchain'
         Describe '--help'
             It 'outputs usage information'
                 When run script src/cpt --help
-                The line 1 of stderr should eq "-> Carbs Packaging Tool "
+                The line 1 of stderr should eq "-> Carbs Packaging Tool"
             End
         End
 
