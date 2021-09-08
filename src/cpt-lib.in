@@ -2146,25 +2146,34 @@ create_cache() {
     # that it doesn't change beneath us.
     pid=${CPT_PID:-$$}
 
-    # Create the cache directories for CPT and set the variables which point
-    # to them. This is seperate from temporary directories created in
-    # create_cache(). That's because we need these variables set on most
-    # occasions.
-    #
     # A temporary directory can be specified apart from the cache directory in
     # order to build in a user specified directory. /tmp could be used in order
-    # to build on ram, useful on SSDs. The user can specify CPT_TMPDIR for this.
-    # We create the temporary directory here to avoid permission issues that can
-    # arise from functions that call as_root().
-    mkdir -p "${cac_dir:=${CPT_CACHE:=${XDG_CACHE_HOME:-$HOME/.cache}/cpt}}" \
-             "${CPT_TMPDIR:=$cac_dir/proc}" \
-             "${src_dir:=$cac_dir/sources}" \
-             "${log_dir:=$cac_dir/logs}" \
-             "${bin_dir:=$cac_dir/bin}"
-
-    # We don't create the temporary $pid directory until `create_tmp()` is
-    # called, but we still declare its variable here.
-    : "${tmp_dir:=${CPT_TMPDIR:=$cac_dir/proc}/$pid}"
+    # to build on ram, useful on SSDs. The user can specify $CPT_TMPDIR for
+    # this. We now also support the usage of $XDG_RUNTIME_DIR, so the directory
+    # naming can be confusing to some. Here are possible $tdir names (by order
+    # of preference):
+    #
+    #   1. $CPT_TMPDIR
+    #   2. $XDG_RUNTIME_DIR/cpt
+    #   3. $XDG_CACHE_DIR/cpt/proc
+    #   4. $HOME/.cache/cpt/proc
+    #
+    # We create the main temporary directory here to avoid permission issues
+    # that can arise from functions that call as_root(). However, the
+    # $pid directories are special for each process and aren't created unless
+    # `create_tmp()` is used.
+    #
+    # We used to assign and create the directories at the same time using a
+    # shell hack, but it made the variables editable outside of the package
+    # manager, but we don't actually want that. Variables that are lower case
+    # aren't meant to be interacted or set by the user.
+    cac_dir=${CPT_CACHE:=$XDG_CACHE_HOME:-${HOME:?}/.cache}/cpt
+    src_dir=$cac_dir/sources
+    log_dir=$cac_dir/logs
+    bin_dir=$cac_dir/bin
+    tdir=${CPT_TMPDIR:=${XDG_RUNTIME_DIR:-$cac_dir/proc}${XDG_RUNTIME_DIR:+/cpt}}
+    tmp_dir=$tdir/$pid
+    mkdir -p "$cac_dir" "$src_dir" "$log_dir" "$bin_dir" "$tdir"
 
     # Set the location to the repository and package database.
     pkg_db=var/db/cpt/installed
