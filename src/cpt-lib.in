@@ -949,11 +949,10 @@ pkg_fix_deps() {
     # simplify path building.
     cd "$pkg_dir/$1/$pkg_db/$1"
 
-    # Make a copy of the depends file if it exists to have a
-    # reference to 'diff' against.
+    # Make a copy of the depends file if it exists to have a reference to 'diff'
+    # against.
     if [ -f depends ]; then
-        cp -f depends "$mak_dir/d"
-        dep_file=$mak_dir/d
+        dep_file=$(_tmp_cp depends)
     else
         dep_file=/dev/null
     fi
@@ -1488,13 +1487,13 @@ pkg_etc() {
         mkdir -p "$CPT_ROOT/$dir"
     done
 
-    digest=$(_get_digest "$mak_dir/c") || digest=b3sum
+    digest=$(_get_digest "$_etcsums") || digest=b3sum
 
     # Handle files in /etc/ based on a 3-way checksum check.
     find etc ! -type d | while read -r file; do
         { sum_new=$("$digest" "$file")
           sum_sys=$(cd "$CPT_ROOT/"; "$digest" "$file")
-          sum_old=$("$grep" "$file$" "$mak_dir/c"); } 2>/dev/null ||:
+          sum_old=$("$grep" "$file$" "$_etcsums"); } 2>/dev/null ||:
 
         logv "$pkg_name" "Doing 3-way handshake for $file"
         outv "Previous: ${sum_old:-null}"
@@ -1559,8 +1558,9 @@ pkg_remove() {
     # remove anything from packages that create empty directories for a
     # purpose (such as baselayout).
     manifest_list="$(set +f; pop "$sys_db/$1/manifest" from "$sys_db/"*/manifest)"
+    dirs="$(_tmp_name "directories")"
     # shellcheck disable=2086
-    [ "$manifest_list" ] && grep -h '/$' $manifest_list | sort -ur > "$mak_dir/dirs"
+    [ "$manifest_list" ] && grep -h '/$' $manifest_list | sort -ur > "$dirs"
 
     run_hook pre-remove "$1" "$sys_db/$1" root
 
@@ -1570,7 +1570,7 @@ pkg_remove() {
         [ "${file##/etc/*}" ] || continue
 
         if [ -d "$CPT_ROOT/$file" ]; then
-            "$grep" -Fxq "$file" "$mak_dir/dirs" 2>/dev/null && continue
+            "$grep" -Fxq "$file" "$dirs" 2>/dev/null && continue
             rmdir "$CPT_ROOT/$file" 2>/dev/null || continue
         else
             rm -f "$CPT_ROOT/$file"
@@ -1656,8 +1656,8 @@ pkg_install() {
 
     # If the package is already installed (and this is an upgrade) make a
     # backup of the manifest and etcsums files.
-    cp -f "$sys_db/$pkg_name/manifest" "$mak_dir/m" 2>/dev/null ||:
-    cp -f "$sys_db/$pkg_name/etcsums"  "$mak_dir/c" 2>/dev/null ||:
+    _manifest=$(_tmp_cp "$sys_db/$pkg_name/manifest" 2>/dev/null) ||:
+    _etcsums=$(_tmp_cp "$sys_db/$pkg_name/etcsums"   2>/dev/null) ||:
 
     # This is repeated multiple times. Better to make it a function.
     pkg_rsync() {
@@ -1672,7 +1672,7 @@ pkg_install() {
     pkg_etc
 
     # Remove any leftover files if this is an upgrade.
-    "$grep" -vFxf "$sys_db/$pkg_name/manifest" "$mak_dir/m" 2>/dev/null |
+    "$grep" -vFxf "$sys_db/$pkg_name/manifest" "$_manifest" 2>/dev/null |
 
     while read -r file; do
         file=$CPT_ROOT/$file
@@ -2113,12 +2113,35 @@ pkg_clean() {
     rm -rf -- "${CPT_TMPDIR:=$cac_dir/proc}/$pid"
 }
 
+_tmp_name() {
+    # Name a temporary file/directory
+    out "$tmp_dir/$1"
+}
+
+_tmp_cp() {
+    # Copy given file to the temporary directory and return its name. If a
+    # second argument is not given, use the basename of the copied file.
+    _ret=${2:-${1##*/}}
+    _ret=$(_tmp_name "$_ret")
+    cp "$1" "$_ret"
+    out "$_ret"
+}
+
+_tmp_create() {
+    # Create given file to the temporary directory and return its name
+    _ret=$(_tmp_name "$1")
+    # False positive, we are not reading from the file.
+    # shellcheck disable=2094
+    out "$_ret" 3>> "$_ret"
+}
+
 create_tmp() {
     # Create the required temporary directories and set the variables which
     # point to them.
-    mkdir -p "${mak_dir:=$tmp_dir/build}" \
-             "${pkg_dir:=$tmp_dir/pkg}" \
-             "${tar_dir:=$tmp_dir/export}"
+    mak_dir=$tmp_dir/build
+    pkg_dir=$tmp_dir/pkg
+    tar_dir=$tmp_dir/export
+    mkdir -p "$mak_dir" "$pkg_dir" "$tar_dir"
 }
 
 create_cache() {
