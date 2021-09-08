@@ -2167,7 +2167,7 @@ create_cache() {
     # shell hack, but it made the variables editable outside of the package
     # manager, but we don't actually want that. Variables that are lower case
     # aren't meant to be interacted or set by the user.
-    cac_dir=${CPT_CACHE:=$XDG_CACHE_HOME:-${HOME:?}/.cache}/cpt
+    cac_dir=${CPT_CACHE:=${XDG_CACHE_HOME:-${HOME:?}/.cache}}/cpt
     src_dir=$cac_dir/sources
     log_dir=$cac_dir/logs
     bin_dir=$cac_dir/bin
