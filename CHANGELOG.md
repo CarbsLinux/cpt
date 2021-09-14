@@ -9,8 +9,15 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[UNRELEASED]
+---------------------------------------------------------------------------------
+
+### Fixed
+- `cpt-fork` follows symbolic links when forking packages.
+
+
 [6.2.0] - 2021-08-14
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
 
 ### BLAKE3 checksums
 
