@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-version=6.2.0
+version=6.2.1
 
 die() {
     printf '%s: %s\n' "${0##*/}" "$*" >&2
