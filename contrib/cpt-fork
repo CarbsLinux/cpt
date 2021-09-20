@@ -31,12 +31,12 @@ for pkg; do
     case "$pkg" in
         */*)
             [ -d "$pkg" ] || die "$pkg is not a directory"
-            cp -r "$pkg" .
+            cp -Hr "$pkg" .
             pkg=${pkg##*/}
             ;;
         *)
             cpt-search "$pkg" >/dev/null
-            cp -r "$(cpt-search --single "$pkg")" .
+            cp -Hr "$(cpt-search --single "$pkg")" .
     esac
 
     # Sometimes forked packages are from the database and not from a repository.
