@@ -9,11 +9,13 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-[UNRELEASED]
+[6.2.1] - 2021-09-20
 ---------------------------------------------------------------------------------
 
 ### Fixed
 - `cpt-fork` follows symbolic links when forking packages.
+- Fixed "crux-like" usage in `cpt-size`
+- Fixed documentation path in the manual page
 
 
 [6.2.0] - 2021-08-14
