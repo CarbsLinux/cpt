@@ -76,6 +76,10 @@ colors_enabled() {
     esac
 }
 
+_dep_append() {
+    dep_graph=$(printf '%s\n%s %s\n' "$dep_graph" "$@" ;)
+}
+
 _tsort() {
     # Return a linear reverse topological sort of the piped input, so we
     # generate a proper build order. Returns 1 if a dependency cycle occurs.
@@ -884,6 +888,7 @@ pkg_depends() {
     # listed first and then the parents in reverse order.
     contains "$pkgs" "$1" || {
         pkgs="$pkgs $1 "
+        [ "$2" = raw ] && _dep_append "$1" "$1"
         while read -r dep type || [ "$dep" ]; do
             # Skip comments and empty lines.
             [ "${dep##\#*}" ] || continue
@@ -898,14 +903,12 @@ pkg_depends() {
 
             # Filter out non-explicit, already installed dependencies if called
             # from 'pkg_build()'.
-            [ "$pkg_build" ] && (pkg_list "$1" >/dev/null) && continue
+            [ "$pkg_build" ] && (pkg_list "$dep" >/dev/null) && continue
 
             if [ "$2" = explicit ] || [ "$3" ]; then
-                dep_graph="$dep_graph
-                           $dep $dep"
+                _dep_append "$dep" "$dep"
             else
-                dep_graph="$dep_graph
-                           $1 $dep"
+                _dep_append "$1" "$dep"
             fi
 
             # Recurse through the dependencies of the child packages. Forward
@@ -932,7 +935,7 @@ pkg_order() {
     order=; redro=; deps=
 
     for pkg do case $pkg in
-        *.tar.*) deps="$deps $pkg "  ;;
+        *.tar.*) _dep_append "$pkg" "$pkg" ;;
         *)       pkg_depends "$pkg" raw
     esac done
     pkg_depends_commit
