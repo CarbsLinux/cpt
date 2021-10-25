@@ -76,6 +76,43 @@ colors_enabled() {
     esac
 }
 
+_tsort() {
+    # Return a linear reverse topological sort of the piped input, so we
+    # generate a proper build order. Returns 1 if a dependency cycle occurs.
+    #
+    # I was really excited when I saw POSIX specified a tsort(1) implementation,
+    # but the specification is quite vague, it doesn't specify cycles as a
+    # reason of error, and implementations differ on how it's handled. coreutils
+    # tsort(1) exits with an error, while openbsd tsort(1) doesn't. Both
+    # implementations are correct according to the specification. This leaves us
+    # with the following awk script, because the POSIX shell is not up for the
+    # job without super ugly hacks.
+    awk 'function fv(s) {
+             for (sp in e) {
+                 split (e[sp],t)
+                 for (j in t) if (s == t[j]) return 0
+             } return 1
+         }
+         function el(_l) {for(i in e){_l=_l" "i;}; return _l;}
+         function ce(t) {if (!(t in e)) e[t]="";}
+         function err(s) {print "Dependency cycle deteced between: " s; exit 1;}
+         {ce($1);$1!=$2&&e[$1]=e[$1]" "$2;}
+         END {
+             do {p=el()
+                 for (s in e) {
+                     if (fv(s)) {
+                         pr=s" "pr
+                         split(e[s],t)
+                         for(i in t){ce(t[i]);}
+                         delete e[s]
+                     }
+                 } c=el()
+             } while (p != c)
+             if (length(p)!=0) err(p);
+             print pr
+         }'
+}
+
 trap_set() {
     # Function to set the trap value.
     case ${1:-cleanup} in
@@ -845,12 +882,8 @@ pkg_depends() {
     # Resolve all dependencies and generate an ordered list.
     # This does a depth-first search. The deepest dependencies are
     # listed first and then the parents in reverse order.
-    contains "$deps" "$1" || {
-        # Filter out non-explicit, aleady installed dependencies.
-        # Only filter installed if called from 'pkg_build()'.
-        [ "$pkg_build" ] && [ -z "$2" ] &&
-            (pkg_list "$1" >/dev/null) && return
-
+    contains "$pkgs" "$1" || {
+        pkgs="$pkgs $1 "
         while read -r dep type || [ "$dep" ]; do
             # Skip comments and empty lines.
             [ "${dep##\#*}" ] || continue
@@ -863,6 +896,18 @@ pkg_depends() {
                 make) [ "$2" = tree ] && [ -z "${3#first-nomake}" ] && continue
             esac
 
+            # Filter out non-explicit, already installed dependencies if called
+            # from 'pkg_build()'.
+            [ "$pkg_build" ] && (pkg_list "$1" >/dev/null) && continue
+
+            if [ "$2" = explicit ] || [ "$3" ]; then
+                dep_graph="$dep_graph
+                           $dep $dep"
+            else
+                dep_graph="$dep_graph
+                           $1 $dep"
+            fi
+
             # Recurse through the dependencies of the child packages. Forward
             # the 'tree' operation.
             if [ "$2" = tree ]; then
@@ -872,10 +917,12 @@ pkg_depends() {
             fi
         done 2>/dev/null < "$(pkg_find "$1")/depends" ||:
 
-        # After child dependencies are added to the list,
-        # add the package which depends on them.
-        [ "$2" = explicit ] || [ "$3" ] || deps="$deps $1 "
     }
+}
+
+pkg_depends_commit() {
+    # Set deps, and cleanup dep_graph, pkgs
+    deps=$(printf '%s\n' "$dep_graph" | _tsort) dep_graph='' pkgs='' || warn "Dependency cycle detected"
 }
 
 pkg_order() {
@@ -888,6 +935,7 @@ pkg_order() {
         *.tar.*) deps="$deps $pkg "  ;;
         *)       pkg_depends "$pkg" raw
     esac done
+    pkg_depends_commit
 
     # Filter the list, only keeping explicit packages.
     # The purpose of these two loops is to order the
@@ -1087,6 +1135,7 @@ pkg_build() {
         # separately from those detected as dependencies.
         explicit="$explicit $pkg "
     } done
+    pkg_depends_commit
 
     [ "$pkg_update" ] || explicit_build=$explicit
 
@@ -2126,6 +2175,7 @@ _tmp_cp() {
 
 _tmp_create() {
     # Create given file to the temporary directory and return its name
+    create_tmp
     _ret=$(_tmp_name "$1")
     # False positive, we are not reading from the file.
     # shellcheck disable=2094
