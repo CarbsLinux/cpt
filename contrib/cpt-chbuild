@@ -26,7 +26,7 @@ parser_definition() {
     global_options silent
 }
 
-# shellcheck disable=1091
+# shellcheck source=/bin/cpt-lib
 . cpt-lib
 
 die() {
@@ -45,9 +45,9 @@ cd "${cac_dir:?}"
 
 # Remove the existing tarball and the chroot directory, so that they can be
 # downloaded again.
-[ "$redownload" ] && rm -rf carbs-rootfs.tar.xz \
-                            carbs-rootfs.tar.xz.sum \
-                            carbs-chroot
+[ "$redownload" ] && as_root rm -rf carbs-rootfs.tar.xz \
+                                    carbs-rootfs.tar.xz.sum \
+                                    carbs-chroot
 
 [ -f carbs-rootfs.tar.xz ] || {
     log "Downloading chroot tarball"
@@ -59,12 +59,18 @@ cd "${cac_dir:?}"
     pkg_download "$url.sha256" carbs-rootfs.tar.xz.sum
 }
 
-log "Verifying checksums"
-sh256 carbs-rootfs.tar.xz | diff - carbs-rootfs.tar.xz.sum ||
-    die "Checksum verification failed"
-
+# We don't want to create the rootfs as a non-priviliged user, because there may
+# arise certain problems if the files inside the chroot don't belong to root.
+[ "$uid" = 0 ] || {
+    as_root "$0" "$@"
+    exit $?
+}
 
 [ -d carbs-chroot ] || {
+    log "Verifying checksums"
+    sh256 carbs-rootfs.tar.xz | diff - carbs-rootfs.tar.xz.sum ||
+        die "Checksum verification failed"
+
     log "Extracting chroot"
     mkdir -p carbs-chroot
     (cd carbs-chroot; xz -cd ../carbs-rootfs.tar.xz | pax -r)
@@ -73,7 +79,8 @@ sh256 carbs-rootfs.tar.xz | diff - carbs-rootfs.tar.xz.sum ||
 mkdir -p "${tmp_dir:?}"
 
 log "Creating temporary chroot"
-cp -a carbs-chroot "${chr_dir:=$tmp_dir/chroot}"
+mkdir -p "${chr_dir:=$tmp_dir/chroot}"
+rsync -a carbs-chroot/ "$chr_dir"
 
 [ "$1" ] && {
     log "Installing extra packages"
@@ -83,9 +90,5 @@ cp -a carbs-chroot "${chr_dir:=$tmp_dir/chroot}"
 run_hook pre-chroot "" "$chr_dir"
 
 log "Entering chroot"
-if [ "$(id -u)" -eq 0 ]; then
-    cpt-chroot "$chr_dir"
-    rm -rf "$chr_dir"
-else
-    as_root sh -c "cpt-chroot $chr_dir; rm -rf $chr_dir"
-fi
+cpt-chroot "$chr_dir"
+rm -rf "$chr_dir"
