@@ -2029,8 +2029,15 @@ pkg_get_base() (
     # subshell. That is our purpose here, thank you very much.
     # shellcheck disable=SC2030
     while read -r pkgname _; do
+        # Ignore comments
         [ "${pkgname##\#*}" ] || continue
+
+        # Store the package list in arguments
         set -- "$@" "$pkgname"
+
+        # Retrieve the dependency tree of the package, so they are listed as
+        # base packages too. This ensures that no packages are broken in a
+        # "base reset", and the user has a working base.
         deps=$(pkg_gentree "$pkgname" xn)
         for dep in $deps; do
             contains "$*" "$dep" || set -- "$@" "$dep"
