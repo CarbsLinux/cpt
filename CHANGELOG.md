@@ -38,6 +38,11 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - Added new hooks: `end-install` and `end-remove` that are run when
   installation/removal is complete (not per-package).
   
+### Changed
+- `cpt-update` is now re-entrant, meaning that it is no longer needed to run the
+  update twice, `cpt-update` will continue the updates with the new version of
+  itself.
+  
 
 [6.2.1] - 2021-09-20
 --------------------------------------------------------------------------------
