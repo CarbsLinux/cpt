@@ -197,6 +197,7 @@ Describe 'CPT Library'
         Describe 'pkg_get_base()'
         CPT_ROOT=$PWD/tests
         CPT_PATH=$PWD/tests/repository
+        cpt_base=$PWD/tests/etc/cpt-base
             It 'returns packages defined in base'
                 When call pkg_get_base nonl
                 The output should eq "dummy-pkg contrib-dummy-pkg "
