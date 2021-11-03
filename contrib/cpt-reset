@@ -17,7 +17,9 @@
     exit 0
 }
 
+# shellcheck source=../src/cpt-lib
 . cpt-lib
+
 base=$(pkg_get_base nonl)
 
 set --
@@ -29,7 +31,7 @@ done
 
 [ "$1" ] && {
     printf 'WARNING: This will remove \033[1m%s\033[m package(s).\n' "$#"
-    printf 'Base packages can be redefined in %s\n' "$CPT_ROOT/etc/cpt-base"
+    printf 'Base packages can be redefined in %s\n' "$cpt_base"
     printf 'Continue? [Enter/Ctrl+C]\n'
     read -r _ && CPT_FORCE=1 cpt-remove "$@"
 }
