@@ -9,8 +9,37 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[UNRELEASED]
+--------------------------------------------------------------------------------
+
+### Configuration Directory
+- In order to simplify file locations and messing up the `/etc` directory, CPT
+  now uses the `/etc/cpt` directory for reading related files. The location of
+  your system configuration directory is defined by the `--sysconfdir` flag in
+  the `./configure` script, it uses `/etc` if the prefix is `/usr`.
+- Since the location of the configuration can differ between installations,
+  `$cpt_confdir` variable can be used in programs using `cpt-lib` to get the
+  user's configuration directory.
+- This change currently doesn't break `cpt-base`, but you are advised to
+  rename your configuration files.
+- `/etc/cpt-base` is renamed to `/etc/cpt/base` (considering `$cpt_confdir` is
+  `/etc/cpt`)
+
+### Changes on hook behaviour
+- `/etc/cpt-hook` will no longer be used.
+- User hooks (as defined by `$CPT_HOOK` will be run regardless of the hook type.
+  I have realised that overriding user hooks on some operations was a mistake.
+  If the users already have the privilege to install packages, they should also
+  be able to run hooks without an interruption of the package manager.
+- Even though `/etc/cpt-hook` file is removed, a collection of systemwide hooks
+  can be added to the `/etc/cpt/hooks`directory. Any file in this directory will
+  be sourced by the package manager when running hooks. User hooks are run
+  _after_ systemwide hooks are run.
+
+
+
 [6.2.1] - 2021-09-20
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### Fixed
 - `cpt-fork` follows symbolic links when forking packages.
@@ -19,7 +48,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 
 
 [6.2.0] - 2021-08-14
----------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 ### BLAKE3 checksums
 
