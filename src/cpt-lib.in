@@ -1947,7 +1947,12 @@ pkg_updates(){
     # an update.
     [ "$CPT_FETCH" = 0 ] || pkg_fetch
 
-    log "Checking for new package versions"
+    # Be quiet if we are doing self update, no need to print the same
+    # information twice. We add this basic function, because we will be using it
+    # more than once.
+    _not_update () { [ "$cpt_self_update" ] || "$@" ;}
+
+    _not_update log "Checking for new package versions"
 
     set +f
 
@@ -1961,7 +1966,7 @@ pkg_updates(){
 
         # Compare installed packages to repository packages.
         [ "$db_ver-$db_rel" != "$re_ver-$re_rel" ] && {
-            printf '%s\n' "$pkg_name $db_ver-$db_rel ==> $re_ver-$re_rel"
+            _not_update printf '%s\n' "$pkg_name $db_ver-$db_rel ==> $re_ver-$re_rel"
             outdated="$outdated$pkg_name "
         }
     done
@@ -1982,6 +1987,13 @@ pkg_updates(){
         exit 0
     }
 
+    [ "$outdated" ] || {
+        log "Everything is up to date"
+        return
+    }
+
+    _not_update log "Packages to update: ${outdated% }"
+
     contains "$outdated" cpt && {
         log "Detected package manager update"
         log "The package manager will be updated first"
@@ -1992,17 +2004,16 @@ pkg_updates(){
         cpt-install cpt
 
         log "Updated the package manager"
-        log "Re-run 'cpt update' to update your system"
+        log "Re-executing the package manager to continue the update"
 
-        exit 0
+        # We export this variable so that cpt knows it's running for the second
+        # time. We make the new process promptless, and we avoid fetching
+        # repositories. We are assuming that the user was already prompted once,
+        # and that their repositories are up to date, or they have also passed
+        # the '-y' or '-n' flags themselves which leads to the same outcome.
+        export cpt_self_update=1
+        exec cpt-update -yn
     }
-
-    [ "$outdated" ] || {
-        log "Everything is up to date"
-        return
-    }
-
-    log "Packages to update: ${outdated% }"
 
     # Tell 'pkg_build' to always prompt before build.
     pkg_update=1
