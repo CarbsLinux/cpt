@@ -6,7 +6,7 @@ packages:
   - curl
   - rsync
   - shellcheck
-  - emacs
+  - emacs-nox
   - texinfo
   - gzip
 tasks:
