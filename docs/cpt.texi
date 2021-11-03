@@ -41,7 +41,8 @@ the section entitled "GNU Free Documentation License."
 @top Carbs Packaging Tools
 
 This is a reference document containing both the user-guide and the development
-manual for @strong{Carbs Packaging Tools}. For development logs see @uref{https://git.carbslinux.org/cpt, the git repository}.
+manual for @strong{Carbs Packaging Tools} version Fossil. For development logs
+see @uref{https://fossil.carbslinux.org/cpt, the fossil repository}.
 @end ifnottex
 
 @menu
@@ -60,10 +61,15 @@ manual for @strong{Carbs Packaging Tools}. For development logs see @uref{https:
 
 Configuration
 
-* CPT Base::                     Defining base packages
+* Configuration directory::
 * Environment Variables::        Change the behaviour of cpt through environment configuration
 * Hooks::                        Use hooks to customize the package manager operations
 * Editing the build file during pre-build:: Modify a package build with your hooks
+
+Configuration directory
+
+* CPT Base::                     Defining base packages
+* Systemwide hooks::
 
 Environment Variables
 
@@ -97,6 +103,7 @@ Rsync Repositories
 CPT Library
 
 * Calling the library::          Including the library on your code
+* Variables::
 * Option parsing::               Easy way of parsing options with cpt-lib
 * Message functions::            Communicate to users
 * Text functions::               Manipulate or check text
@@ -226,23 +233,42 @@ The package manager does @strong{NOT} have a configuration file, but there are a
 variety of ways in order to interact with and configure the package manager.
 
 @menu
-* CPT Base::                     Defining base packages
+* Configuration directory::
 * Environment Variables::        Change the behaviour of cpt through environment configuration
 * Hooks::                        Use hooks to customize the package manager operations
 * Editing the build file during pre-build:: Modify a package build with your hooks
 @end menu
 
-@node CPT Base
-@section CPT Base
+@node Configuration directory
+@section Configuration directory
 
-An @samp{/etc/cpt-base} file can be used in order to define the base to the package
-manager. Base packages are the packages that receive special treatment by
-utilities such as @samp{cpt-reset}, and @samp{cpt-orphans}.
+Some features of the package manager can be configured from the files found
+under @samp{/etc/cpt/}. Even though this doesn't sound like the premise of "no
+configuration" files, these files are completely optional to the package
+manager, and still the majority of configuration is done through environment
+variables. The files on this directory are for configuration that don't have a
+big impact on how the package manager behaves, and are not feasible to be used
+inside simple environment variables (such as the base package list and
+package manager hooks).
+
+@menu
+* CPT Base::                     Defining base packages
+* Systemwide hooks::
+@end menu
+
+@node CPT Base
+@subsection CPT Base
+
+@cindex Base packages
+
+The file @samp{/etc/cpt/base} can be used in order to define the base to the
+package manager. Base packages are the packages that receive special treatment
+by utilities such as @samp{cpt-reset}, and @samp{cpt-orphans}.
 
 @example
 # This file defines the base packages of the system. You can add or remove
 # package names in order to redefine the base. This file will be used by
-# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt/base, both
 # of the tools will assume that there is no defined base, so use with caution.
 baselayout
 binutils
@@ -266,6 +292,14 @@ pkgconf
 xz
 zlib
 @end example
+
+@node Systemwide hooks
+@subsection Systemwide hooks
+
+A collection of hooks can be installed under @samp{/etc/cpt/hooks/}. All of the
+files installed under this directory will then be sourced by the package manager
+whenever a hook is called. Some examples for system hooks can be found under the
+@samp{/usr/share/cpt/examples/hooks/} directory.
 
 @node Environment Variables
 @section Environment Variables
@@ -491,10 +525,14 @@ Run if the @code{test} script fails
 Run before a package is installed for each package
 @item post-install
 Run after a package is installed for each package
+@item end-install 
+Run after all given packages are installed
 @item pre-remove  
 Run before a package is removed for each package
 @item post-remove 
 Run after a package is removed for each package
+@item end-remove  
+Run after all given packages are removed
 @item pre-fetch   
 Run before all repositories are fetched
 @item post-fetch  
@@ -967,6 +1005,7 @@ package manager library.
 
 @menu
 * Calling the library::          Including the library on your code
+* Variables::
 * Option parsing::               Easy way of parsing options with cpt-lib
 * Message functions::            Communicate to users
 * Text functions::               Manipulate or check text
@@ -988,6 +1027,60 @@ files:
 
 This will load the library inside your script, and will set some environment
 variables that are used inside the package manager.
+
+@node Variables
+@section Variables
+
+This section lists some of the variables defined by the package manager that can
+be used in scripts. These variables usually cannot be defined by the user, so
+they are not part of the @ref{Environment Variables, , variables} section above.
+
+@vindex cpt_confdir
+@table @asis
+@item @samp{$cpt_confdir}
+Location of the CPT system configuration directory. This is usually either
+@samp{/etc/cpt} or @samp{PREFIX/etc/cpt}.
+@end table
+@vindex pkg_db
+@table @asis
+@item @samp{$pkg_db}
+Location of the package database without the root (@samp{var/db/cpt/installed}).
+@end table
+@vindex sys_db
+@vindex CPT_ROOT
+@table @asis
+@item @samp{$sys_db}
+Location of the package manager database, making use of the current
+@samp{$CPT_ROOT} (@samp{$CPT_ROOT/$pkg_db}). This is the database you probably want to
+use.
+@end table
+@cindex Base packages
+@vindex cpt_base
+@table @asis
+@item @samp{$cpt_base}
+Location of the file that defines the base packages.
+@end table
+
+@cindex Scripts that use CPT cache directories
+If for some reason, your script interacts with the directories created and
+managed by the package manager you should use the following variables instead of
+the user assigned variables such as @samp{$CPT_CACHE} or @samp{$CPT_TMPDIR}. The variables
+below are the ones used for package operations (which are assigned by using a
+combination of user-assigned values and their fallbacks).
+
+@vindex cac_dir
+@table @asis
+@item @samp{$cac_dir}
+Cache directory used by the package manager.
+@item @samp{$src_dir}
+Directory containing downloaded sources for packages.
+@item @samp{$log_dir}
+Directory where logs are saved.
+@item @samp{$bin_dir}
+Directory where built package tarballs are saved.
+@item @samp{$tmp_dir}
+Temporary directory for the package manager operations.
+@end table
 
 @node Option parsing
 @section Option parsing
@@ -1387,7 +1480,7 @@ SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
 @node @samp{pkg_get_base()}
 @subsection @samp{pkg_get_base()}
 
-This function returns the base packages as defined in @samp{/etc/cpt-base}. If an
+This function returns the base packages as defined in the base file. If an
 optional argument is present, it will print all package names in a single line.
 If it is not given any arguments, it will return one package per line. See @ref{CPT Base} for more information on base packages.
 

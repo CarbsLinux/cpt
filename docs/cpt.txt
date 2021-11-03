@@ -14,7 +14,9 @@ _________________
 2. Preface
 3. Usage
 4. Configuration
-.. 1. CPT Base
+.. 1. Configuration directory
+..... 1. CPT Base
+..... 2. Systemwide hooks
 .. 2. Environment Variables
 ..... 1. `CPT_PATH'
 ..... 2. `CPT_COMPRESS'
@@ -40,27 +42,28 @@ _________________
 7. Comparison Between CPT and KISS
 8. CPT Library
 .. 1. Calling the library
-.. 2. Option parsing
+.. 2. Variables
+.. 3. Option parsing
 ..... 1. Defining a parser
 ..... 2. `global_options()'
-.. 3. Message functions
+.. 4. Message functions
 ..... 1. `out()'
 ..... 2. `log()'
 ..... 3. `die()'
 ..... 4. `warn()'
 ..... 5. `prompt()'
-.. 4. Text functions
+.. 5. Text functions
 ..... 1. `contains()'
 ..... 2. `regesc()'
 ..... 3. `pop()'
 ..... 4. `sepchar()'
-.. 5. Portability functions
+.. 6. Portability functions
 ..... 1. `_seq()'
 ..... 2. `_stat()'
 ..... 3. `_readlinkf()'
-.. 6. System Functions
+.. 7. System Functions
 ..... 1. `as_root()'
-.. 7. Package Functions
+.. 8. Package Functions
 ..... 1. `pkg_build()'
 ..... 2. `pkg_depends()'
 ..... 3. `pkg_order()'
@@ -74,11 +77,11 @@ _________________
 
 
 This is a reference document containing both the user-guide and the
-development manual for *Carbs Packaging Tools*. For development logs see
-[the git repository].
+development manual for *Carbs Packaging Tools* version Fossil. For
+development logs see [the fossil repository].
 
 
-[the git repository] <https://git.carbslinux.org/cpt>
+[the fossil repository] <https://fossil.carbslinux.org/cpt>
 
 
 1 Copying
@@ -178,17 +181,31 @@ development manual for *Carbs Packaging Tools*. For development logs see
   package manager.
 
 
-4.1 CPT Base
-~~~~~~~~~~~~
+4.1 Configuration directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  An `/etc/cpt-base' file can be used in order to define the base to the
-  package manager. Base packages are the packages that receive special
-  treatment by utilities such as `cpt-reset', and `cpt-orphans'.
+  Some features of the package manager can be configured from the files
+  found under `/etc/cpt/'. Even though this doesn't sound like the
+  premise of "no configuration" files, these files are completely
+  optional to the package manager, and still the majority of
+  configuration is done through environment variables. The files on this
+  directory are for configuration that don't have a big impact on how
+  the package manager behaves, and are not feasible to be used inside
+  simple environment variables (such as the base package list and
+  package manager hooks).
+
+
+4.1.1 CPT Base
+--------------
+
+  The file `/etc/cpt/base' can be used in order to define the base to
+  the package manager. Base packages are the packages that receive
+  special treatment by utilities such as `cpt-reset', and `cpt-orphans'.
 
   ,----
   | # This file defines the base packages of the system. You can add or remove
   | # package names in order to redefine the base. This file will be used by
-  | # cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+  | # cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt/base, both
   | # of the tools will assume that there is no defined base, so use with caution.
   | baselayout
   | binutils
@@ -212,6 +229,16 @@ development manual for *Carbs Packaging Tools*. For development logs see
   | xz
   | zlib
   `----
+
+
+4.1.2 Systemwide hooks
+----------------------
+
+  A collection of hooks can be installed under `/etc/cpt/hooks/'. All of
+  the files installed under this directory will then be sourced by the
+  package manager whenever a hook is called. Some examples for system
+  hooks can be found under the `/usr/share/cpt/examples/hooks/'
+  directory.
 
 
 4.2 Environment Variables
@@ -412,10 +439,14 @@ development manual for *Carbs Packaging Tools*. For development logs see
         Run before a package is installed for each package
   post-install
         Run after a package is installed for each package
+  end-install 
+        Run after all given packages are installed
   pre-remove  
         Run before a package is removed for each package
   post-remove 
         Run after a package is removed for each package
+  end-remove  
+        Run after all given packages are removed
   pre-fetch   
         Run before all repositories are fetched
   post-fetch  
@@ -627,7 +658,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   mandatory file for submitting packages to Carbs Linux repositories.
 
 
-[pkg_query_meta()] See section 8.7.10
+[pkg_query_meta()] See section 8.8.10
 
 
 5.7 post-install
@@ -878,7 +909,50 @@ development manual for *Carbs Packaging Tools*. For development logs see
   environment variables that are used inside the package manager.
 
 
-8.2 Option parsing
+8.2 Variables
+~~~~~~~~~~~~~
+
+  This section lists some of the variables defined by the package
+  manager that can be used in scripts. These variables usually cannot be
+  defined by the user, so they are not part of the [variables] section
+  above.
+
+  `$cpt_confdir'
+        Location of the CPT system configuration directory. This is
+        usually either `/etc/cpt' or `PREFIX/etc/cpt'.
+  `$pkg_db'
+        Location of the package database without the root
+        (`var/db/cpt/installed').
+  `$sys_db'
+        Location of the package manager database, making use of the
+        current `$CPT_ROOT' (`$CPT_ROOT/$pkg_db'). This is the database
+        you probably want to use.
+  `$cpt_base'
+        Location of the file that defines the base packages.
+
+  If for some reason, your script interacts with the directories created
+  and managed by the package manager you should use the following
+  variables instead of the user assigned variables such as `$CPT_CACHE'
+  or `$CPT_TMPDIR'. The variables below are the ones used for package
+  operations (which are assigned by using a combination of user-assigned
+  values and their fallbacks).
+
+  `$cac_dir'
+        Cache directory used by the package manager.
+  `$src_dir'
+        Directory containing downloaded sources for packages.
+  `$log_dir'
+        Directory where logs are saved.
+  `$bin_dir'
+        Directory where built package tarballs are saved.
+  `$tmp_dir'
+        Temporary directory for the package manager operations.
+
+
+[variables] See section 4.2
+
+
+8.3 Option parsing
 ~~~~~~~~~~~~~~~~~~
 
   `cpt-lib' includes a POSIX-shell option parser inside named
@@ -890,7 +964,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
 [documentation]
 <https://github.com/ko1nksm/getoptions/blob/v2.5.0/README.md>
 
-8.2.1 Defining a parser
+8.3.1 Defining a parser
 -----------------------
 
   Some functions are called and set automatically when you call
@@ -917,7 +991,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.2.2 `global_options()'
+8.3.2 `global_options()'
 ------------------------
 
   The `global_options()' function is a simple convenience call to
@@ -943,13 +1017,13 @@ development manual for *Carbs Packaging Tools*. For development logs see
         output of the `--help' and `--version' flags.
 
 
-8.3 Message functions
+8.4 Message functions
 ~~~~~~~~~~~~~~~~~~~~~
 
   `cpt' has various functions to print information to users.
 
 
-8.3.1 `out()'
+8.4.1 `out()'
 -------------
 
   `out()' is a really simple function that prints messages to the
@@ -964,7 +1038,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.3.2 `log()'
+8.4.2 `log()'
 -------------
 
   `log()' is the most commonly used message function in the package
@@ -982,7 +1056,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
     above.
 
 
-8.3.3 `die()'
+8.4.3 `die()'
 -------------
 
   `die()' wraps the `log()' function and exits with an error (1). It
@@ -990,14 +1064,14 @@ development manual for *Carbs Packaging Tools*. For development logs see
   function. The third argument for `log()' is set as `!>'.
 
 
-8.3.4 `warn()'
+8.4.4 `warn()'
 --------------
 
   `warn()' is another function that wraps `log()'. In place of the third
   argument, it uses the word `WARNING'.
 
 
-8.3.5 `prompt()'
+8.4.5 `prompt()'
 ----------------
 
   `prompt()' is an interactive function that waits for user input to
@@ -1007,14 +1081,14 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `CPT_PROMPT' to 0.
 
 
-8.4 Text functions
+8.5 Text functions
 ~~~~~~~~~~~~~~~~~~
 
   Following functions are used to manipulate, check, or interact with
   text.
 
 
-8.4.1 `contains()'
+8.5.1 `contains()'
 ------------------
 
   `contains' function can be used to check whether a list variable
@@ -1030,7 +1104,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.4.2 `regesc()'
+8.5.2 `regesc()'
 ----------------
 
   `regesc()' can be used to escape regular expression characters that
@@ -1042,7 +1116,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.4.3 `pop()'
+8.5.3 `pop()'
 -------------
 
   `pop()' can be used to remove a word from a "string list" without a
@@ -1056,7 +1130,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.4.4 `sepchar()'
+8.5.4 `sepchar()'
 -----------------
 
   This function can be used to separate characters from the given string
@@ -1076,7 +1150,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.5 Portability functions
+8.6 Portability functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
   These helper functions are used so that we don't depend on non-POSIX
@@ -1084,7 +1158,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   character.
 
 
-8.5.1 `_seq()'
+8.6.1 `_seq()'
 --------------
 
   This function is similar to `seq(1)' except that it only takes a
@@ -1098,7 +1172,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.5.2 `_stat()'
+8.6.2 `_stat()'
 ---------------
 
   This function imitates `stat %U'. `stat' isn't defined by POSIX, and
@@ -1106,7 +1180,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   file. If the owner cannot be found, it will return `root'.
 
 
-8.5.3 `_readlinkf()'
+8.6.3 `_readlinkf()'
 --------------------
 
   This function was taken from [POSIX sh readlinkf library by Koichi
@@ -1118,10 +1192,10 @@ development manual for *Carbs Packaging Tools*. For development logs see
 <https://github.com/ko1nksm/readlinkf>
 
 
-8.6 System Functions
+8.7 System Functions
 ~~~~~~~~~~~~~~~~~~~~
 
-8.6.1 `as_root()'
+8.7.1 `as_root()'
 -----------------
 
   `as_root()' calls the rest of the arguments as a different
@@ -1138,7 +1212,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `$CPT_SU' variable.
 
 
-8.7 Package Functions
+8.8 Package Functions
 ~~~~~~~~~~~~~~~~~~~~~
 
   Obviously, package functions are the most important ones for
@@ -1146,7 +1220,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   manipulate, or to otherwise interact with packages.
 
 
-8.7.1 `pkg_build()'
+8.8.1 `pkg_build()'
 -------------------
 
   This function builds all given packages. It resolves dependencies for
@@ -1164,7 +1238,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.2 `pkg_depends()'
+8.8.2 `pkg_depends()'
 ---------------------
 
   This function calculates the dependencies for the requested package,
@@ -1173,17 +1247,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
   packages.
 
 
-[pkg_order()] See section 8.7.3
+[pkg_order()] See section 8.8.3
 
 
-8.7.3 `pkg_order()'
+8.8.3 `pkg_order()'
 -------------------
 
   This function receives package names and returns `$order' and `$redro'
   variables that can be used for building and removing packages.
 
 
-8.7.4 `pkg_owner()'
+8.8.4 `pkg_owner()'
 -------------------
 
   This function can be used to determine the owner of a package. The
@@ -1204,7 +1278,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.5 `pkg_isbuilt()'
+8.8.5 `pkg_isbuilt()'
 ---------------------
 
   This function returns with success when the given package has a built
@@ -1212,7 +1286,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   repository.
 
 
-8.7.6 `pkg_lint()'
+8.8.6 `pkg_lint()'
 ------------------
 
   This function checks whether a given package fits the proper package
@@ -1220,7 +1294,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   outright* if it fails.
 
 
-8.7.7 `pkg_find()'
+8.8.7 `pkg_find()'
 ------------------
 
   `pkg_find()' is the tool for searching packages. It accepts up to 3
@@ -1253,17 +1327,17 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.8 `pkg_get_base()'
+8.8.8 `pkg_get_base()'
 ----------------------
 
-  This function returns the base packages as defined in
-  `/etc/cpt-base'. If an optional argument is present, it will print all
-  package names in a single line.  If it is not given any arguments, it
-  will return one package per line. See 4.1 for more information on base
+  This function returns the base packages as defined in the base
+  file. If an optional argument is present, it will print all package
+  names in a single line.  If it is not given any arguments, it will
+  return one package per line. See 4.1.1 for more information on base
   packages.
 
 
-8.7.9 `pkg_gentree()'
+8.8.9 `pkg_gentree()'
 ---------------------
 
   This function generates a dependency tree for the given package. The
@@ -1283,7 +1357,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
         line.
 
 
-* 8.7.9.1 Examples
+* 8.8.9.1 Examples
 
   This example uses the `cpt' package for Carbs Linux. The package
   itself is listed to depend on `curl' and `rsync'. Here is the output
@@ -1309,7 +1383,7 @@ development manual for *Carbs Packaging Tools*. For development logs see
   `----
 
 
-8.7.10 `pkg_query_meta()'
+8.8.10 `pkg_query_meta()'
 -------------------------
 
   This function is used to query the [meta file] inside package

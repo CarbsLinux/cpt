@@ -6,12 +6,14 @@
 #+TEXINFO_DIR_CATEGORY: Development
 #+TEXINFO_DIR_TITLE: Carbs Packaging Tools: (cpt)
 #+TEXINFO_DIR_DESC: Carbs Package Management Library
+#+INCLUDE: ./config.org
 #+OPTIONS: html-scripts:nil todo:nil
 
 #+MACRO: index (eval (format (if (org-export-derived-backend-p org-export-current-backend 'texinfo) "%s Index\n:PROPERTIES:\n:INDEX: %s\n:DESCRIPTION: %ss mentioned in this manual\n:END:\n" "%s%s%s :noexport:\n") $1 $2 $1))
 
 This is a reference document containing both the user-guide and the development
-manual for *Carbs Packaging Tools*. For development logs see [[https://git.carbslinux.org/cpt][the git repository]].
+manual for *Carbs Packaging Tools* version {{{version}}}. For development logs
+see [[https://fossil.carbslinux.org/cpt][the fossil repository]].
 
 * Copying
 :PROPERTIES:
@@ -109,19 +111,32 @@ man cpt-build
 The package manager does *NOT* have a configuration file, but there are a
 variety of ways in order to interact with and configure the package manager.
 
-** CPT Base
+** Configuration directory
+
+Some features of the package manager can be configured from the files found
+under {{{conf_dir}}}. Even though this doesn't sound like the premise of "no
+configuration" files, these files are completely optional to the package
+manager, and still the majority of configuration is done through environment
+variables. The files on this directory are for configuration that don't have a
+big impact on how the package manager behaves, and are not feasible to be used
+inside simple environment variables (such as the base package list and
+package manager hooks).
+
+*** CPT Base
 :PROPERTIES:
 :DESCRIPTION: Defining base packages
 :END:
 
-An =/etc/cpt-base= file can be used in order to define the base to the package
-manager. Base packages are the packages that receive special treatment by
-utilities such as =cpt-reset=, and =cpt-orphans=.
+#+CINDEX: Base packages
+
+The file {{{conf_dir(base)}}} can be used in order to define the base to the
+package manager. Base packages are the packages that receive special treatment
+by utilities such as =cpt-reset=, and =cpt-orphans=.
 
 #+begin_example
 # This file defines the base packages of the system. You can add or remove
 # package names in order to redefine the base. This file will be used by
-# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt-base, both
+# cpt-orphans and cpt-reset. If this file doesn't exist on /etc/cpt/base, both
 # of the tools will assume that there is no defined base, so use with caution.
 baselayout
 binutils
@@ -145,6 +160,13 @@ pkgconf
 xz
 zlib
 #+end_example
+
+*** Systemwide hooks
+
+A collection of hooks can be installed under {{{conf_dir(hooks/)}}}. All of the
+files installed under this directory will then be sourced by the package manager
+whenever a hook is called. Some examples for system hooks can be found under the
+{{{data_dir(cpt/examples/hooks/)}}} directory.
 
 ** Environment Variables
 :PROPERTIES:
@@ -370,8 +392,10 @@ There are a variety of package hooks, mostly self explanatory:
 - test-fail    :: Run if the ~test~ script fails
 - pre-install  :: Run before a package is installed for each package
 - post-install :: Run after a package is installed for each package
+- end-install  :: Run after all given packages are installed
 - pre-remove   :: Run before a package is removed for each package
 - post-remove  :: Run after a package is removed for each package
+- end-remove   :: Run after all given packages are removed
 - pre-fetch    :: Run before all repositories are fetched
 - post-fetch   :: Run after all repositories are fetched
 - post-package :: Run after a tarball for a package is created
@@ -825,6 +849,49 @@ files:
 This will load the library inside your script, and will set some environment
 variables that are used inside the package manager.
 
+** Variables
+
+This section lists some of the variables defined by the package manager that can
+be used in scripts. These variables usually cannot be defined by the user, so
+they are not part of the [[* Environment Variables][variables]] section above.
+
+#+VINDEX: cpt_confdir
+- =$cpt_confdir= ::
+  Location of the CPT system configuration directory. This is usually either
+  =/etc/cpt= or =PREFIX/etc/cpt=.
+#+VINDEX: pkg_db
+- =$pkg_db= ::
+  Location of the package database without the root (=var/db/cpt/installed=).
+#+VINDEX: sys_db
+#+VINDEX: CPT_ROOT
+- =$sys_db= ::
+  Location of the package manager database, making use of the current
+  =$CPT_ROOT= (=$CPT_ROOT/$pkg_db=). This is the database you probably want to
+  use.
+#+CINDEX: Base packages
+#+VINDEX: cpt_base
+- =$cpt_base= ::
+  Location of the file that defines the base packages.
+
+#+CINDEX: Scripts that use CPT cache directories
+If for some reason, your script interacts with the directories created and
+managed by the package manager you should use the following variables instead of
+the user assigned variables such as =$CPT_CACHE= or =$CPT_TMPDIR=. The variables
+below are the ones used for package operations (which are assigned by using a
+combination of user-assigned values and their fallbacks).
+
+#+VINDEX: cac_dir
+- =$cac_dir= ::
+  Cache directory used by the package manager.
+- =$src_dir= ::
+  Directory containing downloaded sources for packages.
+- =$log_dir= ::
+  Directory where logs are saved.
+- =$bin_dir= ::
+  Directory where built package tarballs are saved.
+- =$tmp_dir= ::
+  Temporary directory for the package manager operations.
+
 ** Option parsing
 :PROPERTIES:
 :DESCRIPTION: Easy way of parsing options with cpt-lib
@@ -1194,7 +1261,7 @@ SEARCH_PATH=$PATH pkg_find 'cpt-*' all -x
 :DESCRIPTION: List system base packages
 :END:
 
-This function returns the base packages as defined in =/etc/cpt-base=. If an
+This function returns the base packages as defined in the base file. If an
 optional argument is present, it will print all package names in a single line.
 If it is not given any arguments, it will return one package per line. See [[CPT
 Base]] for more information on base packages.
