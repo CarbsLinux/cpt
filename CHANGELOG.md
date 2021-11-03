@@ -35,8 +35,9 @@ this project _somewhat_ adheres to [Semantic Versioning].
   can be added to the `/etc/cpt/hooks`directory. Any file in this directory will
   be sourced by the package manager when running hooks. User hooks are run
   _after_ systemwide hooks are run.
-
-
+- Added new hooks: `end-install` and `end-remove` that are run when
+  installation/removal is complete (not per-package).
+  
 
 [6.2.1] - 2021-09-20
 --------------------------------------------------------------------------------
