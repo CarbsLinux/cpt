@@ -29,7 +29,7 @@ unset msg
 
 # After all the installations are finished, run an end-install hook. There may
 # be some things that we may want to run, but not per package.
-run_hook end-install "" "$CPT_ROOT" root
+run_hook end-install "" "$CPT_ROOT"
 
 for pkg in $order; do
     [ -f "$sys_db/$pkg/message" ] && {
