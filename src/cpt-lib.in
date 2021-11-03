@@ -511,6 +511,9 @@ as_root() {
 
     # We are exporting package manager variables, so that we still have the
     # same repository paths / access to the same cache directories etc.
+    #
+    # It doesn't matter whether CPT_HOOK is defined or not.
+    # shellcheck disable=2153
     set -- HOME="$HOME" \
            USER="$user" \
            XDG_CACHE_HOME="$XDG_CACHE_HOME" \
@@ -552,14 +555,7 @@ pop() {
 }
 
 run_hook() {
-    # Store the CPT_HOOK variable so that we can revert it if it is changed.
-    oldCPT_HOOK=$CPT_HOOK
-
-    # If a fourth parameter 'root' is specified, source the hook from a
-    # predefined location to avoid privilige escalation through user scripts.
-    [ "$4" ] && CPT_HOOK=$CPT_ROOT/etc/cpt-hook
-
-    [ -f "$CPT_HOOK" ] || { CPT_HOOK=$oldCPT_HOOK; return 0 ;}
+    # Run hooks defined by the system and the user.
 
     if [ "$2" ]; then
         logv "$2" "Running $1 hook"
@@ -567,8 +563,17 @@ run_hook() {
         logv "Running $1 hook"
     fi
 
+    # Run all the hooks found in the configuration directory.
+    set +f
+    for hook in "$cpt_confdir/hooks/"*; do
+        set -f
+        [ -f "$hook" ] || continue
+        TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$hook"
+    done
+
+    [ -f "$CPT_HOOK" ] || return 0
+
     TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$CPT_HOOK"
-    CPT_HOOK=$oldCPT_HOOK
 }
 
 # An optional argument could be provided to enforce a compression algorithm.
@@ -1559,7 +1564,7 @@ pkg_remove() {
     # shellcheck disable=2086
     [ "$manifest_list" ] && grep -h '/$' $manifest_list | sort -ur > "$dirs"
 
-    run_hook pre-remove "$1" "$sys_db/$1" root
+    run_hook pre-remove "$1" "$sys_db/$1"
 
     while read -r file; do
         # The file is in '/etc' skip it. This prevents the package
@@ -1578,7 +1583,7 @@ pkg_remove() {
     # we no longer need to block 'Ctrl+C'.
     trap_set cleanup
 
-    run_hook post-remove "$1" "$CPT_ROOT/" root
+    run_hook post-remove "$1" "$CPT_ROOT/"
 
     log "$1" "Removed successfully"
 }
@@ -1641,7 +1646,7 @@ pkg_install() {
 
     [ "$install_dep" ] && die "$1" "Package requires ${install_dep%, }"
 
-    run_hook pre-install "$pkg_name" "$tar_dir/$pkg_name" root
+    run_hook pre-install "$pkg_name" "$tar_dir/$pkg_name"
     pkg_conflicts "$pkg_name"
 
     log "$pkg_name" "Installing package incrementally"
@@ -1706,7 +1711,7 @@ pkg_install() {
         "$sys_db/$pkg_name/post-install" ||:
     fi
 
-    run_hook post-install "$pkg_name" "$sys_db/$pkg_name" root
+    run_hook post-install "$pkg_name" "$sys_db/$pkg_name"
 
     log "$pkg_name" "Installed successfully"
 }
@@ -2267,7 +2272,7 @@ create_cache() {
     sys_db=$CPT_ROOT/$pkg_db
 
     # CPT system configuration directory
-    cpt_confdir=${CPT_ROOT}@SYSCONFDIR@/cpt
+    cpt_confdir=$CPT_ROOT@SYSCONFDIR@/cpt
 
     # Backwards compatibility for the old cpt-base location
     cpt_base=$CPT_ROOT/etc/cpt-base
