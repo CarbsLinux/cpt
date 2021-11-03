@@ -165,26 +165,12 @@ Describe 'CPT Library'
                 The stderr should eq "-> Running 2 hook"
                 The output should eq "$CPT_HOOK 2 null destination"
             End
-            It "uses the /etc/cpt-hook file of the root when called with a fourth arg"
-                When call run_hook 3 cpt destdir root
-                The stderr should eq "-> cpt Running 3 hook"
-                The output should eq "$CPT_ROOT/etc/cpt-hook 3 cpt destdir"
-                The variable CPT_HOOK should eq "$PWD/tests/hook-file"
-            End
             It "returns with success even when the file doesn't exist"
                 CPT_HOOK=$PWD/some-non-existent-file
                 When call run_hook 4 thiswillnotrun
                 The variable CPT_HOOK should not be exist
                 The stderr should eq ""
                 The status should be success
-            End
-            It "restores the \$CPT_HOOK variable when called with root"
-                CPT_ROOT=$PWD/nonexistentdir
-                When call run_hook 5 cpt dest root
-                The variable CPT_ROOT should not be exist
-                The stderr should eq ""
-                The status should be success
-                The variable CPT_HOOK should eq "$PWD/tests/hook-file"
             End
         End
         Describe 'create_tmp()'
