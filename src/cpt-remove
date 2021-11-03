@@ -23,4 +23,4 @@ for pkg in $redro; do pkg_remove "$pkg" "${CPT_FORCE:-check}"; done
 
 # After all the removals are finished, run an end-remove hook. There may
 # be some things that we may want to run, but not per package.
-run_hook end-remove "" "$CPT_ROOT" root
+run_hook end-remove "" "$CPT_ROOT"
