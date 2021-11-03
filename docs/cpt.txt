@@ -109,8 +109,14 @@ development logs see [the fossil repository].
   aims to document both the usage of the distributed tools and document
   the library functions.
 
+  If you happen to find something that is not properly covered by the
+  documentation, or an area that can be improved, please feel free to
+  submit a patch, or [open a ticket].
+
 
 [kiss] <https://github.com/kisslinux/kiss>
+
+[open a ticket] <https://fossil.carbslinux.org/cpt/tktnew>
 
 
 3 Usage

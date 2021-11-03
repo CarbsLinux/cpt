@@ -42,6 +42,10 @@ it revolves around the shell library =cpt-lib=, and many tools that wrap around
 it. This document aims to document both the usage of the distributed tools and
 document the library functions.
 
+If you happen to find something that is not properly covered by the
+documentation, or an area that can be improved, please feel free to submit a
+patch, or [[https://fossil.carbslinux.org/cpt/tktnew][open a ticket]].
+
 * Usage
 :PROPERTIES:
 :DESCRIPTION: Basic usage of Carbs Packaging Tools
