@@ -13,6 +13,7 @@ src/cpt-lib: src/cpt-lib.in
 	sed -n '/^Copyright/{s,^,        ",;s,$$," \\,;p}' LICENSE | \
 	sed -e '/@LICENSE@/r /dev/stdin' \
 		-e '/@LICENSE@/d' \
+		-e 's|@SYSCONFDIR@|${SYSCONFDIR}|g' \
 		-e "s|@VERSION@|${VERSION}|g" \
 		-e "s|@DOCSTRING@|Call functions from the library|g" src/cpt-lib.in > $@
 	chmod 755 $@

@@ -28,6 +28,7 @@ usage() {
         "Options:" \
         "  --prefix=dir        Set prefix directory" \
         "  --bindir=dir        User executables [PREFIX/bin]" \
+        "  --sysconfdir=dir    System configuration directory [PREFIX/etc]"
         "  --datarootdir=dir   Data root directory [PREFIX/share]" \
         "  --mandir=dir        Manual pages [DATAROOTDIR/man]" \
         "  --infodir=dir       info documentation [DATAROOTDIR/info]" \
@@ -43,6 +44,7 @@ prefix=/usr/local
 # We don't want expansion
 # shellcheck disable=2016
 {
+sysconfdir='$(PREFIX)/etc'
 bindir='$(PREFIX)/bin'
 datarootdir='$(PREFIX)/share'
 mandir='$(DATAROOTDIR)/man'
@@ -54,8 +56,9 @@ docs=auto
 for arg; do
     case $arg in
         -h|--help) usage ;;
-        --prefix=*) prefix=${arg#*=}   ;;
-        --bindir=*) bindir=${arg#*=}   ;;
+        --prefix=*) prefix=${arg#*=}         ;;
+        --bindir=*) bindir=${arg#*=}         ;;
+        --sysconfdir=*) sysconfdir=${arg#*=} ;;
         --mandir=*) mandir=${arg#*=}   ;;
         --infodir=*) infodir=${arg#*=} ;;
         --docdir=*) docdir=${arg#*=}   ;;
@@ -68,6 +71,10 @@ for arg; do
     esac
 done
 
+# If the prefix is /usr and sysconfdir is not modified, make it /etc
+# shellcheck disable=2016
+[ "$prefix" = /usr ] && [ "$sysconfdir" = '$(PREFIX)/etc' ] && sysconfdir=/etc
+
 trap 'rm -f config.mk' EXIT
 trap 'rm -f config.mk; exit 1' INT
 
@@ -78,6 +85,7 @@ out "starting configuration..."
 cat <<EOF > config.mk
 PREFIX = $prefix
 BINDIR = $bindir
+SYSCONFDIR  = $sysconfdir
 DATAROOTDIR = $datarootdir
 MANDIR  = $mandir
 INFODIR = $infodir

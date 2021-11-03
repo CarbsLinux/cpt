@@ -2013,12 +2013,12 @@ pkg_updates(){
 }
 
 pkg_get_base() (
-    # Print the packages defined in the /etc/cpt-base file.
+    # Print the packages defined in the CPT base file.
     # If an argument is given, it prints a space seperated list instead
     # of a list seperated by newlines.
 
-    # cpt-base is an optional file, return with success if it doesn't exist.
-    [ -f "$CPT_ROOT/etc/cpt-base" ] || return 0
+    # CPT base is an optional file, return with success if it doesn't exist.
+    [ -f "$cpt_base" ] || return 0
 
     # If there is an argument, change the format to use spaces instead of
     # newlines.
@@ -2042,7 +2042,7 @@ pkg_get_base() (
         for dep in $deps; do
             contains "$*" "$dep" || set -- "$@" "$dep"
         done
-    done < "$CPT_ROOT/etc/cpt-base"
+    done < "$cpt_base"
 
     # Format variable is intentional.
     # shellcheck disable=2059
@@ -2265,6 +2265,13 @@ create_cache() {
     # Define this variable but don't create its directory structure from
     # the get go. It will be created as needed by package installation.
     sys_db=$CPT_ROOT/$pkg_db
+
+    # CPT system configuration directory
+    cpt_confdir=${CPT_ROOT}@SYSCONFDIR@/cpt
+
+    # Backwards compatibility for the old cpt-base location
+    cpt_base=$CPT_ROOT/etc/cpt-base
+    [ -f "$cpt_confdir/base" ] && cpt_base=$cpt_confdir/base
 
     # Regular expression used in pkg_checksums() and pkg_sources() in order to
     # identify VCS and comments
