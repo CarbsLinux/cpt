@@ -1,0 +1,10 @@
+# -*- mode: sh; -*-
+# Run makewhatis if a manual page is installed, or removed
+case $TYPE in
+    post-install|pre-remove)
+        grep -q "^/usr/share/man/" "$DEST/manifest" &&
+            run_makewhatis=1
+        ;;
+    end-install|end-remove)
+        [ "$run_makewhatis" ] && makewhatis "$DEST/usr/share/man"
+esac

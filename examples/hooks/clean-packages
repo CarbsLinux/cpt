@@ -1,0 +1,7 @@
+# -*- mode: sh; -*-
+# clean-packages -- Remove documentation, and locales from packages.
+case $TYPE in
+    post-build)
+        rm -rf "$DEST/usr/share/locale" \
+               "$DEST/usr/share/doc"
+esac
