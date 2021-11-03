@@ -555,25 +555,26 @@ pop() {
 }
 
 run_hook() {
-    # Run hooks defined by the system and the user.
-
-    if [ "$2" ]; then
-        logv "$2" "Running $1 hook"
-    else
-        logv "Running $1 hook"
-    fi
-
-    # Run all the hooks found in the configuration directory.
+    # Check that hooks exist before announcing that we are running a hook.
     set +f
-    for hook in "$cpt_confdir/hooks/"*; do
+    for hook in "$cpt_confdir/hooks/"* "$CPT_HOOK"; do
+        [ -f "$hook" ] && {
+            if [ "$2" ]; then
+                logv "$2" "Running $1 hook"
+            else
+                logv "Running $1 hook"
+            fi
+            break
+        }
+    done
+
+    # Run all the hooks found in the configuration directory, and the user
+    # defined hook.
+    for hook in "$cpt_confdir/hooks/"* "$CPT_HOOK"; do
         set -f
         [ -f "$hook" ] || continue
         TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$hook"
     done
-
-    [ -f "$CPT_HOOK" ] || return 0
-
-    TYPE=${1:-null} PKG=${2:-null} DEST=${3:-null} . "$CPT_HOOK"
 }
 
 # An optional argument could be provided to enforce a compression algorithm.
