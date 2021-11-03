@@ -18,3 +18,4 @@ tests/etc/cpt-hook
 report
 coverage
 config.mk
+docs/config.org
