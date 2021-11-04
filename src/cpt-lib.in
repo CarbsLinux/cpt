@@ -9,7 +9,7 @@
 # Currently maintained by Cem Keylan.
 
 version() {
-    out "Carbs Packaging Tools, version @VERSION@" \
+    out "Carbs Packaging Tools, version $cpt_version" \
         @LICENSE@
 
     exit 0
@@ -2224,6 +2224,9 @@ create_cache() {
 # main()
 {
     set -ef
+
+    # Package manager version.
+    cpt_version=@VERSION@
 
     # If a parser definition exists, let's run it ourselves. This makes sure we
     # get the variables as soon as possible.
