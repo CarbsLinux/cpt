@@ -42,6 +42,11 @@ this project _somewhat_ adheres to [Semantic Versioning].
 - `cpt-update` is now re-entrant, meaning that it is no longer needed to run the
   update twice, `cpt-update` will continue the updates with the new version of
   itself.
+- The package manager now can handle circular dependencies and exit gracefully.
+
+### Library
+- In order to get the `$deps` variable, one now has to use the new
+  `pkg_depends_commit()` function.
   
 
 [6.2.1] - 2021-09-20
