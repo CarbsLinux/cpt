@@ -189,5 +189,25 @@ Describe 'CPT Library'
                 The output should eq "dummy-pkg contrib-dummy-pkg "
             End
         End
+        Describe 'pkg_query_meta()'
+        CPT_PATH=$PWD/tests/repository
+            It 'queries package meta information'
+                When call pkg_query_meta contrib-dummy-pkg description
+                The output should eq "This is a dummy package"
+            End
+            It 'returns an error if there is no meta file'
+                When call pkg_query_meta dummy-pkg description
+                The status should be failure
+            End
+            It 'returns an error if the queried key is unavailable'
+                When call pkg_query_meta contrib-dummy-pkg license
+                The status should be failure
+            End
+            It "accepts full paths to the package location"
+                When call pkg_query_meta "$PWD/tests/repository/contrib-dummy-pkg" description
+                The output should eq "This is a dummy package"
+                The status should be success
+            End
+        End
     End
 End
