@@ -1465,6 +1465,13 @@ pkg_swap() {
         sed "s#^$(regesc "$2")\$#${PWD#$CPT_ROOT}/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
+    else
+        # If the file doesn't exist, we assume that there was a previous owner,
+        # but the package was then removed. We want the message to be short
+        # and clear, I thought of writing "Swapping [...] from 'null' to '$1'",
+        # but that would probably sound more like a package manager bug. Instead
+        # we are printing the message below which should be informative enough.
+        log "Installing '$2' from '$1'"
     fi
 
     # Convert the desired alternative to a real file and rewrite
