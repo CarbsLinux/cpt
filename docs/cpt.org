@@ -859,6 +859,9 @@ This section lists some of the variables defined by the package manager that can
 be used in scripts. These variables usually cannot be defined by the user, so
 they are not part of the [[* Environment Variables][variables]] section above.
 
+#+VINDEX: cpt_version
+- =$cpt_version= ::
+  Package manager version.
 #+VINDEX: cpt_confdir
 - =$cpt_confdir= ::
   Location of the CPT system configuration directory. This is usually either

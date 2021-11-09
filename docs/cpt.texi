@@ -1039,6 +1039,11 @@ This section lists some of the variables defined by the package manager that can
 be used in scripts. These variables usually cannot be defined by the user, so
 they are not part of the @ref{Environment Variables, , variables} section above.
 
+@vindex cpt_version
+@table @asis
+@item @samp{$cpt_version}
+Package manager version.
+@end table
 @vindex cpt_confdir
 @table @asis
 @item @samp{$cpt_confdir}
