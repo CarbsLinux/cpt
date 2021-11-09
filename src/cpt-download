@@ -9,7 +9,7 @@ case "$1" in
         exit 0
         ;;
     --version|-v) version ;;
-    '') set -- "${PWD##*/}"; export CPT_PATH=${PWD%/*}:$CPT_PATH
+    '') set -- "${PWD##*/}"; export CPT_PATH="${PWD%/*}:$CPT_PATH"
 esac
 
 create_cache
