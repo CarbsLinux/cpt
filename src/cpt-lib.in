@@ -137,7 +137,7 @@ sepchar() {
     # processes.
     [ "$1" ] || return 0; str=$1; set --
     while [ "$str" ]; do
-        set -- "$@" "${str%${str#?}}"
+        set -- "$@" "${str%"${str#?}"}"
         str=${str#?}
     done
     printf '%s\n' "$@"
@@ -845,7 +845,7 @@ pkg_extract() {
             # VCS Repository
             git+*|hg+*|fossil+*)
                 backend=${src%%+*}
-                url=${src##${backend}+} com=${url##*[@#]} com=${com#${url%[@#]*}}
+                url=${src##"${backend}"+} com=${url##*[@#]} com=${com#"${url%[@#]*}"}
 
                 log "$1" "Cloning ${url%[#@]*}"
                 "pkg_vcs_clone_$backend" "${url%[#@]*}" "$com"
@@ -1394,7 +1394,7 @@ pkg_conflicts() {
 
         # Combine the dirname and file values, and print them into the
         # temporary manifest to be parsed.
-        printf '%s/%s\n' "${dirname#$CPT_ROOT}" "${file##*/}"
+        printf '%s/%s\n' "${dirname#"$CPT_ROOT"}" "${file##*/}"
 
     done < "$tar_dir/$1/$pkg_db/$1/manifest" > "$CPT_TMPDIR/$pid/manifest"
 
@@ -1516,15 +1516,22 @@ pkg_swap() {
         # its manifest file to reflect this. We then resort this file
         # so no issues arise when removing packages.
         cp  -Pf "$CPT_ROOT/$2" "$pkg_owns>${alt#*>}"
-        sed "s#^$(regesc "$2")\$#${PWD#$CPT_ROOT}/$pkg_owns>${alt#*>}#" \
+        sed "s#^$(regesc "$2")\$#${PWD#"$CPT_ROOT"}/$pkg_owns>${alt#*>}#" \
             "../installed/$pkg_owns/manifest" |
             sort -r -o "../installed/$pkg_owns/manifest"
+    else
+        # If the file doesn't exist, we assume that there was a previous owner,
+        # but the package was then removed. We want the message to be short
+        # and clear, I thought of writing "Swapping [...] from 'null' to '$1'",
+        # but that would probably sound more like a package manager bug. Instead
+        # we are printing the message below which should be informative enough.
+        log "Installing '$2' from '$1'"
     fi
 
     # Convert the desired alternative to a real file and rewrite
     # the manifest file to reflect this. The reverse of above.
     mv -f "$alt" "$CPT_ROOT/$2"
-    sed "s#^${PWD#$CPT_ROOT}/$(regesc "$alt")\$#$2#" "../installed/$1/manifest" |
+    sed "s#^${PWD#"$CPT_ROOT"}/$(regesc "$alt")\$#$2#" "../installed/$1/manifest" |
         sort -r -o "../installed/$1/manifest"
 }
 
@@ -1769,7 +1776,7 @@ pkg_repository_update() {
     # Function to update the given package repository.
     cd "$1"
     repo_type=$(pkg_vcs_info)
-    repo_root=${repo_type#$PWD:}
+    repo_root=${repo_type#"$PWD":}
     repo_type=${repo_type##*:} repo_root=${repo_root%:*}
     contains "$repos" "$repo_root" || {
         repos="$repos $repo_root "

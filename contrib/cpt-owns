@@ -40,7 +40,7 @@ case "$1" in
 esac
 
 # Strip 'CPT_ROOT' from the file path if passed and follow symlinks.
-file="${1#$CPT_ROOT}"
+file="${1#"$CPT_ROOT"}"
 dirname=$(_readlinkf "$CPT_ROOT/${file%/*}")
 file="$dirname/${file##*/}"
 

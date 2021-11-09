@@ -49,6 +49,15 @@ this project _somewhat_ adheres to [Semantic Versioning].
   `pkg_depends_commit()` function.
   
 
+[6.2.2] - 2021-11-09
+--------------------------------------------------------------------------------
+
+### Fixed
+- `cpt-alternatives` now properly logs file swaps even when the original file
+  no longer exists.
+- Minor fixes
+
+
 [6.2.1] - 2021-09-20
 --------------------------------------------------------------------------------
 
