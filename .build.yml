@@ -1,11 +1,10 @@
-image: alpine/latest
+image: alpine/edge
 packages:
   - musl-dev
   - gcc
   - bison
   - curl
   - rsync
-  - shellcheck
   - emacs-nox
   - texinfo
   - gzip
@@ -20,13 +19,17 @@ tasks:
       git clone --quiet https://git.sr.ht/~mcf/b3sum
       cd b3sum
       sudo make PREFIX=/usr install
+  - install-shellspec: |
+      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
+  - install-shellcheck: |
+      curl -fsLo- https://github.com/koalaman/shellcheck/releases/download/v0.8.0/shellcheck-v0.8.0.linux.x86_64.tar.xz | pax -Jr
+      sudo install -Dm755 shellcheck-v0.8.0/shellcheck /usr/bin/shellcheck
   - build: |
       cd cpt
       ./configure
       make
   - test: |
       cd cpt
-      curl -fsSL https://git.io/shellspec | sudo sh -s -- -y -p /usr
       make test
 triggers:
   - action: email
