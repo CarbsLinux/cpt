@@ -8,6 +8,7 @@ packages:
   - emacs-nox
   - texinfo
   - gzip
+  - xz
 tasks:
   - install-pax: |
       git clone --quiet https://github.com/carbslinux/otools
