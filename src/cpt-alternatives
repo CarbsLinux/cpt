@@ -2,31 +2,83 @@
 # List and swap to alternatives
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [-] [package file]"
-    global_options silent
+    setup REST help:usage -- "usage: ${0##*/} package file"
+    msg --                   "or:    ${0##*/} [-p]"
+    msg --                   "or:    ${0##*/} -"
+    msg -- '' 'Options:'
+    flag preferred -p     -- "List current owners of alternative files"
+    global_options
 }
 
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 # We don't need to be root in order to list alternatives, so skip privilege
 # elevation if no arguments are passed to the script.
-[ -z "$1" ] || [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
+[ -z "$1" ] && [ -t 0 ] || [ -w "$CPT_ROOT/" ] || [ "$uid" = 0 ] || {
         as_root "$0" "$@"
         exit $?
 }
 
+list_alternatives() {
+    # Go over each alternative and format the file name for listing.
+    # (pkg_name>usr>bin>ls)
+    set +f
+    for pkg in "$sys_db/../choices/"*; do
+        printf '%s\n' "${pkg##*/}"
+    done | sed 's|>|\t/|;s|>|/|g;/\*/d'
+}
+
+stdin_swap() {
+    # Swap packages by reading the standard input.
+    while IFS=$(printf '\t') read -r pkg path _; do
+        pkg_swap "$pkg" "$path"
+    done
+    exit
+}
+
 case "$1" in
-    -)
-        while read -r pkg path; do
-            pkg_swap "$pkg" "$path"
-        done
-        ;;
+    -)  stdin_swap ;;
     '')
-        # Go over each alternative and format the file name for listing.
-        # (pkg_name>usr>bin>ls)
-        set +f; for pkg in "$sys_db/../choices/"*; do
-                    printf '%s\n' "${pkg##*/}"
-        done | sed 's|>| /|; s|>|/|g; /\*/d'
+        # We still want to read the standard input when there are no arguments
+        # if the standard input is being used.
+        [ -t 0 ] || stdin_swap
+
+        if [ "$preferred" ]; then
+            # We are not using the pkg_owner() function here. It's much slower
+            # when searching items in bulk.
+            altlist=$(_tmp_create altlist)
+            pathlist=$(_tmp_create pathlist)
+            owners=$(_tmp_create owners)
+            list_alternatives | tee "$altlist" | sed 's,^[^\t]*\t,,' > "$pathlist"
+
+            # Save all matching items in a single file, so we don't ever read
+            # manifests again.
+            set +f
+            grep -Fxf "$pathlist" "$sys_db/"*/manifest > "$owners"
+            sys_db_esc=$(regesc "$sys_db")
+
+            while read -r pkg path; do
+                case $path in
+                    # Running regesc() for each file slows us down, don't use
+                    # it unless we detect a regular expression to escape.
+                    *\[*|*\$*|*\\*|*.*|*^*) path_str=$(regesc "$path") ;;
+                                         *) path_str=$path
+                esac
+                grep_str="$sys_db_esc/[^/]*/manifest:$path_str"
+                owns=$(grep -x -- "$grep_str" "$owners") || owns=null
+                owns=${owns%:*} owns=${owns%/*} owns=${owns##*/}
+                printf '%s\t%s\t(owned by: %s)\n' "$pkg" "$path" "$owns"
+            done < "$altlist"
+
+            # We read the output of list_alternatives(), because that seems to
+            # be the faster option.
+            # list_alternatives | while read -r pkg path; do
+            #     printf '%s %s (owned by: %s)\n' \
+            #         "$pkg" "$path" "$(pkg_owner -lFx "$path" || out "null")"
+            # done
+        else
+            list_alternatives
+        fi
         ;;
     *) pkg_swap "$@" ;;
 esac
