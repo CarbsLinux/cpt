@@ -28,7 +28,7 @@ usage() {
         "Options:" \
         "  --prefix=dir        Set prefix directory" \
         "  --bindir=dir        User executables [PREFIX/bin]" \
-        "  --sysconfdir=dir    System configuration directory [PREFIX/etc]"
+        "  --sysconfdir=dir    System configuration directory [PREFIX/etc]" \
         "  --datarootdir=dir   Data root directory [PREFIX/share]" \
         "  --mandir=dir        Manual pages [DATAROOTDIR/man]" \
         "  --infodir=dir       info documentation [DATAROOTDIR/info]" \
