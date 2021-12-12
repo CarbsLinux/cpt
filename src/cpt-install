@@ -36,8 +36,8 @@ for pkg in $order; do
                "$(_multiply_char '=' 60)" \
                "$pkg" \
                "$(_multiply_char '=' 60)"
-        cat "$sys_db/$pkg/message" >&2
+        cat "$sys_db/$pkg/message"
         msg=1
     }
-done
+done >&2
 [ "$msg" ] || log "No message in queue"
