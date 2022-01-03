@@ -32,6 +32,9 @@ unset msg
 run_hook end-install "" "$CPT_ROOT"
 
 for pkg in $order; do
+    # Ensure that we use package names itself, and not the tarball name if given.
+    pkg=${pkg##*/} pkg=${pkg%#*}
+
     [ -f "$sys_db/$pkg/message" ] && {
         printf '\033[1m%s\n%s\n%s\033[m\n\n' \
                "$(_multiply_char '=' 60)" \
