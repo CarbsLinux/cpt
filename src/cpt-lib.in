@@ -1063,7 +1063,7 @@ pkg_tar() {
     log "$1" "Creating tarball"
 
     # Read the version information to name the package.
-    read -r version release < "$(pkg_find "$1")/version"
+    read -r version release < "$pkg_dir/$1/$pkg_db/$1/version"
 
     # Create a tarball from the contents of the built package.
     cd "$pkg_dir/$1"
