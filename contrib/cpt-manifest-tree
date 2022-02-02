@@ -21,4 +21,4 @@ case "$1" in
 esac
 cpt-list "$1" >/dev/null
 printf '%s\n' "[$1]:"
-tree -C --fromfile "$CPT_ROOT/var/db/cpt/installed/$1/manifest" | sed 1,2d
+tree -C --fromfile "$CPT_ROOT/var/db/cpt/installed/$1/manifest" | sed 1d
