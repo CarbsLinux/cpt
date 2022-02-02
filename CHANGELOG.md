@@ -9,6 +9,22 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[6.2.3] - 2022-02-02
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed a checksum verification bug where adding an extra source did not require
+  checksum verification.
+- `cpt-manifest-tree` now modifies the output of `tree(1)` according to the new
+  version.
+- `cpt-reset` is now much more verbose.
+- Fixed the displayed messages on `cpt-install` when it is given a tarball as an
+  argument.
+- Fixed a faulty implementation in `pkg_tar()` where it used `pkg_find()`
+  instead of using the built package's database directory for gathering
+  information.
+
+
 [6.2.2] - 2021-11-09
 --------------------------------------------------------------------------------
 
