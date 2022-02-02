@@ -3,6 +3,7 @@
 #
 # Disable word-splittng warnings as they're safe here.
 # shellcheck disable=SC2046
+# shellcheck source=../src/cpt-lib
 
 ## SYNOPSIS:
 ## .Nm
@@ -11,10 +12,10 @@
 ## removes all packages from the system that is not defined as a base package in
 ## .Pa /etc/cpt-base .
 
-[ "$1" ] && {
-    printf 'usage: %s\n\nRemove all packages not defined in the base.\n' \
-           "${0##*/}"
-    exit 0
+parser_definition() {
+    setup REST help:usage -- "usage: ${0##*/}"
+    global_options compact
+    msg -- '' "Remove all packages outside of base definition"
 }
 
 . cpt-lib
@@ -27,9 +28,14 @@ set +f; for pkg in *; do
     contains "$base" "$pkg" || set -- "$pkg" "$@"
 done
 
-[ "$1" ] && {
-    printf 'WARNING: This will remove \033[1m%s\033[m package(s).\n' "$#"
-    printf 'Base packages can be redefined in %s\n' "$CPT_ROOT/etc/cpt-base"
-    printf 'Continue? [Enter/Ctrl+C]\n'
-    read -r _ && CPT_FORCE=1 cpt-remove "$@"
+[ -z "$1" ] && {
+    log "No package outside of the base definition could be found, not continuing."
+    exit 0
 }
+
+warn "" "This is a potentially harmful operation, do NOT continue unless"
+warn "" "you know exactly what you are doing. Continuing will remove $#"
+warn "" "packages that are not listed in the base definition or that the"
+warn "" "base packages don't depend on. See the CPT BASE section on the"
+warn "" "user manual to learn more."
+prompt && cpt-remove "$@"
