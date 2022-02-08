@@ -1025,7 +1025,7 @@ pkg_fix_deps() {
 
         case ${elf_prog:-ldd} in
             *readelf) "$elf_prog" -d "$file" 2>/dev/null  ;;
-            *)        pirntf '%s\n' "$lddbuf" ;;
+            *)        printf '%s\n' "$lddbuf" ;;
         esac |
         while read -r dep; do
             # Skip lines containing 'ldd'.

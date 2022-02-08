@@ -49,6 +49,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
   `pkg_depends_commit()` function.
 
 
+[6.2.4] - 2022-02-07
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed a bug in missing dependency where if the user had chosen 'ldd', it would
+  fail to fix dependencies due to a typo.
+
+
 [6.2.3] - 2022-02-02
 --------------------------------------------------------------------------------
 
