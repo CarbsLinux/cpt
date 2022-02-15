@@ -620,6 +620,18 @@ pkg_owner() {
     [ "$1" ] && printf '%s\n' "$1"
 }
 
+pkg_owner_multi() {
+    set +f
+
+    [ "$3" ] || set -- "$1" "$2" "$sys_db"/*/manifest
+
+    grep "$@" | while read -r pkg_owner; do
+        pkg_owner=${pkg_owner%/*}
+        pkg_owner=${pkg_owner##*/}
+        printf '%s\n' "${pkg_owner##*/}"
+    done
+}
+
 pkg_isbuilt() (
     # Check if a package is built or not.
     read -r ver rel < "$(pkg_find "$1")/version"
@@ -929,9 +941,12 @@ pkg_strip() {
 
 pkg_fix_deps_fullpath() {
     # Return the canonical path of libraries extracted by readelf.
-    while read -r dep _ rslv _; do
-        [ "$dep" = "$1" ] || continue
-        printf '%s\n' "$rslv"
+    while read -r line _ rslv _; do
+        [ "$line" = "$1" ] || continue
+        case $rslv in
+            ldd) out "$line" ;;
+            *)   out "$rslv" ;;
+        esac
     done
 }
 
@@ -958,52 +973,72 @@ pkg_fix_deps() {
     pkg_name=$1
     set +f; set -f -- "$sys_db/"*/manifest
 
-    # Get a list of binaries and libraries, false files
-    # will be found, however it's faster to get 'ldd' to check
-    # them anyway than to filter them out.
-    find "$pkg_dir/$pkg_name/" -type f 2>/dev/null |
+    # We create two separate files for storing dependency information.
+    #
+    # 'lddfile' is where we will be storing the output of ldd, so that we can
+    # reference it later.
+    #
+    # 'dep_file_list' is where we will be listing the needed files which we will
+    # be passing to grep.
+    #
+    lddfile=$(_tmp_create lddfile) dep_file_list=$(_tmp_create dfl)
 
-    while read -r file; do
-        # We call ldd regardless here, because we also use it to retrieve the
-        # fullpath of a library when using readelf. Best use we have here is
-        # saving it in a buffer, so we don't use the dynamic loader everytime we
-        # need to reference it.
-        lddbuf=$(ldd -- "$file" 2>/dev/null) ||:
+    pkg_fix_deps_find() {
+        # We run the similar command twice, might as well be a function.
+        # Basically runs find on the package directory and executes the
+        # given command.
+        end=+; [ "$1" = ldd ] && end=';'
 
-        case ${elf_prog:-ldd} in
-            *readelf) "$elf_prog" -d "$file" 2>/dev/null  ;;
-            *)        printf '%s\n' "$lddbuf" ;;
-        esac |
-        while read -r dep; do
-            # Skip lines containing 'ldd'.
-            [ "${dep##*ldd*}" ] || continue
-            case $dep in *NEEDED*\[*\] | *'=>'*) ;; *) continue; esac
+        # Get a list of binaries and libraries, false files will be found,
+        # however it's faster to get 'ldd' to check them anyway than to filter
+        # them out.
+        #
+        # We are terminating exec, so no worries.
+        # shellcheck disable=2067
+        find "$pkg_dir/$pkg_name/" -type f -exec "$@" {} "$end" 2>/dev/null |
+            sed 's/([^)]*) *$//' | sort -u
+    }
 
-            # readelf output:
-            # 0x0000 (NEEDED) Shared library: [libc.so]
-            dep=${dep##*\[}
-            dep=${dep%%\]*}
+    # Record all the dependencies in the 'lddfile'. This will include all
+    # dependencies, including non-direct ones. Unless the user prefers ldd,
+    # readelf will be used to filter the non-direct dependencies out.
+    pkg_fix_deps_find ldd -- > "$lddfile"
 
-            # Retrieve the fullpath of the library from our ldd buffer.
-            case $elf_prog in
-                *readelf) line=$(printf '%s\n' "$lddbuf" |
-                                 pkg_fix_deps_fullpath "$line")
-            esac
+    case "$elf_prog" in
+        *readelf) pkg_fix_deps_find "$elf_prog" -d ;;
+        *)        cat "$lddfile"
+    esac | while read -r dep; do
+        # Skip lines containing 'ldd'.
+        [ "${dep##*ldd*}" ] || continue
+        case $dep in *NEEDED*\[*\] | *'=>'*) ;; *) continue; esac
 
-            # ldd output:
-            # libc.so => /lib/ld-musl-x86_64.so.1
-            dep=${dep#* => }
-            dep=${dep% *}
+        # readelf output:
+        # 0x0000 (NEEDED) Shared library: [libc.so]
+        dep=${dep##*\[}
+        dep=${dep%%\]*}
 
-            # Figure out which package owns the file. Skip file if it is owned
-            # by the current package. This also handles cases where a '*-bin'
-            # package exists on the system, so the package manager doesn't think
-            # that the package we are building depends on the *-bin version of
-            # itself, or any other renamed versions of the same software.
-            pkg_owner -l "/${dep#/}\$" "$PWD/manifest" >/dev/null && continue
-            pkg_owner -l "/${dep#/}\$" "$@" ||:
-        done ||:
-    done >> depends
+        # Retrieve the fullpath of the library from our ldd buffer.
+        case $elf_prog in
+            *readelf) dep=$(pkg_fix_deps_fullpath "$dep" < "$lddfile")
+        esac
+
+        # ldd output:
+        # libc.so => /lib/ld-musl-x86_64.so.1
+        dep=${dep#* => }
+        dep=${dep% *}
+
+        # Figure out which package owns the file. Skip file if it is owned
+        # by the current package. This also handles cases where a '*-bin'
+        # package exists on the system, so the package manager doesn't think
+        # that the package we are building depends on the *-bin version of
+        # itself, or any other renamed versions of the same software.
+        pkg_owner -l "/${dep#/}\$" "$PWD/manifest" >/dev/null && continue
+        out "/${dep#/}\$"
+    done >> "$dep_file_list"
+
+    # We write all the files into 'dep_file_list' so that we don't need to call
+    # grep on our entire database manifest hundreds of times.
+    pkg_owner_multi -lf "$dep_file_list" "$@" >> depends
 
     # Remove duplicate entries from the new depends file.
     # This removes duplicate lines looking *only* at the
