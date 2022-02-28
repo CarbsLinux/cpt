@@ -172,7 +172,7 @@ _stat() (
     printf '%s' "$_user"
 )
 
-_readlinkf() (
+_readlinkf() {
     # Public domain POSIX sh readlink function by Koichi Nakashima
     [ "${1:-}" ] || return 1
     max_symlinks=40
@@ -206,7 +206,7 @@ _readlinkf() (
         target=${link#*" $target -> "}
     done
     return 1
-)
+}
 
 _get_digest() {
     # Get digest algorithm from the given file. It looks for a header on the
