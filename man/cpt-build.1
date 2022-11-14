@@ -5,7 +5,7 @@
 .Nd build given packages
 .Sh SYNOPSIS
 .Nm cpt-build
-.Op Fl tfy
+.Op Fl dfSty
 .Op Fl -root Ar ROOT
 .Op Fl hv
 .Op Ar package...
@@ -21,8 +21,18 @@ package.
 .Pp
 The options are as follows:
 .Bl -tag -width 13n
+.It Fl d , -debug
+Keep the build directories after operation
 .It Fl t , -test
 Run tests (if they exist)
+.It Fl S , -nostrip
+Don't strip debug information from the binaries
+.Po
+might want to add
+.Fl g
+to your
+.Ev $CFLAGS
+.Pc
 .It Fl f , -force
 Force operation
 .It Fl y , -no-prompt
