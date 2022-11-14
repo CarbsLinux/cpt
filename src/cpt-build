@@ -2,9 +2,12 @@
 # Build a package
 
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [-tfy] [--root ROOT] [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-dfSty] [--root ROOT] [pkg...]"
     msg -- '' 'Options:'
-    flag CPT_TEST   -t --test export:1 init:@export -- "Run tests (if they exist)"
+    flag CPT_DEBUG   -d --debug   export:1 init:@export -- "Keep the build directories after operation"
+    flag CPT_TEST    -t --test    export:1 init:@export -- "Run tests (if they exist)"
+    flag CPT_NOSTRIP -S --nostrip export:1 init:@export -- "Don't strip debug information from the binaries" \
+                                                           "(might want to add '-g' to your '\$CFLAGS')"
     global_options
 }
 
