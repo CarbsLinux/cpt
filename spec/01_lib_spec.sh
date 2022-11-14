@@ -112,16 +112,16 @@ Describe 'CPT Library'
 
         Describe '_readlinkf()'
             mklink() { :> tests/testfile; ln -s testfile tests/testfile2 ;}
-            rmlink() { rm -f tests/testfile tests/testfile2 ;}
+            rmlink() { rm tests/testfile tests/testfile2 ;}
             RPWD=$(cd -P .||:; printf %s "$PWD")
-            Before mklink
-            After  rmlink
+            BeforeEach mklink
+            AfterEach  rmlink
             Parameters
                 "#1" . "$RPWD"
-                "#2" "$PWD/tests/testfile2" "$RPWD/tests/testfile"
+                "#2" "./tests/testfile2" "$RPWD/tests/testfile"
             End
-            It "outputs the real location of the given file ($1)"
-               When call _readlinkf "$2"
+            It "outputs the real location of the given file [$1] ($2 -> $3)"
+               When run _readlinkf "$2"
                The output should eq "$3"
             End
         End
@@ -151,6 +151,52 @@ Describe 'CPT Library'
         End
     End
 
+    Describe 'version control functions'
+        check_internet_connection() { ! curl -L git.carbslinux.org >/dev/null 2>&1 ;}
+        Skip if "no internet connection" check_internet_connection
+        Describe 'pkg_vcs_clone_git()'
+            setup() { mkdir test_repository && cd test_repository || return ;}
+            cleanup() { cd .. && rm -rf test_repository ;}
+            check_version() { [ "$1" = "$(sed -n '/^version=/s/.*=//p' configure)" ] ;}
+            BeforeEach setup
+            AfterEach cleanup
+            It "clones the given git repository to the current directory"
+                When call pkg_vcs_clone_git https://git.carbslinux.org/cpt
+                The output should not eq ""
+                The stderr should not eq ""
+                The status should be success
+                Assert [ ! -d test_repository ]
+                Assert [ -f README.md ]
+                Assert check_version Fossil
+            End
+            It "clones the given tag when asked for it"
+                When call pkg_vcs_clone_git https://git.carbslinux.org/cpt @6.2.4
+                The output should not eq ""
+                The stderr should not eq ""
+                The status should be success
+                Assert [ ! -d test_repository ]
+                Assert [ -f README.md ]
+                Assert check_version 6.2.4
+            End
+        End
+        Describe 'pkg_vcs_clone_fossil()'
+            tmpfos=$$
+            setup() { mkdir "/tmp/test_repository.$tmpfos" && cd "/tmp/test_repository.$tmpfos" || return ;}
+            cleanup() { cd /tmp && rm -rf "test_repository.$tmpfos" ;}
+            check_version() { [ "$1" = "$(sed -n '/^version=/s/.*=//p' configure)" ] ;}
+            BeforeEach setup
+            AfterEach cleanup
+            It "clones the given fossil repository to the current directory"
+                When call pkg_vcs_clone_fossil https://fossil.carbslinux.org/cpt
+                The output should not eq ""
+                The stderr should eq ""
+                The status should be success
+                Assert [ ! -d test_repository ]
+                Assert [ -f README.md ]
+                Assert check_version Fossil
+            End
+        End
+    End
     Describe 'package functions'
         Describe 'run_hook()'
             CPT_HOOK=$PWD/tests/hook-file
