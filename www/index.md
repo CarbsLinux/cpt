@@ -1,5 +1,7 @@
 # Home
 
+<img src="https://builds.sr.ht/~carbslinux/cpt" alt="Build status for CPT" />
+
 CPT is the package management toolset written for Carbs Linux. Its aim is to
 provide a stable, powerful, and easily used library for package management that
 complements the tools that come with it. It has the following features:
