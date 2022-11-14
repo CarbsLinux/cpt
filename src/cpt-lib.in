@@ -1845,7 +1845,7 @@ pkg_vcs_clone_git() {
     git init
     git remote add origin "${1%[#@]*}"
     case $2 in
-        @*) git fetch -t --depth=1 origin "${2#@}" || git fetch ;;
+        @*) git fetch -t --depth=1 origin "${2#@}" || git fetch; set -- "$1" "${2#@}" ;;
         *)  git fetch --depth=1 origin "$2"        || git fetch
     esac
     git checkout "${2:-FETCH_HEAD}"
