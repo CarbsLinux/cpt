@@ -974,7 +974,7 @@ pkg_strip() {
     # system as well as on the tarballs we ship for installation.
 
     # Package has stripping disabled, stop here.
-    [ -f "$mak_dir/$pkg/nostrip" ] && return
+    [ "$CPT_NOSTRIP" ] || [ -f "$mak_dir/$pkg/nostrip" ] && return
 
     log "$1" "Stripping binaries and libraries"
 
