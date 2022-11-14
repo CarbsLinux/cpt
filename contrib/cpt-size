@@ -3,6 +3,7 @@
 
 ## SYNOPSIS:
 ## .Nm
+## .Op Fl s
 ## .Op Ar pkg...
 
 ## DESCRIPTION:
@@ -14,8 +15,15 @@
 ## been given,
 ## .Nm
 ## will use the name of the current directory as an argument.
+## .Pp
+## If the
+## .Fl s
+## flag is given,
+## .Nm
+## will sort the files by size.
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-s] [pkg...]"
+    flag sort   -s        hidden:1
     disp :usage -h --help hidden:1
 }
 
@@ -34,6 +42,9 @@ mkdir -p "$tmp_dir"
 # We don't immediately pipe into awk as we want to exit in an error.
 for pkg; do sed '/\/$/d;s/./\\&/g' "$sys_db/$pkg/manifest"; done |
     xargs du -k > "$tmp_dir/size"
+
+# Do a numerical sort on the file if requested.
+[ "$sort" ] && sort -no "$tmp_dir/size" "$tmp_dir/size"
 
 # This awk function formats the `du` output similar to the '-hc' flags. We
 # could have used a shell `while read` loop to do the exact same thing, but that
