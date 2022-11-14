@@ -155,8 +155,9 @@ Describe 'CPT Library'
         check_internet_connection() { ! curl -L git.carbslinux.org >/dev/null 2>&1 ;}
         Skip if "no internet connection" check_internet_connection
         Describe 'pkg_vcs_clone_git()'
-            setup() { mkdir test_repository && cd test_repository || return ;}
-            cleanup() { cd .. && rm -rf test_repository ;}
+            tmpfos=$$
+            setup() { mkdir "/tmp/test_repository.$tmpfos" && cd "/tmp/test_repository.$tmpfos" || return ;}
+            cleanup() { cd /tmp && rm -rf "test_repository.$tmpfos" ;}
             check_version() { [ "$1" = "$(sed -n '/^version=/s/.*=//p' configure)" ] ;}
             BeforeEach setup
             AfterEach cleanup
