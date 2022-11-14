@@ -416,7 +416,7 @@ This example brings us to the next section of this document.
 
 @enumerate
 @item
-Repository preferences
+@anchor{Repository preferences}Repository preferences
 
 
 @cindex package conflicts
@@ -434,7 +434,7 @@ CPT_PATH=$HOME/repos/personal:$HOME/repos/carbs/extra
 @end example
 
 @item
-Setting the @samp{CPT_PATH}
+@anchor{Setting the @samp{CPT_PATH}}Setting the @samp{CPT_PATH}
 
 
 You can set the @samp{CPT_PATH} variable on your shell configuration or your
@@ -1515,7 +1515,7 @@ Print all packages in a single line instead of a package per line.
 
 @enumerate
 @item
-Examples
+@anchor{Examples}Examples
 
 
 This example uses the @samp{cpt} package for Carbs Linux. The package itself is
