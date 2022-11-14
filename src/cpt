@@ -1,5 +1,48 @@
 #!/bin/sh -ef
 
+bi() {
+    # Build and install function for cpt.
+    parser_definition() {
+        setup REST help:usage -- "usage: ${0##*/} bi [-dtfy] [--root ROOT] [pkg...]"
+        msg -- '' 'Options:'
+        flag CPT_TEST    -t --test    export:1 init:@export -- "Run tests (if they exist)"
+        flag CPT_DEBUG   -d --debug   export:1 init:@export -- "Keep the build directories after operation"
+        flag CPT_NOSTRIP -S --nostrip export:1 init:@export -- "Don't strip debug information from the binaries" \
+                                                               "(might want to add '-g' to your '\$CFLAGS')"
+        global_options
+    }
+
+    eval "$(getoptions parser_definition parse "$0")"
+    parse "$@"
+    eval set -- "$REST"
+    cpt-build "$@"
+
+    # When building multiple packages, cpt will already ask to install
+    # the packages, so no need for this here.
+    [ "$2" ] || cpt-install "$@"
+}
+
+cbi() {
+    # Checksum, build and install.
+    parser_definition() {
+        setup REST help:usage -- "usage: ${0##*/} cbi [-dtfy] [--root ROOT] [pkg...]"
+        msg -- '' 'Options:'
+        flag CPT_TEST    -t --test    export:1 init:@export -- "Run tests (if they exist)"
+        flag CPT_DEBUG   -d --debug   export:1 init:@export -- "Keep the build directories after operation"
+        flag CPT_NOSTRIP -S --nostrip export:1 init:@export -- "Don't strip debug information from the binaries" \
+                                                               "(might want to add '-g' to your '\$CFLAGS')"
+        flag sha -s --    "Generate checksums using the depracated sha256 algorithm"
+        global_options
+    }
+
+    eval "$(getoptions parser_definition parse "$0")"
+    parse "$@"
+    eval set -- "$REST"
+
+    cpt-checksum "$@"; cpt-build "$@"
+    [ "$2" ] || cpt-install "$@"
+}
+
 if [ -f ./cpt-lib ]; then . ./cpt-lib; else . cpt-lib; fi
 
 # If none of the tools below are specified, we will reenable glob
@@ -35,21 +78,7 @@ case "$arg" in
     r|remove)       arg=remove ;;
     s|search)       arg=search ;;
     u|update)       arg=update ;;
-    bi)
-        # Build and install function for cpt.
-        cpt-build "$@"
-
-        # When building multiple packages, cpt will already ask to install
-        # the packages, so no need for this here.
-        [ "$2" ] || cpt-install "$@"
-        exit
-        ;;
-    cbi)
-        # Checksum, build and install.
-        cpt-checksum "$@"; cpt-build "$@"
-        [ "$2" ] || cpt-install "$@"
-        exit
-        ;;
+    bi|cbi)         "$arg" "$@"; exit "$?" ;;
     *) glob=1 ;;
 esac
 
