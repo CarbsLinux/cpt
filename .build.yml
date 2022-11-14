@@ -4,6 +4,7 @@ packages:
   - gcc
   - bison
   - curl
+  - fossil
   - rsync
   - emacs-nox
   - texinfo
