@@ -859,6 +859,9 @@ pkg_extract() {
                 backend=${src%%+*}
                 url=${src##"${backend}"+} com=${url##*[@#]} com=${com#"${url%[@#]*}"}
 
+                # Add back @ to com
+                case $url in *@*) com=@$com; esac
+
                 log "$1" "Cloning ${url%[#@]*}"
                 "pkg_vcs_clone_$backend" "${url%[#@]*}" "$com"
             ;;
