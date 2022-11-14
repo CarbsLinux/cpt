@@ -512,11 +512,12 @@ regesc() {
 pkg_download() {
     # $1: URL
     # $2: Output (Optional)
-    set -- "$1" "${2:-${1##*/}}"
+    set -- "$1" "$(_readlinkf "${2:-${1##*/}}")"
     case ${dl_prog##*/} in
-        aria2c|axel) set -- -o "$2" "$1"   ;;
-        curl)        set -- -fLo "$2" "$1" ;;
-        wget|wget2)  set -- -O "$2" "$1"   ;;
+        axel)       set -- -o "$2" "$1"   ;;
+        aria2c)     set -- -d "${2%/*}" -o "${2##*/}" "$1" ;;
+        curl)       set -- -fLo "$2" "$1" ;;
+        wget|wget2) set -- -O "$2" "$1"   ;;
     esac
 
     "$dl_prog" "$@" || {
