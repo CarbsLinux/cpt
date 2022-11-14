@@ -52,7 +52,7 @@ Describe 'Main toolchain'
                 It "expands the '$1' shortcut to '$2'"
                     When run script src/cpt "$1" --help
                     The status should be success
-                    The word 2 of line 1 should eq "cpt-${2%% *}"
+                    The word 3 of line 1 should eq "$1"
                 End
             End
         End
