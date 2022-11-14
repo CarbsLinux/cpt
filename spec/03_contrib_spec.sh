@@ -1,8 +1,9 @@
 Describe 'contrib scripts'
-    export PATH=$PWD/src:$PWD/contrib:$PATH
-    export CPT_ROOT=$PWD/tests/03
-    export CPT_PATH=$PWD/tests/repository
-    export CPT_COMPRESS=''
+    PATH=$PWD/src:$PWD/contrib:$PATH
+    CPT_ROOT=$PWD/tests/03
+    CPT_PATH=$PWD/tests/repository
+    CPT_COMPRESS=''
+    export PATH CPT_ROOT CPT_PATH CPT_COMPRESS
     install_tmp() {
         CPT_HOOK='' ./src/cpt b -y contrib-dummy-pkg >/dev/null 2>&1
         CPT_HOOK='' ./src/cpt-install -y contrib-dummy-pkg >/dev/null 2>&1
