@@ -3,7 +3,7 @@
 bi() {
     # Build and install function for cpt.
     parser_definition() {
-        setup REST help:usage -- "usage: ${0##*/} bi [-dtfy] [--root ROOT] [pkg...]"
+        setup REST help:usage -- "usage: ${0##*/} bi [-dfSty] [--root ROOT] [pkg...]"
         msg -- '' 'Options:'
         flag CPT_TEST    -t --test    export:1 init:@export -- "Run tests (if they exist)"
         flag CPT_DEBUG   -d --debug   export:1 init:@export -- "Keep the build directories after operation"
@@ -25,7 +25,7 @@ bi() {
 cbi() {
     # Checksum, build and install.
     parser_definition() {
-        setup REST help:usage -- "usage: ${0##*/} cbi [-dtfy] [--root ROOT] [pkg...]"
+        setup REST help:usage -- "usage: ${0##*/} cbi [-dfSsty] [--root ROOT] [pkg...]"
         msg -- '' 'Options:'
         flag CPT_TEST    -t --test    export:1 init:@export -- "Run tests (if they exist)"
         flag CPT_DEBUG   -d --debug   export:1 init:@export -- "Keep the build directories after operation"
