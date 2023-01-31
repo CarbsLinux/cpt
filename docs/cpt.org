@@ -235,6 +235,13 @@ to provide detailed information.
   #+VINDEX: CPT_KEEPLOG
   If set to 1, =cpt= will keep logs regardless of operation success.
 
+- ~CPT_NOSTRIP~ ::
+
+  #+VINDEX: CPT_NOSTRIP
+  If set to 1, =cpt= will not strip debug information from the binaries. Keep in
+  mind that your compiler already strips most debug information during
+  compilation, so you also need to add ~-g~ flag to your ~$C{XX}FLAGS~
+
 - ~CPT_PID~ ::
 
   #+VINDEX: CPT_PID

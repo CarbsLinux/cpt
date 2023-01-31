@@ -357,6 +357,12 @@ Absolute path to the package manager hook file.
 @vindex CPT_KEEPLOG
 If set to 1, @samp{cpt} will keep logs regardless of operation success.
 
+@item @code{CPT_NOSTRIP}
+@vindex CPT_NOSTRIP
+If set to 1, @samp{cpt} will not strip debug information from the binaries. Keep in
+mind that your compiler already strips most debug information during
+compilation, so you also need to add @code{-g} flag to your @code{$C@{XX@}FLAGS}
+
 @item @code{CPT_PID}
 @vindex CPT_PID
 Set the temporary build directory name.
