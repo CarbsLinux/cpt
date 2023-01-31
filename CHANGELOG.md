@@ -41,12 +41,20 @@ this project _somewhat_ adheres to [Semantic Versioning].
 ### Added
 
 - `cpt-size` can now sort files based on size.
+- `$CPT_NOSTRIP` variable can now be set to 1 in order to disable package
+  stripping. Make sure to add `-g` to your CFLAGS in order to keep debugging
+  symbols.
+- `cpt-build` now accepts `-d` and `-S` options to enable `$CPT_DEBUG` and
+  `$CPT_NOSTRIP` respectively.
 
 ### Changed
 - `cpt-update` is now re-entrant, meaning that it is no longer needed to run the
   update twice, `cpt-update` will continue the updates with the new version of
   itself.
 - The package manager now can handle circular dependencies and exit gracefully.
+
+### Fixed
+- Fixed the behaviour of `cpt bi` and `cpt cbi` by merging the flag usage.
 
 ### Library
 - In order to get the `$deps` variable, one now has to use the new
