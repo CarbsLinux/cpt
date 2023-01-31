@@ -34,7 +34,7 @@ complements the tools that come with it. It has the following features:
 
 <hr>
 
-### Latest Release: 6.2.4 ([2022-02-07](/timeline?c=6.2.4))
+### Latest Release: 7.0.0 ([2023-01-31](/timeline?c=7.0.0))
 
 - [Download](/uvlist?byage=1)
 - [Changelog](/doc/trunk/CHANGELOG.md)
