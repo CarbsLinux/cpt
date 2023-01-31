@@ -9,7 +9,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
-[UNRELEASED]
+[7.0.0] - 2023-01-31
 --------------------------------------------------------------------------------
 
 ### Configuration Directory
