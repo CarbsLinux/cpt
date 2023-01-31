@@ -39,7 +39,6 @@ this project _somewhat_ adheres to [Semantic Versioning].
   installation/removal is complete (not per-package).
   
 ### Added
-
 - `cpt-size` can now sort files based on size.
 - `$CPT_NOSTRIP` variable can now be set to 1 in order to disable package
   stripping. Make sure to add `-g` to your CFLAGS in order to keep debugging
@@ -55,6 +54,7 @@ this project _somewhat_ adheres to [Semantic Versioning].
 
 ### Fixed
 - Fixed the behaviour of `cpt bi` and `cpt cbi` by merging the flag usage.
+- Fixed the `aria2c` usage on `pkg_download()` function.
 
 ### Library
 - In order to get the `$deps` variable, one now has to use the new
