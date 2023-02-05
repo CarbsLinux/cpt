@@ -3,7 +3,7 @@
 
 ## SYNOPSIS:
 ## .Nm
-## .Op Fl s
+## .Op Fl st
 ## .Op Ar pkg...
 
 ## DESCRIPTION:
@@ -16,14 +16,16 @@
 ## .Nm
 ## will use the name of the current directory as an argument.
 ## .Pp
-## If the
-## .Fl s
-## flag is given,
-## .Nm
-## will sort the files by size.
+## The options are as follows:
+## .Bl -tag -width 13n
+## .It Fl s
+## Sort the output by size.
+## .It Fl t
+## Output only the size of given packages and not individual files.
 parser_definition() {
-    setup REST help:usage -- "usage: ${0##*/} [-s] [pkg...]"
+    setup REST help:usage -- "usage: ${0##*/} [-st] [pkg...]"
     flag sort   -s        hidden:1
+    flag total  -t        hidden:1
     disp :usage -h --help hidden:1
 }
 
@@ -40,8 +42,16 @@ pkg_list "$@" >/dev/null
 mkdir -p "$tmp_dir"
 
 # We don't immediately pipe into awk as we want to exit in an error.
-for pkg; do sed '/\/$/d;s/./\\&/g' "$sys_db/$pkg/manifest"; done |
-    xargs du -k > "$tmp_dir/size"
+if [ "$total" ]; then
+    for pkg; do
+        sed '/\/$/d;s/./\\&/g' "$sys_db/$pkg/manifest" |
+            xargs du -k |
+            awk -v name="$pkg" '{size+=$1}END{printf("%s %s\n", size, name)}' >> "$tmp_dir/size"
+    done
+else
+    for pkg; do sed '/\/$/d;s/./\\&/g' "$sys_db/$pkg/manifest"; done |
+        xargs du -k > "$tmp_dir/size"
+fi
 
 # Do a numerical sort on the file if requested.
 [ "$sort" ] && sort -no "$tmp_dir/size" "$tmp_dir/size"
