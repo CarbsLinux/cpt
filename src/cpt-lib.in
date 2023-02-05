@@ -88,32 +88,100 @@ _tsort() {
     # but the specification is quite vague, it doesn't specify cycles as a
     # reason of error, and implementations differ on how it's handled. coreutils
     # tsort(1) exits with an error, while openbsd tsort(1) doesn't. Both
-    # implementations are correct according to the specification. This leaves us
-    # with the following awk script, because the POSIX shell is not up for the
-    # job without super ugly hacks.
-    awk 'function fv(s) {
-             for (sp in e) {
-                 split (e[sp],t)
-                 for (j in t) if (s == t[j]) return 0
-             } return 1
-         }
-         function el(_l) {for(i in e){_l=_l" "i;}; return _l;}
-         function ce(t) {if (!(t in e)) e[t]="";}
-         function err(s) {print "Dependency cycle deteced between: " s; exit 1;}
-         {ce($1);$1!=$2&&e[$1]=e[$1]" "$2;}
-         END {
-             do {p=el()
-                 for (s in e) {
-                     if (fv(s)) {
-                         pr=s" "pr
-                         split(e[s],t)
-                         for(i in t){ce(t[i]);}
-                         delete e[s]
+    # implementations are correct according to the specification.
+    #
+    # The script below was taken from <https://gist.github.com/apainintheneck/1803fb91dde3ba048ec51d44fa6065a4>
+    #
+    # The MIT License (MIT)
+    # Copyright (c) 2023 Kevin Robell
+    #
+    # Permission is hereby granted, free of charge, to any person obtaining a
+    # copy of this software and associated documentation files (the “Software”),
+    # to deal in the Software without restriction, including without limitation
+    # the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    # and/or sell copies of the Software, and to permit persons to whom the
+    # Software is furnished to do so, subject to the following conditions:
+    #
+    # The above copyright notice and this permission notice shall be included in
+    # all copies or substantial portions of the Software.
+    #
+    # THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    # DEALINGS IN THE SOFTWARE.
+    awk '{
+             for (i = 1; i <= NF; ++i) {
+                 # Store each node.
+                 nodes[$i] = 1
+                 if (is_child) {
+                     child = $i
+                     # Skip nodes that point to themselves.
+                     # This traditionally means that the node
+                     # is disconnected from the rest of the graph.
+                     if (parent != child) {
+                         # Store from parent to child.
+                         idx = ++child_count[parent]
+                         child_graph[parent, idx] = child
+                         # Store count from child to parent.
+                         ++parent_count[child]
                      }
-                 } c=el()
-             } while (p != c)
-             if (length(p)!=0) err(p);
-             print pr
+                 } else {
+                     parent = $i
+                 }
+                 # Flip switch
+                 is_child = !is_child
+             }
+         }
+         END {
+             # Print errors to the stderr
+             stderr = "/dev/stderr"
+
+             # Sanity Check
+             if (is_child) {
+                 print("Error: odd number of input values: expected pairs of values") > stderr
+                 exit(1)
+             }
+
+             #####
+             # Topological Sort
+             #####
+
+             # Remove unconnected nodes first.
+             for (node in nodes) {
+                 if (parent_count[node] == 0 && child_count[node] == 0) {
+                     delete nodes[node]
+                     print(node)
+                 }
+             }
+
+             # Remove the rest of the nodes starting with those without parents.
+             while (length(nodes) > 0) {
+                 removed_node = 0
+                 for (node in nodes) {
+                     # Delete and print nodes without any remaining parents.
+                     if (parent_count[node] == 0) {
+                         delete nodes[node]
+                         removed_node = 1
+                         # Decrease child_count for each parent node.
+                         for (i = child_count[node]; i > 0; --i) {
+                             child = child_graph[node, i]
+                             --parent_count[child]
+                         }
+                         print(node)
+                     }
+                 }
+
+                 # If we havent removed any nodes, it means that there
+                 # are no nodes without any remaining parents so we have
+                 # a cycle.
+                 if (!removed_node) {
+                     print("Error: Cycle found") > stderr
+                     exit(1)
+                 }
+             }
          }'
 }
 
@@ -228,7 +296,7 @@ _get_digest() {
 # function.
 # URL: https://github.com/ko1nksm/getoptions (v2.5.0)
 # License: Creative Commons Zero v1.0 Universal
-# shellcheck disable=2016,2086
+# shellcheck disable=2016,2086,2317
 getoptions() {
     _error='' _on=1 _off='' _export='' _plus='' _mode='' _alt='' _rest=''
     _flags='' _nflags='' _opts='' _help='' _abbr='' _cmds='' _init=@empty IFS=' '
@@ -423,6 +491,7 @@ getoptions() {
 }
 # URL: https://github.com/ko1nksm/getoptions (v2.5.0)
 # License: Creative Commons Zero v1.0 Universal
+# shellcheck disable=2317
 getoptions_help() {
     _width='30,12' _plus='' _leading='  '
 
@@ -904,8 +973,9 @@ pkg_depends() {
     # Resolve all dependencies and generate an ordered list.
     # This does a depth-first search. The deepest dependencies are
     # listed first and then the parents in reverse order.
-    contains "$pkgs" "$1" || {
-        pkgs="$pkgs $1 "
+    #
+    # shellcheck disable=2015
+    contains "$pkgs" "$1" && [ -z "$2" ] || {
         [ "$2" = raw ] && _dep_append "$1" "$1"
         while read -r dep type || [ "$dep" ]; do
             # Skip comments and empty lines.
@@ -926,7 +996,7 @@ pkg_depends() {
             if [ "$2" = explicit ] || [ "$3" ]; then
                 _dep_append "$dep" "$dep"
             else
-                _dep_append "$1" "$dep"
+                _dep_append "$dep" "$1"
             fi
 
             # Recurse through the dependencies of the child packages. Forward
@@ -938,6 +1008,7 @@ pkg_depends() {
             fi
         done 2>/dev/null < "$(pkg_find "$1")/depends" ||:
 
+        pkgs="$pkgs $1 "
     }
 }
 
@@ -2181,6 +2252,7 @@ pkg_gentree() (
         esac
     done
     pkg_depends "$1" tree "$make_deps"
+    pkg_depends_commit
 
     # Unless 'f' is given, pop the package from the list so that we don't list
     # the package (for example if it's part of the base package list). Normally
@@ -2192,7 +2264,9 @@ pkg_gentree() (
     # shellcheck disable=2086
     [ -z "${2##*f*}" ] || deps=$(pop "$1" from $deps)
 
-    eval set -- "$deps"
+    # Word splitting is intentional.
+    # shellcheck disable=2086
+    set -- $deps
     pkg_order "$@"
     if [ "$reverse" ]; then eval set -- "$redro"; else eval set -- "$order"; fi
     [ "$1" ] || return 0

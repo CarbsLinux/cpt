@@ -9,6 +9,17 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[7.0.1] - 2023-02-05
+--------------------------------------------------------------------------------
+
+### Fixed
+- Made the `_tsort()` function compatible with POSIX
+- Fixed dependency calculation issue in `pkg_depends()` where some packages
+  would be removed.
+- Fixed `pkg_gentree()` not generating the dependency tree due to the dependency
+  calculation changes.
+
+
 [7.0.0] - 2023-01-31
 --------------------------------------------------------------------------------
 
