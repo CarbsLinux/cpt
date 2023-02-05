@@ -77,7 +77,7 @@ _________________
 
 
 This is a reference document containing both the user-guide and the
-development manual for *Carbs Packaging Tools* version 7.0.1. For
+development manual for *Carbs Packaging Tools* version 7.0.2. For
 development logs see [the fossil repository].
 
 

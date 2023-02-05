@@ -41,7 +41,7 @@ the section entitled "GNU Free Documentation License."
 @top Carbs Packaging Tools
 
 This is a reference document containing both the user-guide and the development
-manual for @strong{Carbs Packaging Tools} version 7.0.1. For development logs
+manual for @strong{Carbs Packaging Tools} version 7.0.2. For development logs
 see @uref{https://fossil.carbslinux.org/cpt, the fossil repository}.
 @end ifnottex
 
