@@ -22,7 +22,10 @@ shellspec: all tests/etc/cpt-hook
 	shellspec
 
 shellcheck: all
-	cd src; find . ../contrib -name 'cpt*' ! -name '*.*' -exec shellcheck -e 2119 -x -f gcc {} +
+	@cd src; find . ../contrib -name 'cpt*' ! -name '*.*' | while read -r file; do \
+		echo SHELLCHECK "$$file"; \
+		shellcheck -e 2119 -x -f gcc "$$file"; \
+	done
 
 test: shellspec shellcheck
 
