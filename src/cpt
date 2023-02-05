@@ -2,6 +2,8 @@
 
 bi() {
     # Build and install function for cpt.
+    #
+    # shellcheck disable=2317
     parser_definition() {
         setup REST help:usage -- "usage: ${0##*/} bi [-dfSty] [--root ROOT] [pkg...]"
         msg -- '' 'Options:'
@@ -24,6 +26,8 @@ bi() {
 
 cbi() {
     # Checksum, build and install.
+    #
+    # shellcheck disable=2317
     parser_definition() {
         setup REST help:usage -- "usage: ${0##*/} cbi [-dfSsty] [--root ROOT] [pkg...]"
         msg -- '' 'Options:'
