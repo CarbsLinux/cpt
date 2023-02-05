@@ -9,6 +9,16 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[7.0.2] - 2023-02-05
+--------------------------------------------------------------------------------
+
+### Fixed
+- Fixed a bug that caused extra dependencies being added to the later packages
+  during multi-package build operations.
+- Fixed file attribute issue with the `_tmp_cp()` function causing modified
+  dependency files to receive `600` permission bits.
+
+
 [7.0.1] - 2023-02-05
 --------------------------------------------------------------------------------
 
