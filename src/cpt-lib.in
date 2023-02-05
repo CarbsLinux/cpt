@@ -2315,7 +2315,7 @@ _tmp_cp() {
     # second argument is not given, use the basename of the copied file.
     _ret=${2:-${1##*/}}
     _ret=$(_tmp_name "$_ret")
-    cp "$1" "$_ret"
+    cp -p "$1" "$_ret"
     out "$_ret"
 }
 
