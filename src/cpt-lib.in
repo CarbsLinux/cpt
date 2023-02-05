@@ -2264,6 +2264,8 @@ pkg_gentree() (
     # shellcheck disable=2086
     [ -z "${2##*f*}" ] || deps=$(pop "$1" from $deps)
 
+    # Word splitting is intentional.
+    # shellcheck disable=2086
     set -- $deps
     pkg_order "$@"
     if [ "$reverse" ]; then eval set -- "$redro"; else eval set -- "$order"; fi
