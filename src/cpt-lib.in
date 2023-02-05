@@ -2323,9 +2323,8 @@ _tmp_create() {
     # Create given file to the temporary directory and return its name
     create_tmp
     _ret=$(_tmp_name "$1")
-    # False positive, we are not reading from the file.
-    # shellcheck disable=2094
-    out "$_ret" 3>> "$_ret"
+    :> "$_ret" || return 1
+    out "$_ret"
 }
 
 create_tmp() {
