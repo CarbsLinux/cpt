@@ -35,6 +35,7 @@ if [ "$PKG" ]; then
         printf %s "$2"
     fi
 elif [ "$VERSIONCHECK" ]; then
+    [ "$#" -ge 2 ] || die "Minimum of 2 arguments required, got: $#"
     pkg_list "$1" | grep -Fq "$1 $2 $3"
 else
     [ "$CURRENT" ] && set -- "${PWD##*/}"
