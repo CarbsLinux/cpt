@@ -1,4 +1,4 @@
-.Dd Feb 25, 2021
+.Dd Apr 17, 2023
 .Dt cpt-list 1
 .Sh NAME
 .Nm cpt-list
@@ -9,7 +9,13 @@
 .Ar pkg...
 .Nm
 .Fl C
-.Ar pkg true-statement false-statement
+.Ar pkg
+.Op Ar true-statement
+.Op Ar false-statement
+.Nm
+.Fl V
+.Ar pkg version
+.Op Ar release
 .Sh DESCRIPTION
 .Nm
 can be used to list all packages or check if the given package is
@@ -20,9 +26,9 @@ list the given packages. If any of the given packages are not installed on the
 system,
 .Nm
 will exit with an error. However,
-.Fl C
+.Fl C , -check
 and
-.Fl -check
+.Fl V , -version-check
 flags can be used in order to change the behaviour of the utility:
 .Bl -tag -width 12n
 .It Fl c , -current
@@ -39,6 +45,17 @@ if it is installed and the string for
 .Em false_statement
 if it isn't. This function is mostly useful for being called inside packages for
 optional dependencies.
+.It Fl V , -version-check Ar package version release
+Checks if given
+.Em package
+exists in the given
+.Em version
+and
+.Em release
+numbers.
+.Nm
+exits 0 on success, and 1 if the given package does not match the version or
+release number given to the utility.
 .El
 .Sh AUTHOR
 .An Cem Keylan Aq Mt cem@ckyln.com
