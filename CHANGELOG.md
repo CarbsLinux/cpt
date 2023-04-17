@@ -9,6 +9,14 @@ this project _somewhat_ adheres to [Semantic Versioning].
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 
+[UNRELEASED]
+--------------------------------------------------------------------------------
+
+### Added
+- Added `-V` operation to `cpt-list` which can be used in order to verify the
+  version of the given package.
+
+
 [7.0.2] - 2023-02-05
 --------------------------------------------------------------------------------
 
