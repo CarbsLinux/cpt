@@ -1,7 +1,7 @@
 #+TITLE: Carbs Packaging Tools
 #+SUBTITLE: User Manual
-#+AUTHOR: Cem Keylan
-#+EMAIL: cem@ckyln.com
+#+AUTHOR: Ceylin Keylan
+#+EMAIL: ceylin@ckyln.com
 #+TEXINFO_FILENAME: cpt.info
 #+TEXINFO_DIR_CATEGORY: Development
 #+TEXINFO_DIR_TITLE: Carbs Packaging Tools: (cpt)
@@ -20,7 +20,7 @@ see [[https://fossil.carbslinux.org/cpt][the fossil repository]].
 :COPYING:  t
 :END:
 
-Copyright \copy 2020-2021 Cem Keylan
+Copyright \copy 2020-2021 Ceylin Keylan
 
 #+begin_quote
 Permission is granted to copy, distribute and/or modify this document under the

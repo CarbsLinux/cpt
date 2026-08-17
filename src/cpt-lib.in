@@ -6,7 +6,7 @@
 # It was originally forked from the kiss package manager by
 # Dylan Araps.
 #
-# Currently maintained by Cem Keylan.
+# Currently maintained by Ceylin Keylan.
 
 version() {
     out "Carbs Packaging Tools, version $cpt_version" \

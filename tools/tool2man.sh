@@ -69,7 +69,7 @@ while read -r line; do
     esac
 done < "$file"
 
-out ".Sh AUTHOR" ".An Cem Keylan Aq Mt cem@carbslinux.org"
+out ".Sh AUTHOR" ".An Ceylin Keylan Aq Mt ceylin@carbslinux.org"
 out ".Sh COPYING" "See LICENSE for copyright information."
 out ".Sh SEE ALSO" ".Xr cpt 1"
 [ "$see" ] &&
